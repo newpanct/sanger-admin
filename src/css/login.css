@@ -1,0 +1,146 @@
+/* src/pages/Login.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background-color: #f5f7fa;
+    font-family: 'Inter', 'Microsoft YaHei', sans-serif;
+  }
+  
+  .login-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+  }
+  
+  /* 左侧背景图样式 */
+  .login-bg-wrapper {
+    width: 55%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: none; /* 默认隐藏，在媒体查询中显示 */
+  }
+  
+  .login-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .login-bg-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(24, 144, 255, 0.8), rgba(24, 144, 255, 0.6));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+    color: white;
+  }
+  
+  .login-bg-title {
+    margin-bottom: 20px !important;
+    font-weight: 600 !important;
+  }
+  
+  .login-bg-desc {
+    font-size: 18px;
+    opacity: 0.9;
+  }
+  
+  /* 右侧表单样式 */
+  .login-form-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+  
+  .login-form-inner {
+    width: 100%;
+    max-width: 420px;
+    padding: 50px 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Logo样式 */
+  .login-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  
+  .logo-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(24, 144, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* 表单标题样式 */
+  .login-form-title {
+    text-align: center;
+    margin-bottom: 8px !important;
+    color: #1f2937;
+  }
+  
+  .login-form-subtitle {
+    display: block;
+    text-align: center;
+    margin-bottom: 36px;
+    color: #6b7280;
+  }
+  
+  /* 输入框样式 */
+  .login-input {
+    height: 48px;
+    border-radius: 8px !important;
+    border-color: #e5e7eb !important;
+    transition: all 0.3s ease;
+  }
+  
+  .login-input:focus {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1) !important;
+  }
+  
+  .input-icon {
+    color: #9ca3af;
+    font-size: 18px;
+  }
+
+  .login-item{
+    text-align: center;
+  }
+  
+  /* 底部文本样式 */
+  .login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #9ca3af;
+  }
+  
+  /* 响应式：桌面端适配 */
+  @media (min-width: 768px) {
+    .login-bg-wrapper {
+      display: block;
+    }
+    .login-form-wrapper {
+      width: 45%;
+    }
+  }
+  

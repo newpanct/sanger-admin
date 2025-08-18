@@ -1,0 +1,83 @@
+{
+    "menus": [
+      {
+        "path": "/dashboard",
+        "label": "仪表盘",
+        "icon": "DashboardOutlined",
+        "component": "Dashboard",
+        "componentName": "Dashboard"
+      },
+      {
+        "path": "/user",
+        "label": "用户管理",
+        "icon": "UserOutlined",
+        "component": "UserManage",
+        "componentName": "UserManage"
+      },
+      {
+        "path": "/journal",
+        "label": "期刊管理",
+        "icon": "ContainerOutlined",
+        "component": "Journal",
+        "componentName": "Journal"
+      },
+      {
+        "path": "/manuscript",
+        "label": "稿件管理",
+        "icon": "FileTextOutlined",
+        "component": "ManuscriptManage",
+        "componentName": "ManuscriptManage"
+      },
+      {
+        "path": "/certification",
+        "label": "证书管理",
+        "icon": "ReadOutlined",
+        "component": "CertificationManage",
+        "componentName": "CertificationManage"
+      },
+      {
+        "path": "/scan",
+        "label": "桑格查重管理",
+        "icon": "ReadOutlined",
+        "componentName": "Scan",
+        "children": [
+            {
+              "path": "/scan/thesis",
+              "label": "论文管理",
+              "icon": "ReadOutlined",
+              "component": "ThesisScan",
+              "componentName": "ThesisScan"
+            },
+            {
+              "path": "/scan/imgs",
+              "label": "图片管理",
+              "icon": "PictureOutlined",
+              "component": "ImgScan",
+              "componentName": "ImgScan"
+            }
+          ]
+      },
+      {
+        "path": "/test",
+        "label": "测试页面",
+        "icon": "TagOutlined",
+        "componentName": "TestPage",
+        "children": [
+            {
+              "path": "/test/sub1",
+              "label": "测试子管理1",
+              "icon": "TagOutlined",
+              "component": "TestSubManage1",
+              "componentName": "TestSubManage1"
+            },
+            {
+              "path": "/test/sub2",
+              "label": "测试子管理2",
+              "icon": "TagOutlined",
+              "component": "TestSubManage2",
+              "componentName": "TestSubManage2"
+            }
+          ]
+      }
+    ]
+  }
