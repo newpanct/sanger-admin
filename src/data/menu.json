@@ -1,83 +1,140 @@
-{
-    "menus": [
-      {
-        "path": "/dashboard",
-        "label": "仪表盘",
-        "icon": "DashboardOutlined",
-        "component": "Dashboard",
-        "componentName": "Dashboard"
-      },
-      {
-        "path": "/user",
-        "label": "用户管理",
-        "icon": "UserOutlined",
-        "component": "UserManage",
-        "componentName": "UserManage"
-      },
-      {
-        "path": "/journal",
-        "label": "期刊管理",
-        "icon": "ContainerOutlined",
-        "component": "Journal",
-        "componentName": "Journal"
-      },
-      {
-        "path": "/manuscript",
-        "label": "稿件管理",
-        "icon": "FileTextOutlined",
-        "component": "ManuscriptManage",
-        "componentName": "ManuscriptManage"
-      },
-      {
-        "path": "/certification",
-        "label": "证书管理",
-        "icon": "ReadOutlined",
-        "component": "CertificationManage",
-        "componentName": "CertificationManage"
-      },
-      {
-        "path": "/scan",
-        "label": "桑格查重管理",
-        "icon": "ReadOutlined",
-        "componentName": "Scan",
-        "children": [
-            {
-              "path": "/scan/thesis",
-              "label": "论文管理",
-              "icon": "ReadOutlined",
-              "component": "ThesisScan",
-              "componentName": "ThesisScan"
-            },
-            {
-              "path": "/scan/imgs",
-              "label": "图片管理",
-              "icon": "PictureOutlined",
-              "component": "ImgScan",
-              "componentName": "ImgScan"
-            }
-          ]
-      },
-      {
-        "path": "/test",
-        "label": "测试页面",
-        "icon": "TagOutlined",
-        "componentName": "TestPage",
-        "children": [
-            {
-              "path": "/test/sub1",
-              "label": "测试子管理1",
-              "icon": "TagOutlined",
-              "component": "TestSubManage1",
-              "componentName": "TestSubManage1"
-            },
-            {
-              "path": "/test/sub2",
-              "label": "测试子管理2",
-              "icon": "TagOutlined",
-              "component": "TestSubManage2",
-              "componentName": "TestSubManage2"
-            }
-          ]
-      }
-    ]
-  }
+ [
+    {
+      "path": "/dashboard",
+      "label": "仪表盘",
+      "icon": "DashboardOutlined",
+      "component": "DashboardPage"
+    },
+    {
+      "path": "/user",
+      "label": "用户管理",
+      "icon": "TeamOutlined",
+      "component": "UserManage"
+    },
+    {
+      "path": "/merchant",
+      "label": "商户管理",
+      "icon": "ShopOutlined",
+      "component": "MerchantPage"
+    },
+    {
+      "path": "/check",
+      "label": "预审系统",
+      "icon": "AuditOutlined",
+      "children": [
+        {
+          "path": "/check/journal",
+          "label": "期刊",
+          "icon": "BookOutlined",
+          "component": "JournalPage"
+        },
+        {
+          "path": "/check/manuscript",
+          "label": "稿件",
+          "icon": "FileTextOutlined",
+          "component": "ManuscriptPage"
+        },
+        {
+          "path": "/check/certification",
+          "label": "证书",
+          "icon": "IdcardOutlined",
+          "component": "CertificationPage"
+        }
+      ]
+    },
+    {
+      "path": "/scan",
+      "label": "查重系统",
+      "icon": "SearchOutlined",
+      "children": [
+        {
+          "path": "/scan/ithenticate",
+          "label": "ithenticate",
+          "icon": "FileSearchOutlined",
+          "component": "IthenciatePage"
+        },
+        {
+          "path": "/scan/imagetwin",
+          "label": "imagetwin",
+          "icon": "PictureOutlined",
+          "component": "ImagetwinPage"
+        },
+        {
+          "path": "/scan/sanger",
+          "label": "桑格查重",
+          "icon": "CopyOutlined",
+          "component": "SangerPage"
+        }
+      ]
+    },
+    {
+      "path": "/recommend",
+      "label": "推荐系统",
+      "icon": "AppstoreAddOutlined",
+      "children": [
+        {
+          "path": "/recommend/journals",
+          "label": "期刊推荐",
+          "icon": "AppstoreOutlined",
+          "component": "RecommendPage"
+        }
+      ]
+    },
+    {
+      "path": "/overview",
+      "label": "综述系统",
+      "icon": "ProfileOutlined",
+      "children": [
+        {
+          "path": "/overview/overview",
+          "label": "其他",
+          "icon": "ReadOutlined",
+          "component": "OverviewPage"
+        }
+      ]
+    },
+    {
+      "path": "/pay",
+      "label": "支付系统",
+      "icon": "WalletOutlined",
+      "children": [
+        {
+          "path": "/pay/order",
+          "label": "订单",
+          "icon": "OrderedListOutlined",
+          "component": "OrderPage"
+        },
+        {
+          "path": "/pay/statistics",
+          "label": "金额统计",
+          "icon": "BarChartOutlined",
+          "component": "StatisticsPage"
+        }
+      ]
+    },
+    {
+      "path": "/test",
+      "label": "测试页面",
+      "icon": "ExperimentOutlined",
+      "children": [
+        {
+          "path": "/test/sub",
+          "label": "测试页面",
+          "icon": "CodeOutlined",
+          "component": "TestPage"
+        },
+        {
+          "path": "/test/data",
+          "label": "测试",
+          "icon": "CodeOutlined",
+          "component": "TestSubManage1"
+        },
+        {
+          "path": "/test/chart",
+          "label": "图表引用",
+          "icon": "BugOutlined",
+          "component": "TestSubManage2"
+        }
+      ]
+    }
+  ]

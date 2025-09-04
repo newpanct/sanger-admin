@@ -1,9 +1,13 @@
 {
-  "name": "my-react-website",
+  "name": "sanger-management",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/charts": "^2.6.2",
     "@ant-design/icons": "^5.6.1",
+    "@antv/g2": "^5.3.5",
+    "@antv/g2plot": "^2.4.33",
+    "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -14,7 +18,9 @@
     "i18next-http-backend": "^3.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-highlight-words": "^0.21.0",
     "react-i18next": "^14.0.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.3",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
