@@ -5,63 +5,81 @@ import {
   Row,
   Statistic,
   Button,
-  List,
+  Badge,
   Skeleton,
-  Divider,
+  message,
 } from "antd";
-import {
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../components/PageCard";
+import { getDownWosNum } from "../server/api";
+import { Bar } from "@ant-design/charts"; // 改为导入Bar组件
 
 const DashboardPage = () => {
   const [loading, setLoading] = useState(false);
+  const [downWosNum, setDownWosNum] = useState(0);
+  const [statistics, setStatistics] = useState({});
+  const [wosTotalNum, setWosTotalNum] = useState([]);
 
-  // 仪表盘关键指标
-  const [stats, setStats] = useState({
-    newUsers: 0,
-    orders: 0,
-    totalUsers: 0,
-    income: 0,
-  });
+  useEffect(() => {
+    handleRefresh();
+    handleWosTotalNum(); // 初始化时加载 wos 数据
+  }, []);
 
-  // 最新动态
-  const [recentActivities, setRecentActivities] = useState([]);
-
-  // 模拟刷新逻辑
-  const refresh = () => {
+  const handleRefresh = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setStats({
-        newUsers: Math.floor(Math.random() * 200),
-        orders: Math.floor(Math.random() * 100),
-        totalUsers: 8000 + Math.floor(Math.random() * 3000),
-        income: 100000 + Math.floor(Math.random() * 100000),
-      });
+    try {
+      const [wosRes, statRes] = await Promise.all([
+        getDownWosNum(),
+        fetch("/data/getStatistics.json"),
+      ]);
 
-      const activities = [
-        "用户 李四 购买了商品 B",
-        "用户 王五 提交了反馈",
-        "库存告警：商品 C 仅剩 1 件",
-        "管理员更新了系统配置",
-      ];
-      setRecentActivities(
-        Array.from(
-          { length: 3 },
-          () => activities[Math.floor(Math.random() * activities.length)]
-        )
-      );
-
+      if (wosRes?.status === 200) setDownWosNum(wosRes.data);
+      if (statRes.ok) setStatistics(await statRes.json());
+      else throw new Error("读取静态数据失败");
+    } catch (err) {
+      console.error(err);
+      message.error("数据获取失败");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  // 初始化时执行一次刷新
-  useEffect(() => {
-    refresh();
-  }, []);
+  const handleWosTotalNum = async () => {
+    try {
+      const res = await fetch("/data/getWosTotalNum.json");
+      if (!res.ok) throw new Error("读取 WOS 总数失败");
+      const data = await res.json();
+      setWosTotalNum(data);
+    } catch (error) {
+      console.error("获取 WOS 总数失败:", error);
+      message.error("获取 WOS 总数失败");
+    }
+  };
+
+  const metrics = [
+    { title: "下载期刊信息", value: downWosNum, suffix: "次", color: "#3f8600" },
+    { title: "当日新增用户", value: statistics.dataAdd, suffix: "人", color: "#1E9FFF" },
+    { title: "昨日活跃用户", value: statistics.dataActive, suffix: "人", color: "#2F4056" },
+    { title: "当日订单统计", value: statistics.dataOrderNum, suffix: "单", color: "#FFB800" },
+    { title: "当日支付统计", value: statistics.dataOrderCount, prefix: "¥", color: "#FF5722" },
+    { title: "当日查重统计", value: statistics.dataThesisCount, suffix: "次", color: "#009688" },
+    { title: "站内查重统计", value: statistics.dataOtherThesisCount, suffix: "次", color: "#FF0000" },
+    { title: "查重可用余额", value: statistics.thesisBalance, prefix: "¥", precision: 2, color: "#7CEE75" },
+  ];
+
+  // 配置条形图
+  const barConfig = {
+    data: wosTotalNum, 
+    xField: "title", 
+    yField: "total", 
+    colorField: 'title',
+    style: {
+      maxWidth: 20,
+    },
+    label: {
+      text: 'total',
+    },
+  };
 
   return (
     <PageCard
@@ -70,117 +88,34 @@ const DashboardPage = () => {
         <Button
           type="primary"
           icon={<ReloadOutlined />}
-          onClick={refresh}
           loading={loading}
+          onClick={handleRefresh}
         >
-          刷新数据
+          刷新仪表盘
         </Button>
       }
     >
       {/* 关键指标 */}
-      <Row gutter={16}>
-        <Col span={6}>
-          <Card>
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="今日新增用户"
-                value={stats.newUsers}
-                valueStyle={{ color: "#3f8600" }}
-                prefix={<ArrowUpOutlined />}
-                suffix="人"
-              />
-            </Skeleton>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="今日订单数"
-                value={stats.orders}
-                valueStyle={{ color: "#3f8600" }}
-                prefix={<ArrowUpOutlined />}
-                suffix="单"
-              />
-            </Skeleton>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="总用户数"
-                value={stats.totalUsers}
-                suffix="人"
-              />
-            </Skeleton>
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <Statistic
-                title="总收入"
-                value={stats.income}
-                precision={2}
-                prefix="¥"
-              />
-            </Skeleton>
-          </Card>
-        </Col>
+      <Row gutter={8}>
+        {metrics.map((m, i) => (
+          <Col span={3} key={i}>
+            <Badge.Ribbon text="实时" color={m.color}>
+              <Card>
+                <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
+                  <Statistic {...m} valueStyle={{ color: m.color }} />
+                </Skeleton>
+              </Card>
+            </Badge.Ribbon>
+          </Col>
+        ))}
       </Row>
 
-      {/* 图表区域 */}
-      <Card
-        title="数据趋势（示例占位图）"
-        style={{ marginTop: 12, height: 300 }}
-      >
-        <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#999",
-              border: "1px dashed #ccc",
-            }}
-          >
-            静态数据......
-          </div>
+      {/* WOS 总数条形图 */}
+      <Card title="WOS 总数统计" style={{ marginTop: 12 }}>
+        <Skeleton loading={loading} active paragraph={{ rows: 6 }}>
+          <Bar {...barConfig} /> 
         </Skeleton>
       </Card>
-
-      <Row gutter={16} style={{ marginTop: 12 }}>
-        {/* 最新动态 */}
-        <Col span={12}>
-          <Card title="最新动态">
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <List
-                dataSource={recentActivities}
-                renderItem={(item, index) => (
-                  <List.Item key={index}>{item}</List.Item>
-                )}
-              />
-            </Skeleton>
-          </Card>
-        </Col>
-
-        {/* 快捷操作 */}
-        <Col span={12}>
-          <Card title="快捷操作">
-            <Skeleton loading={loading} active paragraph={{ rows: 1 }}>
-              <Button type="primary" style={{ marginRight: 8 }}>
-                新增用户
-              </Button>
-              <Button type="dashed" style={{ marginRight: 8 }}>
-                新建订单
-              </Button>
-              <Button danger>系统设置</Button>
-            </Skeleton>
-          </Card>
-        </Col>
-      </Row>
     </PageCard>
   );
 };

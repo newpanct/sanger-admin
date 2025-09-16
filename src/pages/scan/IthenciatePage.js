@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Button,
   Space,
   Spin,
   Tag,
-  Popconfirm,
   Input,
   Modal,
   Image,
   message,
   Flex,
 } from "antd";
-import { DownloadOutlined, ReloadOutlined } from "@ant-design/icons";
+import {  ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
 const { Search } = Input;
 

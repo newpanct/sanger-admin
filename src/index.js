@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { ConfigProvider } from "antd";
-import App from "./App";
 import "antd/dist/reset.css";
 import reportWebVitals from "./reportWebVitals";
-import zhCN from "antd/locale/zh_CN";
+import { ConfigProvider } from "antd";// 全局配置组件
+import App from "./App";// 根App组件
+import zhCN from "antd/locale/zh_CN";// antd 默认配置中文
 import { Provider, useSelector } from "react-redux"; // 引入useSelector
-import store from "./store";
+import store from "./store";// rudux状态
 
 // 封装一个主题容器组件
 const ThemeContainer = () => {

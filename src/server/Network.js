@@ -83,6 +83,7 @@ const handleError = (error) => {
 const request = async (url, method = "GET", data = {}, config = {}) => {
   const isFormData = data instanceof FormData;
   return axiosInstance({
+    baseURL: config.baseURL || baseURL,
     url,
     method,
     data: method !== "GET" ? data : undefined,

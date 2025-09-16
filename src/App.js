@@ -1,8 +1,7 @@
 import { App as AntdApp, message } from 'antd'; // 重命名避免冲突
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/routes';
-
+// 全局消息提示
 const MessageInitializer = () => {
   const [messageApi, contextHolder] = message.useMessage();
   message.success = messageApi.success;
@@ -17,9 +16,9 @@ function RootApp() {
   return (
     <AntdApp> 
       <MessageInitializer /> 
-      <Router>
+      <BrowserRouter>
         <AppRoutes />
-      </Router>
+      </BrowserRouter>
     </AntdApp>
   );
 }

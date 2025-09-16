@@ -1,5 +1,4 @@
 import { baseRequst, formRequst } from "./Network";
-import { useDispatch } from "react-redux";
 import { setAuth, clearAuth } from "../store";
 import store from "../store";
 // 工具函数：把对象转成 FormData
@@ -17,7 +16,7 @@ const toFormData = (obj = {}) => {
 const postForm = async (url, data = {}) => {
   try {
     const response = await formRequst(url, "post", toFormData(data));
-    console.log(`${url}`,response.data);
+    // console.log(`${url}`,response.data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -36,6 +35,7 @@ const getBase = async (url, params = {}, extraConfig = {}) => {
     throw error.response?.data || error;
   }
 };
+
 
 // 下载文件通用函数
 const downloadFile = (response, defaultName) => {
@@ -151,3 +151,7 @@ export const findCheckByOrderNo = (orderNo) =>
 export const showIwAndIthCountMonth = () => postForm("/showIwAndIthCountMonth");
 
 export const showIwAndIthCountDay = () => postForm("/showIwAndIthCountDay");
+
+// 仪表盘
+export const getDownWosNum = () =>
+  getBase("http://fs.sangerbox.com/getDownWosNum", {}, { headers: { Authorization: "" } });

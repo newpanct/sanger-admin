@@ -8,16 +8,17 @@ import {
   Avatar,
   Spin,
   Drawer,
-  Dropdown,
   ColorPicker,
   Space,
   Tooltip,
-  Popover,
   Typography,
+  Segmented,
   message,
 } from "antd";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
+  MoonOutlined,
+  SunOutlined,
   ShopOutlined,
   DashboardOutlined,
   UserOutlined,
@@ -51,7 +52,6 @@ import {
 } from "@ant-design/icons";
 import { adminLogout } from "../server/api";
 import menuConfig from "../data/menu.json";
-import { Flex } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { setThemeToken } from "../store/themeSlice";
 const { Header, Sider, Content } = Layout;
@@ -129,6 +129,7 @@ const generateMenuItems = (menus, role) =>
     });
 
 const AdminLayout = () => {
+  const [theme, setTheme] = useState("light"); // dark || light
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.theme);
   const location = useLocation();
@@ -270,21 +271,14 @@ const AdminLayout = () => {
     setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
   };
 
-  const items = [
-    {
-      key: "1",
-      label: <div onClick={{ handleLogout }}>注销登录</div>,
-    },
-  ];
-
   return (
     <Layout style={{ height: "100vh", overflow: "hidden" }}>
       {/* 侧边栏 */}
       <Sider
-        theme="light"
-        style={{ height: "100%", display: "flex", flexDirection: "column" }}
+        theme={theme}
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        width="10%"
       >
         <h2
           style={{
@@ -294,12 +288,14 @@ const AdminLayout = () => {
             fontSize: "18px",
             flexShrink: 0,
             margin: 0,
+            color: theme === "dark" ? "#fff" : "#333",
           }}
         >
-          桑格管理
+          <Tooltip title="桑格管理">桑格管理</Tooltip>
         </h2>
         <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
           <Menu
+            theme={theme}
             mode="inline"
             items={menuItems}
             defaultSelectedKeys={["/dashboard"]}
@@ -317,9 +313,7 @@ const AdminLayout = () => {
       </Sider>
 
       {/* 主内容区 */}
-      <Layout
-        style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}
-      >
+      <Layout>
         <Header style={{ background: "#fff", padding: "0 16px" }}>
           <div
             style={{
@@ -331,24 +325,39 @@ const AdminLayout = () => {
           >
             {/* 左侧折叠按钮 */}
             <div style={{ display: "flex", gap: 8 }}>
-              <Button
-                type="text"
-                onClick={() => setCollapsed(!collapsed)}
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                tooltip="折叠/展开菜单"
-              />
-              <Button
-                type="text"
-                onClick={toggleFullscreen}
-                icon={
-                  isFullscreen ? (
-                    <FullscreenExitOutlined />
-                  ) : (
-                    <FullscreenOutlined />
-                  )
-                }
-                tooltip={isFullscreen ? "退出全屏" : "进入全屏"}
-              />
+              <Tooltip title="折叠/展开菜单">
+                <Button
+                  type="text"
+                  onClick={() => setCollapsed(!collapsed)}
+                  icon={
+                    collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+                  }
+                />
+              </Tooltip>
+              <Tooltip title="进入/退出全屏">
+                <Button
+                  type="text"
+                  onClick={toggleFullscreen}
+                  icon={
+                    isFullscreen ? (
+                      <FullscreenExitOutlined />
+                    ) : (
+                      <FullscreenOutlined />
+                    )
+                  }
+                />
+              </Tooltip>
+              <Tooltip title="白天/黑夜">
+                <Segmented
+                  shape="round"
+                  value={theme} // 绑定当前主题状态
+                  onChange={(value) => setTheme(value)} // 切换时更新主题状态
+                  options={[
+                    { value: "light", icon: <SunOutlined /> },
+                    { value: "dark", icon: <MoonOutlined /> },
+                  ]}
+                />
+              </Tooltip>
             </div>
 
             {/* 右侧用户信息 + 颜色设置*/}

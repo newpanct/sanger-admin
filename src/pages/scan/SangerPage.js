@@ -1,9 +1,7 @@
 import React from "react";
-import { Divider, Button, Input, Space } from "antd";
+import {  Button, Input, Space } from "antd";
 import {
   ReloadOutlined,
-  SearchOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
 const { Search } = Input;

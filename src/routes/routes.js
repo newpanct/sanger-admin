@@ -1,11 +1,11 @@
-import React, { lazy, Suspense } from 'react';
-import { useRoutes,Outlet } from 'react-router-dom';
-import AdminLayout from '../layouts/AdminLayout';
-import menuConfig from '../data/menu.json';
-import Login from '../pages/LoginPage';
-import PrivateRoute from './PrivateRoute';
-import NotFoundPage from '../pages/NotFoundPage';
-import ForbiddenPage from '../pages/ForbiddenPage';
+import React, { lazy, Suspense } from "react";
+import { useRoutes, Outlet } from "react-router-dom";
+import AdminLayout from "../layouts/AdminLayout";
+import menuConfig from "../data/menu.json";
+import Login from "../pages/LoginPage";
+import PrivateRoute from "./PrivateRoute";
+import NotFoundPage from "../pages/NotFoundPage";
+import ForbiddenPage from "../pages/ForbiddenPage";
 
 // 动态加载 + loading
 const withLoading = (Component) => (props) => {
@@ -54,7 +54,6 @@ const componentMap = {
   LayoutOutlet: () => <Outlet />,
 };
 
-
 // 生成路由
 const generateRoutes = (menus) =>
   menus
@@ -69,11 +68,10 @@ const generateRoutes = (menus) =>
         const ParentComp = componentMap.LayoutOutlet;
         return {
           path: item.path,
-          element: <ParentComp/>, 
+          element: <ParentComp />,
           children: generateRoutes(item.children),
         };
       }
-
 
       if (!item.component) {
         console.error(`路由缺少 component: 第${index + 1}项`, item);
@@ -84,10 +82,10 @@ const generateRoutes = (menus) =>
         console.error(`未找到组件：${item.component}`);
         return null;
       }
-      
+
       // 包装
       const WrappedComp = withLoading(Comp);
-      
+
       return {
         path: item.path,
         element: <WrappedComp />,
@@ -95,7 +93,7 @@ const generateRoutes = (menus) =>
     })
     .filter(Boolean);
 
-// TODO 权限路由导航
+//  权限路由导航
 const AppRoutes = () => {
   const childRoutes = generateRoutes(menuConfig);
 
@@ -103,7 +101,6 @@ const AppRoutes = () => {
     { path: "/login", element: <Login /> },
     // { path: "/403", element: <ForbiddenPage /> },
     {
-      path: "/",
       element: <PrivateRoute />,
       children: [
         {
@@ -111,8 +108,8 @@ const AppRoutes = () => {
           element: <AdminLayout />,
           children: [
             ...childRoutes,
-            { path: "403", element: <ForbiddenPage /> }, 
-            { path: "*", element: <NotFoundPage /> }, 
+            { path: "403", element: <ForbiddenPage /> },
+            { path: "*", element: <NotFoundPage /> },
           ],
         },
       ],

@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
@@ -6,7 +5,6 @@ const PrivateRoute = () => {
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.role);
   const location = useLocation();
-  // TODO
   // 没登录 → 跳转到登录页
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -17,7 +15,7 @@ const PrivateRoute = () => {
     return <Outlet />;
   }
 
-  // user → 只允许访问 /pay、/scan、/check 开头的路由
+  // user → 限制访问
   if (
     role === "user" &&
     !(location.pathname.startsWith("/pay") ||

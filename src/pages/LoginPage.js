@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Form, Input, Button, message, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import "../style/login.css";
 import { pwdAdminLogin } from "../server/api";
-import { setAuth } from "../store";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { Space } from "antd";
 const { Title, Text } = Typography;
 
