@@ -12,6 +12,18 @@ const toFormData = (obj = {}) => {
   return formData;
 };
 
+// 通用请求封装（JSON POST）
+const postJson = async (url, data = {}, extraConfig = {}) => {
+  try {
+    const response = await baseRequst(url, "post", data, {
+      headers: { "Content-Type": "application/json" },
+      ...extraConfig,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 // 通用请求封装（formRequst）
 const postForm = async (url, data = {}) => {
   try {
@@ -62,14 +74,14 @@ const downloadFile = (response, defaultName) => {
 
 // 登录
 export const pwdAdminLogin = async (obj) => {
-  const response = await formRequst("/pwdAdminLogin", "post", toFormData(obj));
-  const token = response.headers.authorization;
-  const role = response.data.data.userType === -1 ? "admin" : "user";
-  const username = response.data.data.username;
-  if (token) {
+  const response = await postJson("/user/admin/login", obj);
+  if (response.code === 200) {
+  const token = response.data.token;
+  const role = "admin";
+  const username = response.data.nickname;
     store.dispatch(setAuth({ token: token, role: role, username: username }));
   }
-  return response.data;
+  return response;
 };
 
 // 退出登录 （清空状态）

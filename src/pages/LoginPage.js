@@ -19,19 +19,20 @@ const Login = () => {
     setLoading(true);
     try {
       const obj = {
-        email: values.email,
+        username: values.email,
         password: values.password,
       };
       const response = await pwdAdminLogin(obj);
+      console.log("res",response)
       if (response.code === 200) {
-        if (response.data.userType === -1) {
+        if (response.data.isBindWechat === 0) {
           navigate("/dashboard");
-        } else if (response.data.userType === 1) {
+        } else if (response.data.isBindWechat === 1) {
           navigate("/check/journal");
         }
-        message.success(response.msg);
+        message.success(response.message || "登录成功");
       } else {
-        message.warning(response.msg || "登录失败");
+        message.warning(response.message || "登录失败");
       }
     } catch (err) {
       message.error("网络错误，请联系管理员");

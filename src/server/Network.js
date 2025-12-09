@@ -1,7 +1,8 @@
 import axios from "axios";
 import { message } from "antd";
 import store from "../store";
-const baseURL = "http://api.sangerbox.com/mysci";
+// const baseURL = "http://api.sangerbox.com/mysci";
+const baseURL = "https://api.sangerbox.com/api";
 // ================== 基础配置 ================== //
 const axiosInstance = axios.create({
   baseURL: baseURL, // 统一设置基础地址
