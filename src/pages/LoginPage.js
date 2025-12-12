@@ -23,7 +23,6 @@ const Login = () => {
         password: values.password,
       };
       const response = await pwdAdminLogin(obj);
-      console.log("res",response)
       if (response.code === 200) {
         if (response.data.isBindWechat === 0) {
           navigate("/dashboard");

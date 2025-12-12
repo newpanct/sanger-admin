@@ -11,7 +11,6 @@ const toFormData = (obj = {}) => {
   });
   return formData;
 };
-
 // 通用请求封装（JSON POST）
 const postJson = async (url, data = {}, extraConfig = {}) => {
   try {
@@ -48,7 +47,6 @@ const getBase = async (url, params = {}, extraConfig = {}) => {
   }
 };
 
-
 // 下载文件通用函数
 const downloadFile = (response, defaultName) => {
   const blob = new Blob([response.data], { type: "application/octet-stream" });
@@ -76,13 +74,27 @@ const downloadFile = (response, defaultName) => {
 export const pwdAdminLogin = async (obj) => {
   const response = await postJson("/user/admin/login", obj);
   if (response.code === 200) {
-  const token = response.data.token;
-  const role = "admin";
-  const username = response.data.nickname;
+    const token = response.data.token;
+    const role = "admin";
+    const username = response.data.nickname;
     store.dispatch(setAuth({ token: token, role: role, username: username }));
   }
   return response;
 };
+
+// 订单统计
+export const statDashboard = async () => {
+  const response = await getBase("/dedup/order/statistics/current");
+  return response.data;
+};
+
+// 订单月份统计
+export const statMoon = async () => {
+  const response = await getBase("/dedup/order/statistics/single");
+  return response.data;
+};
+
+/* ---------------- 下列接口已作废 ---------------- */
 
 // 退出登录 （清空状态）
 export const adminLogout = () => {
@@ -93,7 +105,7 @@ export const adminLogout = () => {
 export const findTotalJournal = (obj) => postForm("/findTotalJournal", obj);
 export const isOnlineJournal = (obj) => postForm("/isOnlineJournal", obj);
 export const findJournalByTitle = (obj) => postForm("/findJournalByTitle", obj);
-// TODO 待优化 只支持Excel文件
+// 待优化 只支持Excel文件
 export const addJournalByFile = (file) =>
   postForm("/addJournalByFile", { file });
 
@@ -166,4 +178,8 @@ export const showIwAndIthCountDay = () => postForm("/showIwAndIthCountDay");
 
 // 仪表盘
 export const getDownWosNum = () =>
-  getBase("http://fs.sangerbox.com/getDownWosNum", {}, { headers: { Authorization: "" } });
+  getBase(
+    "http://fs.sangerbox.com/getDownWosNum",
+    {},
+    { headers: { Authorization: "" } }
+  );
