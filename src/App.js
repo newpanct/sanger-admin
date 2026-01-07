@@ -1,6 +1,9 @@
-import { App as AntdApp, message } from 'antd'; // 重命名避免冲突
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './routes/routes';
+import { App as AntdApp, ConfigProvider, message } from "antd"; // 重命名避免冲突
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/routes";
+import dayjs from "dayjs";
+import "dayjs/locale/zh-cn";
+import zhCN from "antd/locale/zh_CN";
 // 全局消息提示
 const MessageInitializer = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -14,12 +17,14 @@ const MessageInitializer = () => {
 
 function RootApp() {
   return (
-    <AntdApp> 
-      <MessageInitializer /> 
+    <ConfigProvider locale={zhCN}>
+    <AntdApp>
+      <MessageInitializer />
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
     </AntdApp>
+    </ConfigProvider>
   );
 }
 

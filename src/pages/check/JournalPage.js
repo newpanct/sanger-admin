@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect,  useState } from "react";
 import {
-  Spin,
   Table,
   Space,
   Button,
@@ -42,7 +41,6 @@ const JournalPage = () => {
   const [detailObj, setDetailObj] = useState({});
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const searchInput = useRef(null);
 
   // --- 原有工具函数保留 ---
   const getTagColor = (tag) => {

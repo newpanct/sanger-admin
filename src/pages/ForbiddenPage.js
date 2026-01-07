@@ -15,7 +15,7 @@ const ForbiddenPage = () => {
           返回上一级
         </Button>,
         <Button key="login" onClick={() => navigate("/login")}>
-          去登录
+          管理员登录
         </Button>,
       ]}
     />

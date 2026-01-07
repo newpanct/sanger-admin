@@ -6,7 +6,14 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
+import {
+  setMenuBadges,
+  clearMenuBadge,
+  decreaseMenuBadge,
+} from "../../store/menuBadgeSlice";
+import { useDispatch } from "react-redux";
 const RecommendPage = () => {
+  const dispatch = useDispatch();
   return (
     <PageCard
       title="期刊推荐"
@@ -32,7 +39,13 @@ const RecommendPage = () => {
         </Space>
       }
     >
-      期刊推荐(暂无数据)
+      <Button
+        onClick={() => {
+          dispatch(decreaseMenuBadge("/recommend/journals"));
+        }}
+      >
+        减少红点
+      </Button>
     </PageCard>
   );
 };

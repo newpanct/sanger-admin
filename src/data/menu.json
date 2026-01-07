@@ -1,41 +1,139 @@
  [
     {
-      "path": "/dashboard",
+      "path": "dashboard",
       "label": "仪表盘",
       "icon": "DashboardOutlined",
       "component": "DashboardPage"
     },
     {
-      "path": "/user",
-      "label": "用户管理",
-      "icon": "TeamOutlined",
-      "component": "UserManage"
-    },
-    {
-      "path": "/merchant",
+      "path": "merchant-manage",
       "label": "商户管理",
       "icon": "ShopOutlined",
-      "component": "MerchantPage"
+      "children":[
+        {
+          "path":"list",
+          "label": "商户列表",
+          "icon": "MenuOutlined",
+          "component": "MerchantPage"
+        },
+        {
+          "path":"balance",
+          "label": "余额管理",
+          "icon": "PayCircleOutlined",
+          "component": "MerchantBalancePage"
+        }
+      ]
     },
     {
-      "path": "/check",
-      "label": "预审系统",
-      "icon": "AuditOutlined",
+      "path": "pay",
+      "label": "支付系统",
+      "icon": "WalletOutlined",
       "children": [
         {
-          "path": "/check/journal",
+          "path": "stat",
+          "label": "金额统计",
+          "icon": "BarChartOutlined",
+          "children": [
+            {
+              "path": "crosscheck",
+              "label": "CrossCheck",
+              "icon": "FileSearchOutlined",
+              "component": "PayCrossCheckPage"
+            },
+            {
+              "path": "imagetwin",
+              "label": "imagetwin",
+              "icon": "PictureOutlined",
+              "component": "PayImagetwinPage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "scan",
+      "label": "查重系统",
+      "icon": "SearchOutlined",
+      "children": [
+        {
+          "path": "crosscheck",
+          "label": "CrossCheck",
+          "icon": "FileSearchOutlined",
+          "children": [
+            {
+              "path": "order",
+              "label": "订单",
+              "icon": "OrderedListOutlined",
+              "component": "CrossCheckOrderPage"
+            },
+            {
+              "path": "abnormal-orders",
+              "label": "异常订单",
+              "icon": "UnorderedListOutlined",
+              "component": "CrossCheckAbnOrderPage"
+            }
+          ]
+        },
+        {
+          "path": "imagetwin",
+          "label": "imagetwin",
+          "icon": "PictureOutlined",
+          "children": [
+            {
+              "path": "order",
+              "label": "订单",
+              "icon": "OrderedListOutlined",
+              "component": "ImagetwinOrderPage"
+            },
+            {
+              "path": "abnormal-orders",
+              "label": "异常订单",
+              "icon": "UnorderedListOutlined",
+              "component": "ImagetwinAbnOrderPage"
+            }
+          ]
+        },
+        {
+          "path": "history",
+          "label": "turnitin(v2)",
+          "icon": "HistoryOutlined",
+          "children": [
+            {
+              "path": "order",
+              "label": "订单",
+              "icon": "OrderedListOutlined",
+              "component": "HistoryOrderPage"
+            },
+            {
+              "path": "abnormal-orders",
+              "label": "异常订单",
+              "icon": "UnorderedListOutlined",
+              "component": "HistoryAbnOrderPage"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "check",
+      "label": "预审系统",
+      "icon": "AuditOutlined",
+      "hidden": true,
+      "children": [
+        {
+          "path": "journal",
           "label": "期刊",
           "icon": "BookOutlined",
           "component": "JournalPage"
         },
         {
-          "path": "/check/manuscript",
+          "path": "manuscript",
           "label": "稿件",
           "icon": "FileTextOutlined",
           "component": "ManuscriptPage"
         },
         {
-          "path": "/check/certification",
+          "path": "certification",
           "label": "证书",
           "icon": "IdcardOutlined",
           "component": "CertificationPage"
@@ -43,37 +141,13 @@
       ]
     },
     {
-      "path": "/scan",
-      "label": "查重系统",
-      "icon": "SearchOutlined",
-      "children": [
-        {
-          "path": "/scan/ithenticate",
-          "label": "ithenticate",
-          "icon": "FileSearchOutlined",
-          "component": "IthenciatePage"
-        },
-        {
-          "path": "/scan/imagetwin",
-          "label": "imagetwin",
-          "icon": "PictureOutlined",
-          "component": "ImagetwinPage"
-        },
-        {
-          "path": "/scan/sanger",
-          "label": "桑格查重",
-          "icon": "CopyOutlined",
-          "component": "SangerPage"
-        }
-      ]
-    },
-    {
-      "path": "/recommend",
+      "path": "recommend",
       "label": "推荐系统",
+      "hidden":true,
       "icon": "AppstoreAddOutlined",
       "children": [
         {
-          "path": "/recommend/journals",
+          "path": "journals",
           "label": "期刊推荐",
           "icon": "AppstoreOutlined",
           "component": "RecommendPage"
@@ -81,12 +155,13 @@
       ]
     },
     {
-      "path": "/overview",
+      "path": "overview",
       "label": "综述系统",
+      "hidden": true,
       "icon": "ProfileOutlined",
       "children": [
         {
-          "path": "/overview/overview",
+          "path": "overview",
           "label": "其他",
           "icon": "ReadOutlined",
           "component": "OverviewPage"
@@ -94,46 +169,21 @@
       ]
     },
     {
-      "path": "/pay",
-      "label": "支付系统",
-      "icon": "WalletOutlined",
-      "children": [
-        {
-          "path": "/pay/order",
-          "label": "订单",
-          "icon": "OrderedListOutlined",
-          "component": "OrderPage"
-        },
-        {
-          "path": "/pay/statistics",
-          "label": "金额统计",
-          "icon": "BarChartOutlined",
-          "component": "StatisticsPage"
-        }
-      ]
+      "path": "email",
+      "label": "邮件模板管理",
+      "icon": "MailOutlined",
+      "component": "EmailPage"
     },
     {
-      "path": "/test",
-      "label": "测试页面",
-      "icon": "ExperimentOutlined",
+      "path": "wechat",
+      "label": "微信公众号",
+      "icon": "WechatOutlined",
       "children": [
         {
-          "path": "/test/sub",
-          "label": "测试页面",
-          "icon": "CodeOutlined",
-          "component": "TestPage"
-        },
-        {
-          "path": "/test/data",
-          "label": "测试",
-          "icon": "CodeOutlined",
-          "component": "TestSubManage1"
-        },
-        {
-          "path": "/test/chart",
-          "label": "图表引用",
-          "icon": "BugOutlined",
-          "component": "TestSubManage2"
+          "path": "keyword",
+          "label": "关键词回复",
+          "icon": "CommentOutlined",
+          "component": "KeywordPage"
         }
       ]
     }

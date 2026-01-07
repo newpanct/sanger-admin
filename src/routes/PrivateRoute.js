@@ -1,29 +1,45 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-
-const PrivateRoute = () => {
+import ForbiddenPage from "../pages/ForbiddenPage";
+import LoginPage from "../pages/LoginPage";
+const PrivateRoute = ({ allow }) => {
   const token = useSelector((state) => state.auth.token);
-  const role = useSelector((state) => state.auth.role);
+  const role = useSelector((state) => state.auth.role); // role设置对应server下的api.js登录
   const location = useLocation();
+  const path = location.pathname;
   // 没登录 → 跳转到登录页
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  // admin → 不限制，放行
-  if (role === "admin") {
-    return <Outlet />;
-  }
+  // superAdmin → 不限制，放行
+  // if (role === "superAdmin") {
+  //   return <Outlet />;
+  // }
 
-  // user → 限制访问
-  if (
-    role === "user" &&
-    !(location.pathname.startsWith("/pay") ||
-      location.pathname.startsWith("/scan") ||
-      location.pathname.startsWith("/test") ||
-      location.pathname.startsWith("/check"))
-  ) {
-    return <Navigate to="/403" replace />; // 无权限 → 跳转403页面
+  // if (role === "superAdmin") {
+  //   if (path.startsWith("/merchant")) {
+  //     return <ForbiddenPage />;
+  //   }
+  //   return <Outlet />;
+  // }
+
+  // // admin → 限制放行
+  // if (role === "admin") {
+  //   if (path.startsWith("/merchant")) {
+  //     return <ForbiddenPage />;
+  //   }
+  //   return <Outlet />;
+  // }
+
+  // // merchant → 限制访问
+  // if (role === "merchant" && !(location.pathname.startsWith("/merchant"))) {
+  //   return <ForbiddenPage />; // 无权限 → 跳转403页面
+  // }
+
+  
+  if (allow && !allow.includes(role)) {
+    return <ForbiddenPage />;
   }
 
   return <Outlet />;

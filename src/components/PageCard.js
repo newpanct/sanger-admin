@@ -29,7 +29,7 @@ const PageCard = ({ title, extraActions, rightActions, children }) => {
         </div>
       }
       styles={{
-        body: { padding: '20px'}
+        body: { padding: "10px", paddingTop: "1px" },
       }}
     >
       {children}

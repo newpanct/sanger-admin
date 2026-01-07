@@ -1,0 +1,46 @@
+[
+  {
+    "path": "control",
+    "label": "商户控制",
+    "icon": "SettingOutlined",
+    "children": [
+      {
+        "path": "information",
+        "label": "商户信息",
+        "icon": "WalletOutlined",
+        "component": "InformationPage"
+      },
+      {
+        "path": "purchase",
+        "label": "购买商品",
+        "icon": "ProfileOutlined",
+        "component": "PurchasePage"
+      }
+    ]
+  },
+  {
+    "path": "goods",
+    "label": "商品",
+    "icon": "ShoppingOutlined",
+    "children": [
+      {
+        "path": "inventory",
+        "label": "库存",
+        "icon": "CheckSquareOutlined",
+        "component": "InventoryPage"
+      },
+      {
+        "path": "sales-consumption",
+        "label": "出售和消费",
+        "icon": "ProfileOutlined",
+        "component": "SalesConsumptionPage"
+      },
+      {
+        "path": "invalidated",
+        "label": "作废",
+        "icon": "ProfileOutlined",
+        "component": "InvalidatedPage"
+      }
+    ]
+  }
+]

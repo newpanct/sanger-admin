@@ -3,7 +3,6 @@ import {
   Table,
   Button,
   Space,
-  Spin,
   Row,
   Col,
   Typography,
@@ -19,7 +18,6 @@ import {
 import {
   findAllManuscript,
   downloadFileById,
-  findStatusById,
   findManuTitle,
   operateManuscriptById,
 } from "../../server/api";
@@ -28,13 +26,10 @@ import {
   HourglassOutlined,
   ArrowLeftOutlined,
   ReloadOutlined,
-  SearchOutlined,
   ArrowRightOutlined,
-  PlusOutlined,
   CloseOutlined,
   ProfileOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import PageCard from "../../components/PageCard";
 import steps from "../../data/step.json";
 import baseURL from "../../server/Network";
@@ -55,7 +50,6 @@ const ManuscriptPage = () => {
   const [title, setTitle] = useState("");
   const [currentStep, setCurrentStep] = useState(0); // 当前步骤索引（0-7）
   const [stepsData] = useState(steps);
-  const [searchText, setSearchText] = useState("");
   const fetchData = async () => {
     try {
       setSpinning(true);

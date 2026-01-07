@@ -75,31 +75,369 @@ export const pwdAdminLogin = async (obj) => {
   const response = await postJson("/user/admin/login", obj);
   if (response.code === 200) {
     const token = response.data.token;
-    const role = "admin";
+    const isSuper = response.data.isSuper;
+    let role;
+    role = isSuper === 1 ? "superAdmin" : "admin";
+    if (!token.startsWith("Bearer")) {
+      role = "merchant";
+    }
     const username = response.data.nickname;
-    store.dispatch(setAuth({ token: token, role: role, username: username }));
+    const merchantId = response?.data.merchantId;
+    const wechatName = response?.data.wechatName;
+    const merchantBalance = response?.data.balance;
+    store.dispatch(
+      setAuth({
+        token,
+        role,
+        username,
+        merchantBalance,
+        wechatName,
+        merchantId,
+      })
+    );
+    return {
+      ...response,
+      data: {
+        ...response.data,
+        role,
+      },
+    };
   }
   return response;
 };
 
+// 查重订单失败统计
+export const getFailed = async () => {
+  const response = await getBase("/dedup/statistics/failed");
+  return response.data;
+};
+
+// --扫码登录
+// 获取微信state状态
+export const getWeChatState = async () => {
+  const response = await getBase("/user/wechat/web/getState");
+  return response.data;
+};
+
+// 微信登录状态查询
+export const weChatLoginStatus = async (state) => {
+  const response = await getBase("/user/wechat/web/login/status", { state });
+  const res = response?.data;
+  if (res.code === 200 && res.data.status !== "not_admin" && res.data.user) {
+    const token = res.data.user.token;
+    const isSuper = res.data.user.isSuper;
+    let role;
+    role = isSuper === 1 ? "superAdmin" : "admin";
+    if (!token.startsWith("Bearer")) {
+      role = "merchant";
+    }
+    // 目前前端强制设置为超级管理员 可以在routers/PrivateRoute下切换或修改
+    const username = res.data.user.nickname;
+    const merchantId = res?.data.user.merchantId;
+    const wechatName = res?.data.user.wechatName;
+    const merchantBalance = res?.data.user.balance;
+    store.dispatch(
+      setAuth({
+        token,
+        role,
+        username,
+        merchantBalance,
+        wechatName,
+        merchantId,
+      })
+    );
+    return {
+      ...res,
+      data: {
+        ...res.data,
+        role,
+      },
+    };
+  }
+  return res;
+};
+
+// --商户
+// 生成微信绑定state
+export const generateState = async (merchantId) => {
+  const response = await getBase("/user/merchant/wechat/bind/state", {
+    merchantId,
+  });
+  return response.data;
+};
+// 微信绑定状态
+export const wxchatBindState = async (state) => {
+  const response = await getBase("/user/merchant/wechat/bind/status", {
+    state,
+  });
+  return response.data;
+};
+// 商户订单统计
+export const merchantDashboard = (id) =>
+  postJson("/merchant/statistics/dashboard", id);
+
+// 分页查询
+export const merchantOrderPageList = (obj) =>
+  postJson("/merchant/order/pagelist", obj);
+
+// 商户订单可用库存
+export const usedAvailable = (obj) =>
+  postJson("/merchant/statistics/available", obj);
+
+// 卡密分页
+export const cardkeyPageList = (obj) =>
+  postJson("/merchant/cardkey/pageList", obj);
+
+// 商户卡密提取
+export const cardkeyExtract = async (obj) => {
+  const response = await postJson("/merchant/cardkey/extract", obj);
+  return response;
+};
+
+// 商户卡密售出消费分页
+export const soldPageList = async (obj) => {
+  const response = await postJson("/merchant/cardkey/pageList/sold", obj);
+  return response;
+};
+
+// 商户卡密批量标记为已出售
+export const markAsSoldBatch = async (obj) => {
+  const response = await postJson("/merchant/cardkey/markAsSold/batch", obj);
+  return response;
+};
+
+// 新增卡密
+export const cardkeyAdd = (obj) => postJson("/merchant/cardkey/add", obj);
+
+// 作废卡密
+export const cardkeyInvalid = async (id) => {
+  const response = await getBase("/merchant/cardkey/invalid", { id });
+  return response.data;
+};
+
+// 刷新余额
+export const refreshMerchantBalance = async (merchantId) => {
+  const response = await getBase(`/merchant/cardkey/balance/${merchantId}`);
+  return response.data;
+};
+
+// 退出登录 （清空状态）
+export const adminLogout = async () => {
+  store.dispatch(clearAuth());
+  const response = await getBase("/user/logout");
+  return response.data;
+};
+
 // 订单统计
 export const statDashboard = async () => {
-  const response = await getBase("/dedup/order/statistics/current");
+  const response = await getBase("/dedup/statistics/current");
   return response.data;
 };
 
 // 订单月份统计
 export const statMoon = async () => {
-  const response = await getBase("/dedup/order/statistics/single");
+  const response = await getBase("/dedup/statistics/single");
   return response.data;
 };
 
-/* ---------------- 下列接口已作废 ---------------- */
-
-// 退出登录 （清空状态）
-export const adminLogout = () => {
-  store.dispatch(clearAuth());
+// --查重系统
+//获取imagetwin任务分页列表
+export const imagetwinPageList = async (obj) => {
+  const response = await postJson("/dedup/admin/imagetwin/pageList", obj);
+  return response;
 };
+
+//获取imagetwin任务失败的分页列表
+export const imagetwinFailedPageList = async (obj) => {
+  const response = await postJson(
+    "/dedup/admin/imagetwin/failed/pageList",
+    obj
+  );
+  return response;
+};
+
+//获取ithenticate任务分页列表
+export const ithenticatePageList = async (obj) => {
+  const response = await postJson("/dedup/admin/ithenticate/pageList", obj);
+  return response;
+};
+
+//获取ithenticate任务失败的分页列表
+export const ithenticateFailedPageList = async (obj) => {
+  const response = await postJson(
+    "/dedup/admin/ithenticate/failed/pageList",
+    obj
+  );
+  return response;
+};
+
+// imagetwin 订单统计
+export const statisticsImagetwin = async (obj) => {
+  const response = await postJson("/dedup/statistics/imagetwin", obj);
+  return response;
+};
+// ithenticate 订单统计
+export const statisticsIthenticate = async (obj) => {
+  const response = await postJson("/dedup/statistics/ithenticate", obj);
+  return response;
+};
+
+// turnicheck 历史查重分页列表
+export const turnicheckPageList = async (obj) => {
+  const response = await postJson("/dedup/admin/turnicheck/pageList", obj);
+  return response;
+};
+
+// turnicheck 历史失败查重列表
+export const turnicheckFailedPageList = async (obj) => {
+  const response = await postJson(
+    "/dedup/admin/turnicheck/failed/pageList",
+    obj
+  );
+  return response;
+};
+
+// 手动提交删除turnicheck任务
+export const delTurFaiOrder = async (orderId, userPhone) => {
+  const response = await getBase("/dedup/admin/turnicheck/commit", {
+    orderId,
+    userPhone,
+  });
+  return response.data;
+};
+
+// 获取结果链接
+export const getResLink = async (id) => {
+  const response = await getBase("/dedup/task/getNewUrl", { id });
+  return response.data;
+};
+
+// 删除Imagetwin订单
+export const deleteImagetwinById = async (id) => {
+  const response = await getBase("/dedup/task/imagetwin/delete", { id });
+  return response.data;
+};
+
+// 删除Ithenticate订单
+export const deleteIthenticateById = async (id) => {
+  const response = await getBase("/dedup/task/ithenticate/delete", { id });
+  return response.data;
+};
+
+// 手动提交imagetwin任务
+export const commitImagetwin = async (taskId) => {
+  const response = await getBase("/dedup/admin/imagetwin/commit", { taskId });
+  return response.data;
+};
+
+// 手动提交ithenticate任务
+export const commitIthenticate = async (taskId) => {
+  const response = await getBase("/dedup/admin/ithenticate/commit", { taskId });
+  return response.data;
+};
+
+// --商户
+// ---商户列表
+// 商户注册
+export const merchantRegister = async (obj) => {
+  const response = await postJson("/user/merchant/register", obj);
+  return response;
+};
+
+// 商户管理分页列表
+export const merchantPageList = async (obj) => {
+  const response = await postJson("/user/merchant/pagelist", obj);
+  return response;
+};
+
+// 修改商户密码
+export const updateMerchantPassword = async (obj) => {
+  const response = await postJson("/user/merchant/updatePassword", obj);
+  return response;
+};
+
+// 商户权限操作
+export const merchantPermission = async (obj) => {
+  const response = await postJson("/user/merchant/permission", obj);
+  return response;
+};
+
+// 获取所有商户权限枚举值
+export const getPermissionEnums = async () => {
+  const response = await getBase("/user/merchant/getPermissionEnums");
+  return response.data;
+};
+
+// ---余额
+// 获取商户权限列表
+export const getPermissionList = async (obj) => {
+  const response = await postJson("/user/merchant/balanceList", obj);
+  return response;
+};
+
+// 扣减商户余额
+export const merchantAccountDeduct = async (obj) => {
+  const response = await postJson("/admin/merchant/pay/deduct", obj);
+  return response;
+};
+
+// 增加商户余额
+export const merchantAccountAdd = async (obj) => {
+  const response = await postJson("/admin/merchant/pay/recharge", obj);
+  return response;
+};
+
+// ---邮箱
+// 邮件模板分页列表
+export const mailTemplatePageList = async (obj) => {
+  const response = await postJson("/admin/mailTemplate/pageList", obj);
+  return response;
+};
+
+// 保存邮件模板
+export const mailTemplateUpsert = async (obj) => {
+  const response = await postJson("/admin/mailTemplate/upsert", obj);
+  return response;
+};
+
+// 删除邮件模板
+export const mailTemplateDelete = async (code) => {
+  const response = await getBase("/admin/mailTemplate/delete",{code});
+  return response.data;
+};
+
+// 获取所有邮件类型
+export const getMailTemplateEnumList = async () => {
+  const response = await getBase("/admin/mailTemplate/getMailTemplateEnumList");
+  return response.data;
+};
+
+// 添加关键词
+export const addKeyword = async (obj) => {
+  const response = await postJson("/admin/wxKeyword/add", obj);
+  return response;
+};
+
+// 关键词回复分页列表
+export const replyPageList = async (obj) => {
+  const response = await postJson("/admin/wxKeyword/pageList", obj);
+  return response;
+};
+
+// 修改关键词回复
+export const updateKeyword = async (obj) => {
+  const response = await postJson("/admin/wxKeyword/update", obj);
+  return response;
+};
+
+// 删除关键词回复
+export const deleteKeyword = async (id) => {
+  const response = await getBase("/admin/wxKeyword/delete",{id});
+  return response.data;
+};
+
+
+/* ---------------- 下列接口已作废 ---------------- */
 
 // 期刊
 export const findTotalJournal = (obj) => postForm("/findTotalJournal", obj);

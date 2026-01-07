@@ -1,4 +1,5 @@
 import React, { Suspense, useState, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Layout,
   Menu,
@@ -13,9 +14,9 @@ import {
   Tooltip,
   Typography,
   Segmented,
+  Badge,
   message,
 } from "antd";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   MoonOutlined,
   SunOutlined,
@@ -40,6 +41,7 @@ import {
   WalletOutlined,
   OrderedListOutlined,
   BarChartOutlined,
+  UnorderedListOutlined,
   ExperimentOutlined,
   CodeOutlined,
   BugOutlined,
@@ -49,19 +51,44 @@ import {
   FullscreenOutlined,
   BgColorsOutlined,
   ExclamationCircleOutlined,
+  HistoryOutlined,
+  PayCircleOutlined,
+  MenuOutlined,
+  KeyOutlined,
+  CheckCircleOutlined,
+  ThunderboltOutlined,
+  StopOutlined,
+  SettingOutlined,
+  ShoppingOutlined,
+  CheckSquareOutlined,
+  MailOutlined,
+  WechatOutlined,
+  CommentOutlined,
 } from "@ant-design/icons";
-import { adminLogout } from "../server/api";
-import menuConfig from "../data/menu.json";
+import { adminLogout, getFailed, refreshMerchantBalance } from "../server/api";
+import adminMenu from "../data/menu.json";
+import merchantMenu from "../data/merchantMenu.json";
 import { useDispatch, useSelector } from "react-redux";
 import { setThemeToken } from "../store/themeSlice";
+import { useIdleLogout } from "../hooks/useIdleLogout";
+import { clearAuth, persistor, updateMerchantBalance } from "../store";
+import { setMenuBadges, clearAllMenuBadge } from "../store/menuBadgeSlice";
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
-// icon 映射表
+// icon 映射
 const iconMap = {
+  CommentOutlined,
+  WechatOutlined,
+  SettingOutlined,
+  CheckSquareOutlined,
+  StopOutlined,
+  CheckCircleOutlined,
+  ThunderboltOutlined,
   ShopOutlined,
   DashboardOutlined,
   UserOutlined,
   TeamOutlined,
+  UnorderedListOutlined,
   ContainerOutlined,
   TagOutlined,
   ReadOutlined,
@@ -82,72 +109,173 @@ const iconMap = {
   ExperimentOutlined,
   CodeOutlined,
   BugOutlined,
+  HistoryOutlined,
+  PayCircleOutlined,
+  MenuOutlined,
+  KeyOutlined,
+  ShoppingOutlined,
+  MailOutlined 
 };
-
-const findMenuPath = (menus, path, parents = []) => {
-  for (let item of menus) {
-    if (item.path === path) {
-      return [...parents, item];
-    }
-    if (item.children) {
-      const found = findMenuPath(item.children, path, [...parents, item]);
-      if (found) return found;
-    }
-  }
-  return null;
+const computeFullPath = (item, parentPath = "") => {
+  if (!item.path) return "";
+  // 商户菜单相对路径拼接 /merchant
+  const pathPrefix = item.isMerchant ? "/merchant" : "";
+  const base = parentPath || pathPrefix;
+  return base ? `${base}/${item.path}`.replace(/\/+/g, "/") : `/${item.path}`;
 };
-const generateMenuItems = (menus, role) =>
+const generateMenuItems = (menus, role, badgeMap = {}, parentPath = "") =>
   menus
-    .filter((item) => {
-      if (role === "admin") return true; // admin → 全部保留
-      if (role === "user") {
-        return (
-          item.path.startsWith("/check") ||
-          item.path.startsWith("/pay") ||
-          item.path.startsWith("/scan") ||
-          item.path.startsWith("/test")
-        );
-      }
-      return false;
-    })
+    .filter((item) => !item.hidden)
     .map((item) => {
       const IconComponent = iconMap[item.icon];
-      if (item.children && item.children.length > 0) {
-        return {
-          key: item.path,
-          label: item.label,
-          icon: IconComponent ? <IconComponent /> : null,
-          children: generateMenuItems(item.children, role),
-        };
-      } else {
-        return {
-          key: item.path,
-          label: item.label,
-          icon: IconComponent ? <IconComponent /> : null,
-        };
+      const fullPath = computeFullPath(item, parentPath);
+      let childrenItems;
+      let hasChildrenBadge = false;
+      if (item.children?.length) {
+        childrenItems = generateMenuItems(
+          item.children,
+          role,
+          badgeMap,
+          fullPath
+        );
+        hasChildrenBadge = childrenItems.some((child) =>
+          child.label?.props?.children?.some?.((c) => c?.type === Badge)
+        );
       }
-    });
+      const badgeValue = badgeMap[fullPath];
+      const showBadge = badgeValue || hasChildrenBadge;
+      const label = showBadge ? (
+        <Space size={1}>
+          <span>{item.label}</span>
+          <Badge
+            count={badgeValue === true ? 0 : badgeValue}
+            dot={badgeValue === true || hasChildrenBadge}
+            size="small"
+          />
+        </Space>
+      ) : (
+        item.label
+      );
 
+      return {
+        key: fullPath,
+        label,
+        icon: IconComponent ? <IconComponent /> : null,
+        children: childrenItems,
+      };
+});
 const AdminLayout = () => {
-  const [theme, setTheme] = useState("light"); // dark || light
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.theme);
   const location = useLocation();
   const navigate = useNavigate();
+  const { token } = useSelector((state) => state.theme);
+  const role = useSelector((state) => state.auth.role);
+  const menuSource = role === "merchant" ? merchantMenu : adminMenu;
+  const name = useSelector((state) => state.auth.username);
+  const username = name.slice(0, 3);
+  const merchantBalance = useSelector((state) => state.auth.merchantBalance);
+  const merchantId = useSelector((state) => state.auth.merchantId);
+  const badgeMap = useSelector((state) => state.menuBadge.badges);
+  const [theme, setTheme] = useState("light");
   const [collapsed, setCollapsed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [colorDrawerVisible, setColorDrawerVisible] = useState(false);
+  const [openKeys, setOpenKeys] = useState([]);
+  const onOpenChange = (keys) => {
+    setOpenKeys(keys);
+  };
   const [show, setShow] = useState(false);
-  const matchedPath = findMenuPath(menuConfig, location.pathname) || [];
-  const role = useSelector((state) => state.auth.role || "user");
-  const name = useSelector((state) => state.auth.username || "user");
-  const username = useSelector((state) => state.auth.username || "user").slice(
-    0,
-    3
-  );
-  const menuItems = generateMenuItems(menuConfig, role);
+  const manageTitle = role === "merchant" ? "商户管理" : "桑格管理";
 
-  // 预设主题颜色选项
+  const splitKeyToPaths = (key) => {
+    return key.replace(/^\//, "").split("/");
+  };
+  const normalizeSelectedKey = (selectedKey, role) => {
+    if (!selectedKey) return "";
+  
+    // 仅 merchant 需要去掉前缀
+    if (role === "merchant") {
+      return selectedKey.replace(/^\/merchant/, "") || "/";
+    }
+  
+    return selectedKey;
+  };
+  // 侧边栏
+  const menuItems = generateMenuItems(
+    menuSource,
+    role,
+    badgeMap,
+    role === "merchant" ? "/merchant" : ""
+  );
+  // 刷新余额
+  const refreshBalance = async () => {
+    if (!merchantId) return;
+
+    const res = await refreshMerchantBalance(merchantId);
+    if (res?.code === 200) {
+      dispatch(updateMerchantBalance(res?.data));
+    }
+  };
+  // 刷新数据
+  const refreshDate = async(role) => {
+    if(role === "merchant"){
+      refreshBalance();
+    }else{
+      const res = await getFailed();
+      if(res?.code === 200){
+        const data = res?.data || {};
+        dispatch(
+          setMenuBadges([
+            {
+              path: "/scan/crosscheck/abnormal-orders",
+              value: data?.paperCount,
+            },
+            {
+              path: "/scan/imagetwin/abnormal-orders",
+              value: data?.imageCount,
+            },
+            {
+              path: "/scan/history/abnormal-orders",
+              value: data?.turnitinCount,
+            },
+          ])
+        )
+      }
+    }
+  };
+  const getBreadcrumbByKey = (menus, selectedKey, role) => {
+    // console.log("高亮路径",selectedKey);
+    if (!selectedKey) return [];
+    refreshDate(role);
+    const normalizedKey = normalizeSelectedKey(selectedKey, role);
+    const paths = splitKeyToPaths(normalizedKey);
+  
+    const result = [];
+    let currentMenus = menus;
+  
+    for (const path of paths) {
+      const match = currentMenus.find((m) => m.path === path);
+      if (!match) break;
+  
+      result.push({
+        key: path,
+        title: match.label,
+      });
+  
+      currentMenus = match.children || [];
+    }
+  
+    return result;
+  };
+  // 面包屑
+  const breadcrumbItems = [
+    { key: "home", title: manageTitle },
+    ...getBreadcrumbByKey(menuSource, location.pathname,role),
+  ];
+  
+
+
+  // 预设主题
   const presetColors = [
     "#1890ff", // 默认蓝色
     "#00b42a", // 绿色
@@ -157,13 +285,6 @@ const AdminLayout = () => {
     "#0fc6c2", // 青色
   ];
 
-  const breadcrumbItems = [
-    { key: "home", title: "桑格管理" },
-    ...matchedPath.map((item) => ({
-      key: item.path,
-      title: item.label,
-    })),
-  ];
 
   // 处理主色修改
   const handleColorChange = (color) => {
@@ -227,6 +348,7 @@ const AdminLayout = () => {
   );
 
   // 监听全屏状态变化
+  useIdleLogout();
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -260,25 +382,28 @@ const AdminLayout = () => {
 
   const handleLogout = () => {
     adminLogout();
+    dispatch(clearAuth());
+    dispatch(clearAllMenuBadge());
+    persistor.purge();
     navigate("/login");
     setShow(false);
     message.info("已注销登录");
   };
 
-  const [openKeys, setOpenKeys] = useState([]);
-  const onOpenChange = (keys) => {
-    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
-    setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
-  };
-
   return (
-    <Layout style={{ height: "100vh", overflow: "hidden" }}>
+    <Layout
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+        background: theme === "dark" ? "#333" : "#fff",
+      }}
+    >
       {/* 侧边栏 */}
       <Sider
+        width={260}
         theme={theme}
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        width="10%"
       >
         <h2
           style={{
@@ -291,14 +416,13 @@ const AdminLayout = () => {
             color: theme === "dark" ? "#fff" : "#333",
           }}
         >
-          <Tooltip title="桑格管理">桑格管理</Tooltip>
+          <Tooltip title={manageTitle}>{manageTitle}</Tooltip>
         </h2>
         <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
           <Menu
-            theme={theme}
             mode="inline"
+            theme={theme}
             items={menuItems}
-            defaultSelectedKeys={["/dashboard"]}
             selectedKeys={[location.pathname]}
             openKeys={openKeys}
             onOpenChange={onOpenChange}
@@ -307,14 +431,18 @@ const AdminLayout = () => {
                 navigate(key);
               }
             }}
-            style={{ border: "0px" }}
           />
         </div>
       </Sider>
 
       {/* 主内容区 */}
       <Layout>
-        <Header style={{ background: "#fff", padding: "0 16px" }}>
+        <Header
+          style={{
+            background: "#fff",
+            padding: "0 16px",
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -362,7 +490,17 @@ const AdminLayout = () => {
 
             {/* 右侧用户信息 + 颜色设置*/}
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              {/* TODO */}
+              { merchantBalance !== undefined && merchantBalance !== null && (
+                <Tooltip title="刷新余额">
+                  <Button
+                    type="text"
+                    className="p-0 m-0"
+                    onClick={() => refreshBalance()}
+                  >
+                    当前余额：{merchantBalance}
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="注销登录">
                 <Button
                   type="text"
@@ -393,64 +531,8 @@ const AdminLayout = () => {
           </div>
         </Header>
 
-        <Modal
-          open={show}
-          title={<Text strong>确认注销</Text>}
-          okText="确认注销"
-          cancelText="取消"
-          onOk={handleLogout}
-          onCancel={() => setShow(false)}
-          maskClosable={false}
-          destroyOnHidden
-          width={400}
-          okButtonProps={{
-            danger: true, // 危险操作使用红色按钮强调
-          }}
-        >
-          {/* 使用Antd的Space组件实现间距布局，无需依赖外部CSS */}
-          <Space
-            direction="vertical"
-            size="middle"
-            align="center"
-            style={{ width: "100%", padding: "16px 0" }}
-          >
-            <ExclamationCircleOutlined
-              style={{ fontSize: "48px", color: "#ff4d4f" }}
-            />
-
-            <Text>您确定要注销当前登录吗？</Text>
-
-            <Text type="secondary" style={{ fontSize: "14px" }}>
-              账户 <Text strong>{name}</Text> 将退出登录，
-              <br />
-              需要重新登录才能继续使用
-            </Text>
-          </Space>
-        </Modal>
-
-        <Drawer
-          title="主题颜色设置"
-          placement="right"
-          open={colorDrawerVisible}
-          onClose={() => setColorDrawerVisible(false)}
-          width={320}
-          closable={true}
-          mask={true}
-          maskClosable={true}
-          style={{ zIndex: 1001 }}
-        >
-          {colorDrawerContent}
-        </Drawer>
-
         {/* 内容区 */}
-        <Content
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflow: "auto",
-            margin: "16px 24px",
-          }}
-        >
+        <Content className="flex-1 min-h-0 overflow-auto no-scrollbar mx-6 my-4">
           <Breadcrumb
             style={{
               paddingBottom: "16px",
@@ -479,6 +561,54 @@ const AdminLayout = () => {
           </Suspense>
         </Content>
       </Layout>
+
+      <Modal
+        open={show}
+        title={<Text strong>确认注销</Text>}
+        okText="确认注销"
+        cancelText="取消"
+        onOk={handleLogout}
+        onCancel={() => setShow(false)}
+        maskClosable={false}
+        destroyOnHidden
+        width={400}
+        okButtonProps={{
+          danger: true,
+        }}
+      >
+        <Space
+          direction="vertical"
+          size="middle"
+          align="center"
+          style={{ width: "100%", padding: "16px 0" }}
+        >
+          <ExclamationCircleOutlined
+            style={{ fontSize: "48px", color: "#ff4d4f" }}
+          />
+
+          <Text>您确定要注销当前登录吗？</Text>
+
+          <Text type="secondary" style={{ fontSize: "14px" }}>
+            账户 <Text strong>{name}</Text> 将退出登录，
+            <br />
+            需要重新登录才能继续使用
+          </Text>
+        </Space>
+      </Modal>
+
+      <Drawer
+        title="主题颜色设置"
+        placement="right"
+        open={colorDrawerVisible}
+        onClose={() => setColorDrawerVisible(false)}
+        width={320}
+        closable={true}
+        mask={true}
+        maskClosable={true}
+        style={{ zIndex: 1001 }}
+      >
+        {colorDrawerContent}
+      </Drawer>
     </Layout>
   );
 };

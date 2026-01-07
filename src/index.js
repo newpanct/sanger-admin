@@ -2,15 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "antd/dist/reset.css";
 import reportWebVitals from "./reportWebVitals";
-import { ConfigProvider } from "antd";// 全局配置组件
-import App from "./App";// 根App组件
-import zhCN from "antd/locale/zh_CN";// antd 默认配置中文
-import { Provider, useSelector } from "react-redux"; // 引入useSelector
-import store from "./store";// rudux状态
+import { ConfigProvider } from "antd";
+import App from "./App";
+import zhCN from "antd/locale/zh_CN";
+import { Provider, useSelector } from "react-redux";
+import store, { persistor } from "./store";
+import { PersistGate } from "redux-persist/integration/react";
+import "./index.css";
 
-// 封装一个主题容器组件
+// 包裹 ConfigProvider 的主题组件
 const ThemeContainer = () => {
-  const { token } = useSelector((state) => state.theme); // 从Redux获取主题配置
+  const { token } = useSelector((state) => state.theme);
   return (
     <ConfigProvider locale={zhCN} theme={{ token }}>
       <App />
@@ -19,9 +21,12 @@ const ThemeContainer = () => {
 };
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <Provider store={store}>
-    <ThemeContainer />
+    <PersistGate loading={null} persistor={persistor}>
+      <ThemeContainer />
+    </PersistGate>
   </Provider>
 );
 

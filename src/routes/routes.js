@@ -1,11 +1,11 @@
 import React, { lazy, Suspense } from "react";
 import { useRoutes, Outlet } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
-import menuConfig from "../data/menu.json";
+import adminMenu from "../data/menu.json";
+import merchantMenu from "../data/merchantMenu.json";
 import Login from "../pages/LoginPage";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../pages/NotFoundPage";
-import ForbiddenPage from "../pages/ForbiddenPage";
 
 // 动态加载 + loading
 const withLoading = (Component) => (props) => {
@@ -29,27 +29,46 @@ const withLoading = (Component) => (props) => {
 // 所有页面组件映射
 const componentMap = {
   DashboardPage: lazy(() => import("../pages/DashboardPage")),
-  UserManage: lazy(() => import("../pages/UserPage")),
-  MerchantPage: lazy(() => import("../pages/MerchantPage")),
+  // 商户管理
+  MerchantPage: lazy(() => import("../pages/merchant-manage/MerchantPage")),
+  MerchantBalancePage: lazy(() => import("../pages/merchant-manage/MerchantBalancePage")),
+  // 支付
+  // -- 金额统计
+  PayCrossCheckPage: lazy(() => import("../pages/pay/amount-stat/PayCrossCheckPage")),
+  PayImagetwinPage: lazy(() => import("../pages/pay/amount-stat/PayImagetwinPage")),
+  // 查重
+  // -- CrossCheckPage
+  CrossCheckAbnOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckAbnOrderPage")),
+  CrossCheckOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckOrderPage")),
+
+  // -- ImagetwinPage
+  ImagetwinAbnOrderPage: lazy(() => import("../pages/scan/imagetwin/ImagetwinAbnOrderPage")),
+  ImagetwinOrderPage: lazy(() => import("../pages/scan/imagetwin/ImagetwinOrderPage")),
+
+  // -- 历史订单
+  HistoryAbnOrderPage: lazy(() => import("../pages/scan/history/HistoryAbnOrderPage")),
+  HistoryOrderPage: lazy(() => import("../pages/scan/history/HistoryOrderPage")),
+
   // 预审
   JournalPage: lazy(() => import("../pages/check/JournalPage")),
   ManuscriptPage: lazy(() => import("../pages/check/ManuscriptPage")),
   CertificationPage: lazy(() => import("../pages/check/CertificationPage")),
-  // 查重
-  ImagetwinPage: lazy(() => import("../pages/scan/ImagetwinPage")),
-  IthenciatePage: lazy(() => import("../pages/scan/IthenciatePage")),
-  SangerPage: lazy(() => import("../pages/scan/SangerPage")),
   // 推荐
   RecommendPage: lazy(() => import("../pages/recommend/RecommendPage")),
   // 综述
   OverviewPage: lazy(() => import("../pages/overview/OverviewPage")),
-  // 支付
-  OrderPage: lazy(() => import("../pages/pay/OrderPage")),
-  StatisticsPage: lazy(() => import("../pages/pay/StatisticsPage")),
-  // 测试
-  TestSubManage1: lazy(() => import("../pages/test/TestSubManage1")),
-  TestSubManage2: lazy(() => import("../pages/test/TestSubManage2")),
-  TestPage: lazy(() => import("../pages/test/TestPage")),
+
+  // 邮件
+  EmailPage:lazy(()=> import("../pages/EmailPage")),
+
+  // 微信公众号
+  KeywordPage:lazy(()=> import("../pages/wechat/KeywordPage")),
+  // 商家界面
+  InvalidatedPage:lazy(()=>import("../pages/merchant/goods/InvalidatedPage")),
+  PurchasePage:lazy(()=>import("../pages/merchant/control/PurchasePage")),
+  InformationPage:lazy(()=>import("../pages/merchant/control/InformationPage")),
+  SalesConsumptionPage:lazy(()=>import("../pages/merchant/goods/SalesConsumptionPage")),
+  InventoryPage:lazy(()=>import("../pages/merchant/goods/InventoryPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };
@@ -58,59 +77,53 @@ const componentMap = {
 const generateRoutes = (menus) =>
   menus
     .map((item, index) => {
-      if (!item.path) {
-        console.error(`路由缺少 path: 第${index + 1}项`, item);
-        return null;
-      }
-
-      // 父级路由：有 children
+      if (!item.path) return null;
       if (item.children?.length) {
-        const ParentComp = componentMap.LayoutOutlet;
         return {
           path: item.path,
-          element: <ParentComp />,
-          children: generateRoutes(item.children),
+          element: <componentMap.LayoutOutlet key={item.path} />,
+          children: generateRoutes(item.children, item.path),
         };
       }
 
-      if (!item.component) {
-        console.error(`路由缺少 component: 第${index + 1}项`, item);
-        return null;
-      }
+      if (!item.component) return null;
       const Comp = componentMap[item.component];
-      if (!Comp) {
-        console.error(`未找到组件：${item.component}`);
-        return null;
-      }
+      if (!Comp) return null;
 
-      // 包装
       const WrappedComp = withLoading(Comp);
 
       return {
         path: item.path,
-        element: <WrappedComp />,
+        element: <WrappedComp key={item.path} />,
       };
     })
     .filter(Boolean);
 
+
+
 //  权限路由导航
 const AppRoutes = () => {
-  const childRoutes = generateRoutes(menuConfig);
-
+  const adminRoutes = generateRoutes(adminMenu);
+  const merchantRoutes = generateRoutes(merchantMenu);
   const routes = useRoutes([
     { path: "/login", element: <Login /> },
-    // { path: "/403", element: <ForbiddenPage /> },
     {
-      element: <PrivateRoute />,
+      element: <PrivateRoute allow={["admin", "superAdmin"]} />,
       children: [
         {
           path: "/",
           element: <AdminLayout />,
-          children: [
-            ...childRoutes,
-            { path: "403", element: <ForbiddenPage /> },
-            { path: "*", element: <NotFoundPage /> },
-          ],
+          children: [...adminRoutes, { path: "*", element: <NotFoundPage /> }],
+        },
+      ],
+    },
+    {
+      element: <PrivateRoute allow={["merchant"]} />,
+      children: [
+        {
+          path: "/merchant",
+          element: <AdminLayout />,
+          children: [...merchantRoutes, { path: "*", element: <NotFoundPage /> }],
         },
       ],
     },

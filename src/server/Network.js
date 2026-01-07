@@ -1,12 +1,12 @@
 import axios from "axios";
 import { message } from "antd";
 import store from "../store";
-// const baseURL = "http://api.sangerbox.com/mysci";
-const baseURL = "https://api.sangerbox.com/api";
+import config from "../config";
+const baseURL = config.baseUrl;
 // ================== 基础配置 ================== //
 const axiosInstance = axios.create({
   baseURL: baseURL, // 统一设置基础地址
-  timeout: 15000,
+  timeout: config.timeout,
 });
 
 // ================== 请求拦截 ================== //
@@ -36,15 +36,14 @@ axiosInstance.interceptors.response.use(
 );
 
 const handleAuthExpired = () => {
+  window.location.href = "/login"; // 跳转登录页
   message.info("登录超时，请重新登录");
   console.warn("登录超时，请重新登录");
   localStorage.clear();
-  window.location.href = "/login"; // 跳转登录页
 };
 
 // ================== 错误处理 ================== //
 const handleError = (error) => {
-  console.log("err", error);
   if (error.response) {
     const status = error.response.status;
     console.log("status", status);
@@ -56,7 +55,7 @@ const handleError = (error) => {
         console.error("上传的文件过大，请选择较小的文件进行上传。");
         break;
       case 500:
-        console.error("服务器内部错误，请联系管理员");
+        console.error("服务器内部错误，请联系管理员！");
         break;
       default:
         console.error(

@@ -1,62 +1,145 @@
-import React, {  useState } from "react";
-import { Form, Input, Button, message, Typography } from "antd";
+/* global WxLogin */
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Typography, Tabs, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import "../style/login.css";
-import { pwdAdminLogin } from "../server/api";
-import {  useSelector } from "react-redux";
+import {
+  getWeChatState,
+  pwdAdminLogin,
+  weChatLoginStatus,
+} from "../server/api";
+import { useSelector } from "react-redux";
 import { Space } from "antd";
 const { Title, Text } = Typography;
 
 const Login = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [merchantForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [wxState, setWxState] = useState("");
+  const [loginType, setLoginType] = useState("account"); // "account" | "wechat"
   const { token } = useSelector((state) => state.theme);
-
   // 登录提交处理
   const onFinish = async (values) => {
     setLoading(true);
     try {
       const obj = {
-        username: values.email,
+        username: values.email || values.username,
         password: values.password,
       };
-      const response = await pwdAdminLogin(obj);
-      if (response.code === 200) {
-        if (response.data.isBindWechat === 0) {
+      const res = await pwdAdminLogin(obj);
+      if (res.code === 200) {
+        const token = res.data.token;
+        if(!token.startsWith("Bearer")){
+          navigate("/merchant/control/information");
+        }else{
           navigate("/dashboard");
-        } else if (response.data.isBindWechat === 1) {
-          navigate("/check/journal");
         }
-        message.success(response.message || "登录成功");
+        message.success(res.message || "登录成功");
       } else {
-        message.warning(response.message || "登录失败");
+        message.warning(res.message || "登录失败");
       }
     } catch (err) {
-      message.error("网络错误，请联系管理员");
+      message.error("网络错误，请联系管理员！");
     } finally {
       setLoading(false);
     }
   };
+
+  // 获取微信唯一标识
+  const onGetWeChatState = async () => {
+    try {
+      const res = await getWeChatState();
+      if (res.code === 200) {
+        return res.data;
+      } else {
+        message.warning(res?.message || "微信唯一标识获取失败");
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("网络失败");
+      return null;
+    }
+  };
+
+  const fetchState = async () => {
+    const res = await onGetWeChatState();
+    if (res) {
+      setWxState(res);
+    }
+  };
+
+  useEffect(() => {
+    if (loginType !== "wechat") {
+      setWxState("");
+      return;
+    }
+
+    fetchState();
+  }, [loginType]);
+
+  useEffect(() => {
+    if (loginType !== "wechat" || !wxState) return;
+
+    const container = document.getElementById("wxLoginContainer");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const redirect = encodeURIComponent(
+      "https://sangerbox.com/api/v2/user/wechat/web/callback/admin"
+    );
+
+    new WxLogin({
+      self_redirect: true,
+      id: "wxLoginContainer",
+      appid: "wx214d2ccc7c0b3d3b",
+      scope: "snsapi_login",
+      redirect_uri: redirect,
+      state: wxState,
+    });
+  }, [loginType, wxState]);
+
+  useEffect(() => {
+    if (loginType !== "wechat" || !wxState) return;
+
+    const timer = setInterval(async () => {
+      const res = await weChatLoginStatus(wxState);
+
+      if (res?.data.status === "confirmed") {
+        const token = res?.data.user.token;
+        if(!token.startsWith("Bearer")){
+          navigate("/merchant/control/information");
+        }else{
+          navigate("/dashboard");
+        }
+        setWxState("");
+        clearInterval(timer);
+        message.success(res.message || "登录成功！");
+      } else if (res?.data.status === "not_admin") {
+        setWxState("");
+        clearInterval(timer);
+        message.error(res.message || "登录失败！");
+      }
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, [loginType, wxState]);
+
   return (
     <div className="login-container">
       {/* 左侧背景图区域 */}
       <div className="login-bg-wrapper">
-        <div
-          className="login-bg-mask"
-          style={
-            {
-              // background:token.colorPrimary
-            }
-          }
-        >
+        <div className="login-bg-mask">
           <Space direction="vertical">
             <img src="/assets/logo.png" alt="logo" style={{ maxWidth: 300 }} />
             <Title level={2} className="login-bg-title">
               桑格查重后台管理系统
             </Title>
-            <Text className="login-bg-desc">致 力 于 更 优 质 的 服 务</Text>
+            <Text className="login-bg-desc ">致 力 于 更 优 质 的 服 务</Text>
           </Space>
         </div>
       </div>
@@ -64,75 +147,142 @@ const Login = () => {
       {/* 右侧登录表单区域 */}
       <div className="login-form-wrapper">
         <div className="login-form-inner">
-          {/* 系统Logo */}
-          <div className="login-logo">
-            <div className="logo-icon">
-              <UserOutlined
-                style={{ fontSize: 32, color: token.colorPrimary }}
-              />
-            </div>
-          </div>
+          {/* Tab 切换 */}
+          <Tabs
+            centered
+            activeKey={loginType}
+            onChange={(key) => setLoginType(key)}
+            items={[
+              // {
+              //   key: "merchant",
+              //   label: "商户登录",
+              //   children: (
+              //     <>
+              //     <div className="login-logo">
+              //         <div className="logo-icon">
+              //           <UserOutlined
+              //             style={{ fontSize: 32, color: token.colorPrimary }}
+              //           />
+              //         </div>
+              //       </div>
 
-          {/* 表单标题 */}
-          <Title level={3} className="login-form-title">
-            欢迎登录
-          </Title>
-          <Text type="secondary" className="login-form-subtitle">
-            请输入账号信息登录桑格管理
-          </Text>
+              //       <Title level={3} className="login-form-title">
+              //         欢迎登录
+              //       </Title>
+              //       <Text type="secondary" className="login-form-subtitle">
+              //         请输入账号信息登录桑格管理
+              //       </Text>
+              //     <Form
+              //       form={merchantForm}
+              //       layout="vertical"
+              //       onFinish={onFinish}
+              //       style={{ maxWidth: 400, margin: "auto" }}
+              //     >
+              //       <Form.Item
+              //         name="username"
+              //         label="用户名"
+              //         rules={[{ required: true, message: "请输入用户名" }]}
+              //       >
+              //         <Input prefix={<UserOutlined />} placeholder="请输入用户名" />
+              //       </Form.Item>
+              //       <Form.Item
+              //         name="password"
+              //         label="密码"
+              //         rules={[{ required: true, message: "请输入密码" }]}
+              //       >
+              //         <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
+              //       </Form.Item>
+              //       <Form.Item>
+              //         <Button type="primary" htmlType="submit" block size="large" loading={loading}>
+              //           登录
+              //         </Button>
+              //       </Form.Item>
+              //     </Form>
+              //     </>
+              //   ),
+              // },
+              {
+                key: "account",
+                label: "账号密码登录",
+                children: (
+                  <>
+                    {/* 系统Logo */}
+                    <div className="login-logo">
+                      <div className="logo-icon">
+                        <UserOutlined
+                          style={{ fontSize: 32, color: token.colorPrimary }}
+                        />
+                      </div>
+                    </div>
 
-          {/* 登录表单 */}
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            className="login-form"
-          >
-            {/* 邮箱输入框 */}
-            <Form.Item
-              name="email"
-              label="邮箱"
-              rules={[{ required: true, message: "请输入邮箱" }]}
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input
-                prefix={<MailOutlined className="input-icon" />}
-                placeholder="请输入邮箱地址"
-                className="login-input"
-                autoComplete="email"
-              />
-            </Form.Item>
+                    <Title level={3} className="login-form-title">
+                      欢迎登录
+                    </Title>
+                    <Text type="secondary" className="login-form-subtitle">
+                      请输入账号信息登录桑格管理
+                    </Text>
 
-            {/* 密码输入框 */}
-            <Form.Item
-              name="password"
-              label="密码"
-              rules={[{ required: true, message: "请输入密码" }]}
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-            >
-              <Input.Password
-                prefix={<LockOutlined className="input-icon" />}
-                placeholder="请输入密码"
-                className="login-input"
-                autoComplete="current-password"
-              />
-            </Form.Item>
+                    {/* 原登录表单 */}
+                    <Form
+                      form={form}
+                      layout="vertical"
+                      onFinish={onFinish}
+                      className="login-form"
+                    >
+                      <Form.Item
+                        name="email"
+                        label="邮箱"
+                        rules={[{ required: true, message: "请输入邮箱" }]}
+                      >
+                        <Input
+                          prefix={<MailOutlined />}
+                          placeholder="请输入邮箱地址"
+                        />
+                      </Form.Item>
 
-            {/* 登录按钮 */}
-            <Form.Item wrapperCol={{ span: 24 }} className="login-item">
-              <Button
-                type="primary"
-                htmlType="submit"
-                size="large"
-                loading={loading}
-                className="login-btn"
-              >
-                登录
-              </Button>
-            </Form.Item>
-          </Form>
+                      <Form.Item
+                        name="password"
+                        label="密码"
+                        rules={[{ required: true, message: "请输入密码" }]}
+                      >
+                        <Input.Password
+                          prefix={<LockOutlined />}
+                          placeholder="请输入密码"
+                        />
+                      </Form.Item>
+
+                      <Form.Item>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          size="large"
+                          block
+                          loading={loading}
+                        >
+                          登录
+                        </Button>
+                      </Form.Item>
+                    </Form>
+                  </>
+                ),
+              },
+              {
+                key: "wechat",
+                label: "微信扫码登录",
+                children: (
+                  <div
+                    style={{
+                      marginTop: 24,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div id="wxLoginContainer" />
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
