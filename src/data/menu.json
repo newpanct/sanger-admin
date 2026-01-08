@@ -186,5 +186,11 @@
           "component": "KeywordPage"
         }
       ]
+    },
+    {
+      "path": "resources",
+      "label": "资源管理",
+      "icon": "FolderOpenOutlined",
+      "component": "ResourcesPage"
     }
   ]

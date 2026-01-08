@@ -128,10 +128,10 @@ const EMAIL_HTML_TEMPLATE = `
 export default function EmailPage() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [emailType, setEmailType] = useState(null);
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [emailType, setEmailType] = useState(null);
 
   const editorRef = useRef(null);
 
@@ -148,6 +148,8 @@ export default function EmailPage() {
   const [addPreviewOpen, setAddPreviewOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [customType, setCustomType] = useState("");
+  const [emailTypeOptions, setEmailTypeOptions] = useState([]);
 
   const quillModules = {
     toolbar: [
@@ -226,14 +228,15 @@ export default function EmailPage() {
 
   const getAllEmailType = async () => {
     const res = await getMailTemplateEnumList();
-    res?.code === 200 &&
-      setEmailType([
-        { label: "所有模板类型", value: "" },
-        ...(res.data || []).map((item) => ({
-          label: item.label,
-          value: item.value,
-        })),
-      ]);
+    if (res?.code === 200) {
+      const options = (res.data || []).map((item) => ({
+        label: item,
+        value: item,
+      }));
+
+      setEmailTypeOptions(options);
+      setEmailType([{ label: "所有模板类型", value: "" }, ...options]);
+    }
   };
 
   const handleList = async (pageNum, pageSize, type) => {
@@ -391,7 +394,7 @@ export default function EmailPage() {
                 message.success(
                   res?.message || (editMode ? "模板修改成功" : "新增模板成功")
                 );
-
+                getAllEmailType();
                 setAddOpen(false);
                 setEditMode(false);
                 setCurrentRecord(null);
@@ -429,11 +432,72 @@ export default function EmailPage() {
               <Form.Item
                 label="邮件类型"
                 name="type"
-                rules={[{ required: true, message: "请选择邮件类型" }]}
+                rules={[{ required: true, message: "请选择或输入邮件类型" }]}
               >
                 <Select
-                  placeholder="请选择邮件类型"
-                  options={emailType?.filter((i) => i.value !== "")}
+                  placeholder="请选择或输入邮件类型"
+                  options={emailTypeOptions}
+                  showSearch
+                  optionFilterProp="label"
+                  popupRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider style={{ margin: "8px 0" }} />
+                      <Space style={{ padding: "0 8px 4px" }}>
+                        <Input
+                          placeholder="自定义邮件类型"
+                          value={customType}
+                          onChange={(e) => setCustomType(e.target.value)}
+                          onPressEnter={() => {
+                            if (!customType) return;
+
+                            const exists = emailTypeOptions.some(
+                              (i) => i.value === customType
+                            );
+                            if (!exists) {
+                              const newOption = {
+                                label: customType,
+                                value: customType,
+                              };
+                              setEmailTypeOptions((prev) => [
+                                ...prev,
+                                newOption,
+                              ]);
+                            }
+
+                            addForm.setFieldsValue({ type: customType });
+                            setCustomType("");
+                          }}
+                        />
+                        <Button
+                          type="text"
+                          onClick={() => {
+                            if (!customType) return;
+
+                            const exists = emailTypeOptions.some(
+                              (i) => i.value === customType
+                            );
+                            if (!exists) {
+                              const newOption = {
+                                label: customType,
+                                value: customType,
+                              };
+                              setEmailTypeOptions((prev) => [
+                                ...prev,
+                                newOption,
+                              ]);
+                            }
+
+                            addForm.setFieldsValue({ type: customType });
+                            setCustomType("");
+                          }}
+                        >
+                          添加
+                        </Button>
+                       <Tag color="error">添加后可以新增或修改新的邮件类型</Tag> 
+                      </Space>
+                    </>
+                  )}
                 />
               </Form.Item>
             </Col>

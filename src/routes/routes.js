@@ -61,6 +61,9 @@ const componentMap = {
   // 邮件
   EmailPage:lazy(()=> import("../pages/EmailPage")),
 
+  // 资源管理
+  ResourcesPage:lazy(()=> import("../pages/ResourcesPage")),
+
   // 微信公众号
   KeywordPage:lazy(()=> import("../pages/wechat/KeywordPage")),
   // 商家界面

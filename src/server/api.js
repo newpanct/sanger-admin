@@ -34,6 +34,24 @@ const postForm = async (url, data = {}) => {
   }
 };
 
+// 文件上传
+const postFormWithQuery = async (url, params = {}, data = {}) => {
+  try {
+    const response = await formRequst(
+      url,
+      "post",
+      toFormData(data),
+      {
+        params,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+
 // 通用请求封装（baseRequst）
 const getBase = async (url, params = {}, extraConfig = {}) => {
   try {
@@ -70,6 +88,7 @@ const downloadFile = (response, defaultName) => {
 };
 /* ---------------- 具体 API ---------------- */
 
+/* ---------------- 权限 ---------------- */
 // 登录
 export const pwdAdminLogin = async (obj) => {
   const response = await postJson("/user/admin/login", obj);
@@ -157,7 +176,7 @@ export const weChatLoginStatus = async (state) => {
   return res;
 };
 
-// --商户
+/* ---------------- 商户 ---------------- */
 // 生成微信绑定state
 export const generateState = async (merchantId) => {
   const response = await getBase("/user/merchant/wechat/bind/state", {
@@ -240,7 +259,7 @@ export const statMoon = async () => {
   return response.data;
 };
 
-// --查重系统
+/* ---------------- 查重系统 ---------------- */
 //获取imagetwin任务分页列表
 export const imagetwinPageList = async (obj) => {
   const response = await postJson("/dedup/admin/imagetwin/pageList", obj);
@@ -337,7 +356,7 @@ export const commitIthenticate = async (taskId) => {
 };
 
 // --商户
-// ---商户列表
+/* ---------------- 商户列表 ---------------- */
 // 商户注册
 export const merchantRegister = async (obj) => {
   const response = await postJson("/user/merchant/register", obj);
@@ -368,7 +387,7 @@ export const getPermissionEnums = async () => {
   return response.data;
 };
 
-// ---余额
+/* ---------------- 商户余额 ---------------- */
 // 获取商户权限列表
 export const getPermissionList = async (obj) => {
   const response = await postJson("/user/merchant/balanceList", obj);
@@ -387,7 +406,7 @@ export const merchantAccountAdd = async (obj) => {
   return response;
 };
 
-// ---邮箱
+/* ---------------- 邮件模板管理 ---------------- */
 // 邮件模板分页列表
 export const mailTemplatePageList = async (obj) => {
   const response = await postJson("/admin/mailTemplate/pageList", obj);
@@ -402,7 +421,7 @@ export const mailTemplateUpsert = async (obj) => {
 
 // 删除邮件模板
 export const mailTemplateDelete = async (code) => {
-  const response = await getBase("/admin/mailTemplate/delete",{code});
+  const response = await getBase("/admin/mailTemplate/delete", { code });
   return response.data;
 };
 
@@ -412,6 +431,7 @@ export const getMailTemplateEnumList = async () => {
   return response.data;
 };
 
+/* ---------------- 微信公众号 ---------------- */
 // 添加关键词
 export const addKeyword = async (obj) => {
   const response = await postJson("/admin/wxKeyword/add", obj);
@@ -432,10 +452,35 @@ export const updateKeyword = async (obj) => {
 
 // 删除关键词回复
 export const deleteKeyword = async (id) => {
-  const response = await getBase("/admin/wxKeyword/delete",{id});
+  const response = await getBase("/admin/wxKeyword/delete", { id });
   return response.data;
 };
 
+/* ---------------- 资源管理 ---------------- */
+// 上传静态文件
+export const uploadStaticUpload = async (obj) => {
+  return postFormWithQuery(
+    "/admin/staticUpload/upload",
+    {
+      customName: obj.customName,
+      category: obj.category,
+    },
+    {
+      file: obj.file,
+    }
+  );
+};
+
+// 静态文件分页列表
+export const staticUploadPageList = async (obj) => {
+  const response = await postJson("/admin/staticUpload/pageList", obj);
+  return response;
+};
+// 删除静态文件
+export const deleteStaticUpload = async (id) => {
+  const response = await getBase("/admin/staticUpload/delete", { id });
+  return response.data;
+};
 
 /* ---------------- 下列接口已作废 ---------------- */
 
