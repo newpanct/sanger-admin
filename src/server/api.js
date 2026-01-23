@@ -493,8 +493,16 @@ export const usageSummaryPage = async (obj) => {
   const response = await postJson("/admin/usage/summaryPage", obj);
   return response;
 };
-
-
+// 按月份查询费用统计记录
+export const summaryByMonth = async () => {
+  const response = await getBase("/admin/usage/summaryByMonth", );
+  return response.data;
+};
+// 实时统计费用记录
+export const realTimeSummary = async () => {
+  const response = await getBase("/admin/usage/realTimeSummary", );
+  return response.data;
+};
 
 
 /* ---------------- 下列接口已作废 ---------------- */
