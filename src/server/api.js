@@ -482,6 +482,21 @@ export const deleteStaticUpload = async (id) => {
   return response.data;
 };
 
+/* ---------------- 模型计费 ---------------- */
+// 获取费用使用总览
+export const usageOverview = async () => {
+  const response = await getBase("/admin/usage/overview", );
+  return response.data;
+};
+// 查询费用统计分页记录
+export const usageSummaryPage = async (obj) => {
+  const response = await postJson("/admin/usage/summaryPage", obj);
+  return response;
+};
+
+
+
+
 /* ---------------- 下列接口已作废 ---------------- */
 
 // 期刊

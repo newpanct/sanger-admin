@@ -63,6 +63,8 @@ const componentMap = {
 
   // 资源管理
   ResourcesPage:lazy(()=> import("../pages/ResourcesPage")),
+  // 资源管理
+  ModelBillingPage:lazy(()=> import("../pages/ModelBillingPage")),
 
   // 微信公众号
   KeywordPage:lazy(()=> import("../pages/wechat/KeywordPage")),

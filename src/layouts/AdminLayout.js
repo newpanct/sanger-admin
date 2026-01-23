@@ -64,7 +64,8 @@ import {
   MailOutlined,
   WechatOutlined,
   CommentOutlined,
-  FolderOpenOutlined 
+  FolderOpenOutlined,
+  PropertySafetyOutlined 
 } from "@ant-design/icons";
 import { adminLogout, getFailed, refreshMerchantBalance } from "../server/api";
 import adminMenu from "../data/menu.json";
@@ -78,6 +79,7 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 // icon 映射
 const iconMap = {
+  PropertySafetyOutlined,
   FolderOpenOutlined,
   CommentOutlined,
   WechatOutlined,

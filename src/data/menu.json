@@ -192,5 +192,11 @@
       "label": "资源管理",
       "icon": "FolderOpenOutlined",
       "component": "ResourcesPage"
+    },
+    {
+      "path": "model-billing",
+      "label": "模型计费",
+      "icon": "PropertySafetyOutlined",
+      "component": "ModelBillingPage"
     }
   ]
