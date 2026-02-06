@@ -1,7 +1,6 @@
 import { App as AntdApp, ConfigProvider, message } from "antd"; // 重命名避免冲突
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/routes";
-import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
 // 全局消息提示

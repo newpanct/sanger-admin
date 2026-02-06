@@ -37,20 +37,14 @@ const postForm = async (url, data = {}) => {
 // 文件上传
 const postFormWithQuery = async (url, params = {}, data = {}) => {
   try {
-    const response = await formRequst(
-      url,
-      "post",
-      toFormData(data),
-      {
-        params,
-      }
-    );
+    const response = await formRequst(url, "post", toFormData(data), {
+      params,
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
   }
 };
-
 
 // 通用请求封装（baseRequst）
 const getBase = async (url, params = {}, extraConfig = {}) => {
@@ -485,7 +479,7 @@ export const deleteStaticUpload = async (id) => {
 /* ---------------- 模型计费 ---------------- */
 // 获取费用使用总览
 export const usageOverview = async () => {
-  const response = await getBase("/admin/usage/overview", );
+  const response = await getBase("/admin/usage/overview");
   return response.data;
 };
 // 查询费用统计分页记录
@@ -495,15 +489,31 @@ export const usageSummaryPage = async (obj) => {
 };
 // 按月份查询费用统计记录
 export const summaryByMonth = async () => {
-  const response = await getBase("/admin/usage/summaryByMonth", );
+  const response = await getBase("/admin/usage/summaryByMonth");
   return response.data;
 };
 // 实时统计费用记录
 export const realTimeSummary = async () => {
-  const response = await getBase("/admin/usage/realTimeSummary", );
+  const response = await getBase("/admin/usage/realTimeSummary");
   return response.data;
 };
+/* ---------------- 用户管理 ---------------- */
+// 会员补偿
+export const memberCompensate = async (obj) => {
+  const response = await postJson("/admin/pub/member/compensate", obj);
+  return response;
+};
 
+// 统计会员补偿人数
+export const memberCount = async (obj) => {
+  const response = await postJson("/admin/pub/member/count", obj);
+  return response;
+};
+// 查询用户
+export const queryByModileOrUserId = async (mobileOrUserId) => {
+  const response = await getBase(`/admin/pub/member/queryByModileOrUserId?mobileOrUserId=${mobileOrUserId}`);
+  return response.data;
+};
 
 /* ---------------- 下列接口已作废 ---------------- */
 
@@ -581,11 +591,3 @@ export const findCheckByOrderNo = (orderNo) =>
 export const showIwAndIthCountMonth = () => postForm("/showIwAndIthCountMonth");
 
 export const showIwAndIthCountDay = () => postForm("/showIwAndIthCountDay");
-
-// 仪表盘
-export const getDownWosNum = () =>
-  getBase(
-    "http://fs.sangerbox.com/getDownWosNum",
-    {},
-    { headers: { Authorization: "" } }
-  );

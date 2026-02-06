@@ -74,6 +74,9 @@ const componentMap = {
   InformationPage:lazy(()=>import("../pages/merchant/control/InformationPage")),
   SalesConsumptionPage:lazy(()=>import("../pages/merchant/goods/SalesConsumptionPage")),
   InventoryPage:lazy(()=>import("../pages/merchant/goods/InventoryPage")),
+
+  // 会员管理
+  MemberPage:lazy(()=>import("../pages/user/MemberPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };

@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+# 项目名称
+[桑格管理系统]
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 项目配置
+npm run start : 启动项目
+npm run build : 打包项目
 
-## Available Scripts
 
-In the project directory, you can run:
+## 项目结构
+说明项目核心目录/文件的作用
+admin.sangerbox.com/
+├── src/                # 业务逻辑模块
+│   └── components/     # 公共组件
+│   └── data/           # 配置数据
+│   └── hooks/          # 项目钩子
+│   └── layouts/        # 界面布局
+│   └── pages/          # 各个分页
+│   └── routers/        # 路由配置
+│   └── server/         # 接口服务
+│   └── store/          # 状态管理
+│   └── style/          # 样式配置
+│   └── utils/          # 全局配置文件
+│   └── index.js        # 入口文件
+├── deploy.js           # 上传z盘脚本
+└── rollback.js         # 返回上一版本脚本
 
-### `npm start`
+## 核心功能
+1. 用户权限：基于角色的权限控制（RBAC），区分管理员/商户角色
+2. 商户管理：控制商户的权限和卡密
+3. 支付系统：统计项目具体金额
+4. 查重系统：用于管理查重网站
+5. 邮箱模板：回复用户的邮箱管理
+····
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 版本记录
+记录版本迭代信息，示例：
+| 版本 | 发布时间 | 核心变更 |
+|------|----------|----------|
+| v1.0 | 2026-02-05 | 初始版本，新增用户管理界面 |
+| v1.0 | 2026-02-05 | 用户管理界面 |

@@ -198,5 +198,18 @@
       "label": "模型计费",
       "icon": "PropertySafetyOutlined",
       "component": "ModelBillingPage"
+    },
+    {
+      "path": "user",
+      "label": "用户管理",
+      "icon": "TeamOutlined",
+      "children": [
+        {
+          "path": "member",
+          "label": "会员管理",
+          "icon": "SafetyCertificateOutlined",
+          "component": "MemberPage"
+        }
+      ]
     }
   ]
