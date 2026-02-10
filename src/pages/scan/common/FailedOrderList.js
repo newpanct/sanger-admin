@@ -5,8 +5,10 @@ import PageCard from "../../../components/PageCard";
 import {
   commitImagetwin,
   commitIthenticate,
+  commitDuplisee,
   imagetwinFailedPageList,
   ithenticateFailedPageList,
+  dupliseeFailedPageList,
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch } from "react-redux";
@@ -116,6 +118,7 @@ export default function FailedOrderList({ title, props }) {
   const apiCommmit = {
     imagetwin: commitImagetwin,
     ithenticate: commitIthenticate,
+    dupliSee: commitDuplisee,
   };
 
   const handleOrderList = async (page = pageNum, size = pageSize) => {
@@ -130,6 +133,8 @@ export default function FailedOrderList({ title, props }) {
         response = await imagetwinFailedPageList(params);
       } else if (props === "ithenticate") {
         response = await ithenticateFailedPageList(params);
+      }else if (props === "dupliSee") {
+        response = await dupliseeFailedPageList(params);
       }
 
       if (response && response.code === 200) {
@@ -154,18 +159,13 @@ export default function FailedOrderList({ title, props }) {
       const api = apiCommmit[props];
       if (!api) throw new Error("未匹配到接口");
       const res = await api(taskId);
-      // const pathMap = {
-      //   imagetwin: "/scan/imagetwin/abnormal-orders",
-      //   ithenticate: "/scan/crosscheck/abnormal-orders",
-      // };
-      // const path = pathMap[props];
-      // if (path) dispatch(decreaseMenuBadge(path));
       if (res?.code === 200) {
         message.success(res?.message || "手动提交成功");
         handleOrderList(pageNum, pageSize);
         const pathMap = {
           imagetwin: "/scan/imagetwin/abnormal-orders",
           ithenticate: "/scan/crosscheck/abnormal-orders",
+          dupliSee: "/scan/duplisee/abnormal-orders",
         };
         setCommitModalOpen(false);
         setCurrentRecord(null);

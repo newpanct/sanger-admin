@@ -109,7 +109,7 @@ export default baseURL;
 export const baseRequst = (url, method = "GET", data = {}, config = {}) =>
   request(url, method, data, config);
 
-// FormData 请求
+// From 请求
 export const formRequst = (url, method = "POST", data = {}, config = {}) =>
   request(url, method, data, {
     ...config,

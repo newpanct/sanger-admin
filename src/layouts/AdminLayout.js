@@ -244,6 +244,10 @@ const AdminLayout = () => {
               path: "/scan/history/abnormal-orders",
               value: data?.turnitinCount,
             },
+            {
+              path: "/scan/duplisee/abnormal-orders",
+              value: data?.dupliseeCount,
+            },
           ])
         )
       }

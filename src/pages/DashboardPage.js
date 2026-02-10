@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getFailed, statDashboard, statMoon } from "../server/api";
+import { statDashboard, statMoon } from "../server/api";
 import { Column } from "@ant-design/charts";
 import { Card, Col, Row, Statistic, Button, Badge, Skeleton } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { setMenuBadges } from "../store/menuBadgeSlice";
 import PageCard from "../components/PageCard";
 import { useNavigate } from "react-router-dom";
+const abnormalCardStyle = (color, bg) => ({
+  cursor: "pointer",
+  padding: "8px 12px",
+  borderRadius: 8,
+  borderLeft: `4px solid #ff4d4f`,
+  background: "#fff2f0",
+});
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -26,6 +33,7 @@ const DashboardPage = () => {
     paperCount: 0,
     imageCount: 0,
     turnitinCount: 0,
+    dupliseeCount: 0,
   });
 
   useEffect(() => {
@@ -35,6 +43,7 @@ const DashboardPage = () => {
       paperCount: badgeMap["/scan/crosscheck/abnormal-orders"] || 0,
       imageCount: badgeMap["/scan/imagetwin/abnormal-orders"] || 0,
       turnitinCount: badgeMap["/scan/history/abnormal-orders"] || 0,
+      dupliseeCount: badgeMap["/scan/duplisee/abnormal-orders"] || 0,
     });
   }, []);
 
@@ -67,48 +76,6 @@ const DashboardPage = () => {
       setLoading(false);
     }
   };
-
-  // 异常订单
-  // const handleFailedOrder = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const res = await getFailed();
-  //     if (res?.code === 200) {
-  //       const data = res.data || {};
-
-  //       setFailedStat({
-  //         paperCount: data.paperCount || 0,
-  //         imageCount: data.imageCount || 0,
-  //         turnitinCount: data.turnitinCount || 0,
-  //       });
-
-  //       dispatch(
-  //         setMenuBadges([
-  //           {
-  //             path: "/scan/crosscheck/abnormal-orders",
-  //             value: data.paperCount,
-  //           },
-  //           {
-  //             path: "/scan/imagetwin/abnormal-orders",
-  //             value: data.imageCount,
-  //           },
-  //           {
-  //             path: "/scan/history/abnormal-orders",
-  //             value: data.turnitinCount,
-  //           },
-  //           {
-  //             path: "/recommend/journals",
-  //             value: 10,
-  //           },
-  //         ])
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const onInit = () => {
     handleStatOrder();
@@ -216,62 +183,101 @@ const DashboardPage = () => {
         ))}
       </Row>
 
-      {/* 异常订单提示 */}
-      {(failedStat.paperCount > 0 ||
-        failedStat.imageCount > 0 ||
-        failedStat.turnitinCount > 0) && (
-        <Card  size="small"  title="异常订单" style={{ marginTop: 12, padding: 12 }}>
-          <Row gutter={[16, 16]}>
-            {failedStat.paperCount > 0 && (
-              <Col xs={24} sm={12} md={8}>
-                <Card
-                  hoverable
-                  onClick={() => navigate("/scan/crosscheck/abnormal-orders")}
-                >
-                  <Statistic
-                    title="CrossCheck 异常订单"
-                    value={failedStat.paperCount}
-                    suffix="条"
-                    valueStyle={{ color: "#ff4d4f" }}
-                  />
-                </Card>
-              </Col>
-            )}
-
-            {failedStat.imageCount > 0 && (
-              <Col xs={24} sm={12} md={8}>
-                <Card
-                  hoverable
-                  onClick={() => navigate("/scan/imagetwin/abnormal-orders")}
-                >
-                  <Statistic
-                    title="imagetwin 异常订单"
-                    value={failedStat.imageCount}
-                    suffix="条"
-                    valueStyle={{ color: "#faad14" }}
-                  />
-                </Card>
-              </Col>
-            )}
-
-            {failedStat.turnitinCount > 0 && (
-              <Col xs={24} sm={12} md={8}>
-                <Card
-                  hoverable
-                  onClick={() => navigate("/scan/history/abnormal-orders")}
-                >
-                  <Statistic
-                    title="turnitin 异常订单"
-                    value={failedStat.turnitinCount}
-                    suffix="条"
-                    valueStyle={{ color: "#722ed1" }}
-                  />
-                </Card>
-              </Col>
-            )}
-          </Row>
-        </Card>
+{/* 异常订单提示 */}
+{(failedStat.paperCount > 0 ||
+  failedStat.imageCount > 0 ||
+  failedStat.dupliseeCount > 0 ||
+  failedStat.turnitinCount > 0) && (
+  <Card
+    size="small"
+    title="异常订单"
+    style={{ marginTop: 12 }}
+    styles={{ body: { padding: 12 } }}
+  >
+    <Row gutter={[12, 12]}>
+      {failedStat.paperCount > 0 && (
+        <Col md={3}>
+          <Card
+            size="small"
+            hoverable
+            style={abnormalCardStyle()}
+            onClick={() =>
+              navigate("/scan/crosscheck/abnormal-orders")
+            }
+          >
+            <Statistic
+              title="CrossCheck"
+              value={failedStat.paperCount}
+              suffix="条"
+              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+            />
+          </Card>
+        </Col>
       )}
+
+      {failedStat.imageCount > 0 && (
+        <Col md={3}>
+          <Card
+            size="small"
+            hoverable
+            style={abnormalCardStyle()}
+            onClick={() =>
+              navigate("/scan/imagetwin/abnormal-orders")
+            }
+          >
+            <Statistic
+              title="ImageTwin"
+              value={failedStat.imageCount}
+              suffix="条"
+              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+            />
+          </Card>
+        </Col>
+      )}
+
+      {failedStat.turnitinCount > 0 && (
+        <Col md={3}>
+          <Card
+            size="small"
+            hoverable
+            style={abnormalCardStyle()}
+            onClick={() =>
+              navigate("/scan/history/abnormal-orders")
+            }
+          >
+            <Statistic
+              title="Turnitin"
+              value={failedStat.turnitinCount}
+              suffix="条"
+              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+            />
+          </Card>
+        </Col>
+      )}
+
+      {failedStat.dupliseeCount > 0 && (
+        <Col md={3}>
+          <Card
+            size="small"
+            hoverable
+            style={abnormalCardStyle()}
+            onClick={() =>
+              navigate("/scan/duplisee/abnormal-orders")
+            }
+          >
+            <Statistic
+              title="SangerboxScope"
+              value={failedStat.dupliseeCount}
+              suffix="条"
+              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+            />
+          </Card>
+        </Col>
+      )}
+    </Row>
+  </Card>
+)}
+
 
       {/* 月度订单柱状图 */}
       <Row gutter={[16, 16]} style={{ marginTop: 12 }}>

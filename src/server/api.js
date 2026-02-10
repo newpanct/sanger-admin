@@ -348,6 +348,27 @@ export const commitIthenticate = async (taskId) => {
   const response = await getBase("/dedup/admin/ithenticate/commit", { taskId });
   return response.data;
 };
+// duplisee 成功查重分页列表
+export const dupliseePageList = async (obj) => {
+  const response = await postJson("/dedup/admin/duplisee/pagelist", obj);
+  return response;
+};
+// duplisee 失败查重分页列表
+export const dupliseeFailedPageList = async (obj) => {
+  const response = await postJson("/dedup/admin/duplisee/failed", obj);
+  return response;
+};
+// 手动提交 duplisee 任务
+export const commitDuplisee = async (taskId) => {
+  const response = await getBase("/dedup/admin/duplisee/commit", { taskId });
+  return response.data;
+};
+//  duplisee 任务 删除去重任务
+export const dupliSeeDeleteById = async (id) => {
+  const response = await getBase("/dedup/dupliSee/deleteById", { id });
+  return response.data;
+};
+
 
 // --商户
 /* ---------------- 商户列表 ---------------- */
@@ -514,6 +535,8 @@ export const queryByModileOrUserId = async (mobileOrUserId) => {
   const response = await getBase(`/admin/pub/member/queryByModileOrUserId?mobileOrUserId=${mobileOrUserId}`);
   return response.data;
 };
+
+
 
 /* ---------------- 下列接口已作废 ---------------- */
 

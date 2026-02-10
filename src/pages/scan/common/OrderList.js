@@ -26,6 +26,8 @@ import {
   getResLink,
   deleteImagetwinById,
   deleteIthenticateById,
+  dupliseePageList,
+  dupliSeeDeleteById,
 } from "../../../server/api";
 
 export default function OrderList({ title, props }) {
@@ -60,11 +62,13 @@ export default function OrderList({ title, props }) {
   const apiMap = {
     imagetwin: imagetwinPageList,
     ithenticate: ithenticatePageList,
+    dupliSee: dupliseePageList,
   };
 
   const apiDeleteMap = {
     imagetwin: deleteImagetwinById,
     ithenticate: deleteIthenticateById,
+    dupliSee: dupliSeeDeleteById,
   };
 
   /** 获取列表 */
@@ -129,7 +133,6 @@ export default function OrderList({ title, props }) {
         </Typography.Text>
       ),
     },
-
     {
       title: "任务状态",
       width: 100,
@@ -167,20 +170,23 @@ export default function OrderList({ title, props }) {
         const disabled = record.status !== 2;
         return (
           <Space>
-            <Tooltip title="查看结果链接">
-              <Button
-                size="small"
-                icon={<LinkOutlined />}
-                disabled={disabled}
-                onClick={() => {
-                  if (!record.resultUrl)
-                    return message.warning("请先从右侧获取新链接");
-                  if (isExpired(record.expireTime) && props === "ithenticate")
-                    return message.warning("链接已过期");
-                  window.open(record.resultUrl);
-                }}
-              />
-            </Tooltip>
+            {
+              props !== "dupliSee" &&
+              <Tooltip title="查看结果链接">
+                <Button
+                  size="small"
+                  icon={<LinkOutlined />}
+                  disabled={disabled}
+                  onClick={() => {
+                    if (!record.resultUrl)
+                      return message.warning("请先从右侧获取新链接");
+                    if (isExpired(record.expireTime) && props === "ithenticate")
+                      return message.warning("链接已过期");
+                    window.open(record.resultUrl);
+                  }}
+                />
+              </Tooltip>
+            }
             {props === "imagetwin" ? (
               <Tooltip title="下载">
                 <Button
@@ -191,7 +197,7 @@ export default function OrderList({ title, props }) {
                   disabled={!record.localFileUrl}
                 />
               </Tooltip>
-            ) : (
+            ) : props === "ithenticate" ? (
               <Tooltip title="获取新链接">
                 <Button
                   size="small"
@@ -199,7 +205,17 @@ export default function OrderList({ title, props }) {
                   onClick={() => onGetNewLink(record.id)}
                 />
               </Tooltip>
-            )}
+            ) : props === "dupliSee" ? (
+              <Tooltip title="获取新链接">
+                <Button
+                  size="small"
+                  icon={<DownloadOutlined />}
+                  href={record.pdfReportUrl || undefined}
+                  target="_blank"
+                  disabled={!record.pdfReportUrl}
+                />
+              </Tooltip>
+            ) :null}
             <Tooltip title="删除">
               <Button
                 size="small"

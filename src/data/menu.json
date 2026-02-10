@@ -76,7 +76,7 @@
         },
         {
           "path": "imagetwin",
-          "label": "imagetwin",
+          "label": "Imagetwin",
           "icon": "PictureOutlined",
           "children": [
             {
@@ -109,6 +109,25 @@
               "label": "异常订单",
               "icon": "UnorderedListOutlined",
               "component": "HistoryAbnOrderPage"
+            }
+          ]
+        },
+        {
+          "path": "duplisee",
+          "label": "SangerboxScope",
+          "icon": "ThunderboltOutlined",
+          "children": [
+            {
+              "path": "order",
+              "label": "订单",
+              "icon": "OrderedListOutlined",
+              "component": "DupliSeePage"
+            },
+            {
+              "path": "abnormal-orders",
+              "label": "异常订单",
+              "icon": "UnorderedListOutlined",
+              "component": "DupliSeeFaidPage"
             }
           ]
         }
