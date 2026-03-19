@@ -295,6 +295,12 @@ export const statisticsIthenticate = async (obj) => {
   return response;
 };
 
+// SangerboxScope 订单统计
+export const statisticsSangerboxScope = async (obj) => {
+  const response = await postJson("/dedup/statistics/sangerboxscope", obj);
+  return response;
+};
+
 // turnicheck 历史查重分页列表
 export const turnicheckPageList = async (obj) => {
   const response = await postJson("/dedup/admin/turnicheck/pageList", obj);
@@ -535,6 +541,13 @@ export const queryByModileOrUserId = async (mobileOrUserId) => {
   const response = await getBase(`/admin/pub/member/queryByModileOrUserId?mobileOrUserId=${mobileOrUserId}`);
   return response.data;
 };
+
+// 优惠码
+export const couponPageList = async (obj) => {
+  const response = await postJson("/admin/coupon/pageList", obj);
+  return response;
+};
+
 
 
 

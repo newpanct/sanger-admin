@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import dayjs from "dayjs";
-import { Button, Skeleton, Table, DatePicker,  message } from "antd";
+import { Button, Skeleton, Table, DatePicker, message } from "antd";
 import {
   statisticsIthenticate,
   statisticsImagetwin,
+  statisticsSangerboxScope
 } from "../../../server/api";
 export default function StatisticsList({ title, props }) {
   const [errMsg, setErrMsg] = useState(null);
@@ -19,6 +20,7 @@ export default function StatisticsList({ title, props }) {
   const apiMap = {
     imagetwin: statisticsImagetwin,
     ithenticate: statisticsIthenticate,
+    sangerboxscope: statisticsSangerboxScope,
   };
   const handleStatisticsList = async (page = pageNum, size = pageSize) => {
     setLoading(true);
@@ -36,7 +38,7 @@ export default function StatisticsList({ title, props }) {
         const { records = [], total = 0 } = res.data || {};
         setList(records);
         setTotal(total);
-      }else{
+      } else {
         message.error("请联系管理员！");
       }
     } catch (e) {

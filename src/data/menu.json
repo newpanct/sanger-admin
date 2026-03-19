@@ -45,6 +45,12 @@
               "label": "imagetwin",
               "icon": "PictureOutlined",
               "component": "PayImagetwinPage"
+            },
+            {
+              "path": "sangerboxscope",
+              "label": "SangerboxScope",
+              "icon": "PictureOutlined",
+              "component": "PaySangerboxScopePage"
             }
           ]
         }
@@ -130,6 +136,12 @@
               "component": "DupliSeeFaidPage"
             }
           ]
+        },
+        {
+          "path": "promocode",
+          "label": "优惠码",
+          "icon": "GiftOutlined",
+          "component": "PromoCodePage"
         }
       ]
     },

@@ -36,6 +36,7 @@ const componentMap = {
   // -- 金额统计
   PayCrossCheckPage: lazy(() => import("../pages/pay/amount-stat/PayCrossCheckPage")),
   PayImagetwinPage: lazy(() => import("../pages/pay/amount-stat/PayImagetwinPage")),
+  PaySangerboxScopePage: lazy(() => import("../pages/pay/amount-stat/PaySangerboxScopePage")),
   // 查重
   // -- CrossCheckPage
   CrossCheckAbnOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckAbnOrderPage")),
@@ -52,7 +53,9 @@ const componentMap = {
   // -- DupliSee订单
   DupliSeePage: lazy(() => import("../pages/scan/duplisee/DupliSeePage")),
   DupliSeeFaidPage: lazy(() => import("../pages/scan/duplisee/DupliSeeFaidPage")),
-
+  
+  // 优惠码
+  PromoCodePage: lazy(() => import("../pages/scan/PromoCodePage")),
   // 预审
   JournalPage: lazy(() => import("../pages/check/JournalPage")),
   ManuscriptPage: lazy(() => import("../pages/check/ManuscriptPage")),

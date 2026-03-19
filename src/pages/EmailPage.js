@@ -345,7 +345,7 @@ export default function EmailPage() {
         title={editMode ? "编辑邮件模板" : "新增邮件模板"}
         open={addOpen}
         width={"80%"}
-        destroyOnClose
+        destroyOnHidden
         onClose={() => {
           setAddOpen(false);
           setEditMode(false);

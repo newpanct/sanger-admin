@@ -244,7 +244,7 @@ export default function MerchantBalancePage() {
           }
         }}
         okText="确认"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -298,7 +298,7 @@ export default function MerchantBalancePage() {
         onOk={handleUpdateAccount}
         confirmLoading={confirmLoading}
         okText="确认修改"
-        destroyOnClose
+        destroyOnHidden
       >
         <Typography.Paragraph>
           您确定要
