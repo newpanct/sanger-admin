@@ -68,6 +68,7 @@ import {
   PropertySafetyOutlined,
   SafetyCertificateOutlined,
   GiftOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import { adminLogout, getFailed, refreshMerchantBalance } from "../server/api";
 import adminMenu from "../data/menu.json";
@@ -122,7 +123,8 @@ const iconMap = {
   KeyOutlined,
   ShoppingOutlined,
   MailOutlined,
-  GiftOutlined
+  GiftOutlined,
+  LinkOutlined
 };
 const computeFullPath = (item, parentPath = "") => {
   if (!item.path) return "";

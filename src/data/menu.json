@@ -242,5 +242,11 @@
           "component": "MemberPage"
         }
       ]
+    },
+    {
+      "path": "link",
+      "label": "链接管理",
+      "icon": "LinkOutlined",
+      "component": "LinkPage"
     }
   ]

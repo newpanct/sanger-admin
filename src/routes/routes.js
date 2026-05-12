@@ -84,6 +84,7 @@ const componentMap = {
 
   // 会员管理
   MemberPage:lazy(()=>import("../pages/user/MemberPage")),
+  LinkPage:lazy(()=>import("../pages/LinkPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };

@@ -548,6 +548,32 @@ export const couponPageList = async (obj) => {
   return response;
 };
 
+/* ---------------- 链接管理 ---------------- */
+export const serviceUrlList = async (obj) => {
+  const response = await postJson("/admin/service-url/pageList", obj);
+  return response;
+};
+
+export const serviceUrlAdd = async (obj) => {
+  const response = await postJson("/admin/service-url/add", obj);
+  return response;
+};
+
+export const serviceUrlUpdate = async (obj) => {
+  const response = await postJson("/admin/service-url/update", obj);
+  return response;
+};
+
+export const serviceUrlDelete = async (id) => {
+  const response = await getBase(`/admin/service-url/delete/${id}`);
+  return response.data;
+};
+
+export const serviceUrlToggleStatus = async (id) => {
+  const response = await getBase(`/admin/service-url/toggleStatus/${id}`);
+  return response.data;
+};
+
 
 
 
