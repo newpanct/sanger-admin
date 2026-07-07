@@ -42,8 +42,6 @@ const EMAIL_HTML_TEMPLATE = `
     <title>模拟发送</title>
     <style>
         body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
         }
@@ -494,7 +492,7 @@ export default function EmailPage() {
                         >
                           添加
                         </Button>
-                       <Tag color="error">添加后可以新增或修改新的邮件类型</Tag> 
+                        <Tag color="error">添加后可以新增或修改新的邮件类型</Tag>
                       </Space>
                     </>
                   )}
@@ -530,6 +528,7 @@ export default function EmailPage() {
               style={{
                 display: "flex",
                 gap: 16,
+                height:'74vh'
               }}
             >
               {/* 左侧编辑 */}
@@ -555,7 +554,7 @@ export default function EmailPage() {
               </div>
 
               {/* 右侧预览 */}
-              <div
+              {/* <div
                 style={{
                   flex: 1,
                   border: "1px solid #f0f0f0",
@@ -574,6 +573,25 @@ export default function EmailPage() {
                     __html: contentHtml,
                   }}
                 />
+              </div> */}
+              <div
+                style={{
+                  flex: 1,
+                  border: "1px solid #f0f0f0",
+                  background: "#f2f4f6",
+                  overflow: "auto",
+                }}
+              >
+                <iframe
+                  title="live-email-preview"
+                  srcDoc={contentHtml}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    background: "#fff",
+                  }}
+                />
               </div>
             </div>
           </Form.Item>
@@ -588,7 +606,17 @@ export default function EmailPage() {
         width={800}
         onCancel={() => setPreviewOpen(false)}
       >
-        <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+        <iframe
+          title="email-preview"
+          srcDoc={previewHtml}
+          style={{
+            width: "100%",
+            height: "600px",
+            border: "none",
+            background: "#fff",
+          }}
+        />
+        {/* <div dangerouslySetInnerHTML={{ __html: previewHtml }} /> */}
       </Modal>
 
       <Modal

@@ -69,6 +69,9 @@ import {
   SafetyCertificateOutlined,
   GiftOutlined,
   LinkOutlined,
+  ApartmentOutlined,
+  CloudServerOutlined ,
+  DesktopOutlined ,
 } from "@ant-design/icons";
 import { adminLogout, getFailed, refreshMerchantBalance } from "../server/api";
 import adminMenu from "../data/menu.json";
@@ -82,6 +85,10 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 // icon 映射
 const iconMap = {
+  ExclamationCircleOutlined,
+  DesktopOutlined,
+  CloudServerOutlined,
+  ApartmentOutlined,
   SafetyCertificateOutlined,
   PropertySafetyOutlined,
   FolderOpenOutlined,

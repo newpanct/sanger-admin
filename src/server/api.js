@@ -653,3 +653,13 @@ export const findCheckByOrderNo = (orderNo) =>
 export const showIwAndIthCountMonth = () => postForm("/showIwAndIthCountMonth");
 
 export const showIwAndIthCountDay = () => postForm("/showIwAndIthCountDay");
+
+// 企业
+export const enterpriseAdd = (obj) => postJson("/user/enterprise/add",obj);
+export const enterprisePage = (obj) => postJson("/user/enterprise/page",obj);
+export const enterpriseList = (integer) => getBase("/user/enterprise/list",{id:integer});
+export const enterpriseDelete = (integer) => getBase("/user/enterprise/delete",{id:integer});
+
+// 服务
+export const dedupCheck = () => getBase("/dedup/check");
+export const dedupCheckToggle = (integer) => getBase("/dedup/check/toggle",{service:integer});

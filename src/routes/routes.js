@@ -69,8 +69,8 @@ const componentMap = {
   EmailPage:lazy(()=> import("../pages/EmailPage")),
 
   // 资源管理
-  ResourcesPage:lazy(()=> import("../pages/ResourcesPage")),
-  // 资源管理
+  // ResourcesPage:lazy(()=> import("../pages/ResourcesPage")),
+  // 模型计费
   ModelBillingPage:lazy(()=> import("../pages/ModelBillingPage")),
 
   // 微信公众号
@@ -84,7 +84,13 @@ const componentMap = {
 
   // 会员管理
   MemberPage:lazy(()=>import("../pages/user/MemberPage")),
+  // 链接管理
   LinkPage:lazy(()=>import("../pages/LinkPage")),
+  // 企业
+  EnterprisePage:lazy(()=>import("../pages/EnterprisePage")),
+
+  // 网页
+  ServerPage:lazy(()=>import("../pages/web/ServerPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };

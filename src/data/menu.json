@@ -219,12 +219,6 @@
       ]
     },
     {
-      "path": "resources",
-      "label": "资源管理",
-      "icon": "FolderOpenOutlined",
-      "component": "ResourcesPage"
-    },
-    {
       "path": "model-billing",
       "label": "模型计费",
       "icon": "PropertySafetyOutlined",
@@ -248,5 +242,30 @@
       "label": "链接管理",
       "icon": "LinkOutlined",
       "component": "LinkPage"
+    },
+    {
+      "path": "enterprise",
+      "label": "企业管理",
+      "icon": "ApartmentOutlined",
+      "component": "EnterprisePage"
+    },
+    {
+      "path": "web",
+      "label": "网页管理",
+      "icon": "DesktopOutlined",
+      "children": [
+        {
+          "path": "member",
+          "label": "公告管理",
+          "icon": "ExclamationCircleOutlined",
+          "component": "MemberPage"
+        },
+        {
+          "path": "server",
+          "label": "服务管理",
+          "icon": "SafetyCertificateOutlined",
+          "component": "ServerPage"
+        }
+      ]
     }
   ]
