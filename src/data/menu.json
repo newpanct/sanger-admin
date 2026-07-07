@@ -255,10 +255,10 @@
       "icon": "DesktopOutlined",
       "children": [
         {
-          "path": "member",
+          "path": "notice",
           "label": "公告管理",
           "icon": "ExclamationCircleOutlined",
-          "component": "MemberPage"
+          "component": "NoticePage"
         },
         {
           "path": "server",

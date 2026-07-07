@@ -91,6 +91,7 @@ const componentMap = {
 
   // 网页
   ServerPage:lazy(()=>import("../pages/web/ServerPage")),
+  NoticePage:lazy(()=>import("../pages/web/NoticePage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };
