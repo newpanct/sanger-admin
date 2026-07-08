@@ -198,8 +198,24 @@ const AdminLayout = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [colorDrawerVisible, setColorDrawerVisible] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
+  const menuPrefix = role === "merchant" ? "/merchant" : "";
+  const rootSubmenuKeys = menuSource
+    .filter((item) => !item.hidden && item.children?.length)
+    .map((item) => computeFullPath(item, menuPrefix));
+
   const onOpenChange = (keys) => {
-    setOpenKeys(keys);
+    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
+    // 一级菜单手风琴：同时只展开一个根级子菜单，保留其下的嵌套展开项
+    if (latestOpenKey && rootSubmenuKeys.includes(latestOpenKey)) {
+      setOpenKeys(
+        keys.filter(
+          (key) =>
+            key === latestOpenKey || key.startsWith(`${latestOpenKey}/`)
+        )
+      );
+    } else {
+      setOpenKeys(keys);
+    }
   };
   const [show, setShow] = useState(false);
   const manageTitle = role === "merchant" ? "商户管理" : "桑格管理";
@@ -265,9 +281,7 @@ const AdminLayout = () => {
     }
   };
   const getBreadcrumbByKey = (menus, selectedKey, role) => {
-    // console.log("高亮路径",selectedKey);
     if (!selectedKey) return [];
-    refreshDate(role);
     const normalizedKey = normalizeSelectedKey(selectedKey, role);
     const paths = splitKeyToPaths(normalizedKey);
   
@@ -370,6 +384,30 @@ const AdminLayout = () => {
 
   // 监听全屏状态变化
   useIdleLogout();
+  // 仅在路由或角色变化时刷新异常订单/余额，避免 render 期副作用
+  useEffect(() => {
+    refreshDate(role);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, role]);
+
+  // 根据当前路由自动展开对应父级菜单
+  useEffect(() => {
+    const pathname = location.pathname;
+    if (role === "merchant" && !pathname.startsWith("/merchant")) return;
+
+    const relative = role === "merchant"
+      ? pathname.replace(/^\/merchant/, "") || "/"
+      : pathname;
+    const segments = relative.replace(/^\//, "").split("/").filter(Boolean);
+    const keys = [];
+    let acc = menuPrefix;
+    for (let i = 0; i < segments.length - 1; i++) {
+      acc = `${acc}/${segments[i]}`.replace(/\/+/g, "/");
+      keys.push(acc);
+    }
+    setOpenKeys(keys);
+  }, [location.pathname, role, menuPrefix]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -425,34 +463,51 @@ const AdminLayout = () => {
         theme={theme}
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        style={{ height: "100vh", overflow: "hidden" }}
       >
-        <h2
+        <div
           style={{
-            height: "64px",
-            lineHeight: "64px",
-            textAlign: "center",
-            fontSize: "18px",
-            flexShrink: 0,
-            margin: 0,
-            color: theme === "dark" ? "#fff" : "#333",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
           }}
         >
-          <Tooltip title={manageTitle}>{manageTitle}</Tooltip>
-        </h2>
-        <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-          <Menu
-            mode="inline"
-            theme={theme}
-            items={menuItems}
-            selectedKeys={[location.pathname]}
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-            onClick={({ key }) => {
-              if (location.pathname !== key) {
-                navigate(key);
-              }
+          <h2
+            style={{
+              height: "64px",
+              lineHeight: "64px",
+              textAlign: "center",
+              fontSize: "18px",
+              flexShrink: 0,
+              margin: 0,
+              color: theme === "dark" ? "#fff" : "#333",
             }}
-          />
+          >
+            <Tooltip title={manageTitle}>{manageTitle}</Tooltip>
+          </h2>
+          <div
+            className="no-scrollbar"
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: "auto",
+              overflowX: "hidden",
+            }}
+          >
+            <Menu
+              mode="inline"
+              theme={theme}
+              items={menuItems}
+              selectedKeys={[location.pathname]}
+              openKeys={openKeys}
+              onOpenChange={onOpenChange}
+              onClick={({ key }) => {
+                if (location.pathname !== key) {
+                  navigate(key);
+                }
+              }}
+            />
+          </div>
         </div>
       </Sider>
 

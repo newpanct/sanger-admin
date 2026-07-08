@@ -8,6 +8,7 @@ import {
   Spin,
   Typography,
   message,
+  Alert,
 } from "antd";
 import {
   ReloadOutlined,
@@ -121,6 +122,13 @@ export default function ServerPage() {
         </>
       }
     >
+      <Alert
+        type="warning"
+        showIcon
+        style={{ margin: "12px 0" }}
+        message="操作提醒"
+        description="服务状态的开启或关闭会直接影响线上产品的使用，请谨慎操作。"
+      />
       <Spin spinning={loading}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
           {SERVICE_LIST.map((service) => {

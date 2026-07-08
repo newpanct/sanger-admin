@@ -51,6 +51,12 @@
               "label": "SangerboxScope",
               "icon": "PictureOutlined",
               "component": "PaySangerboxScopePage"
+            },
+            {
+              "path": "enterprise-recharge",
+              "label": "企业充值",
+              "icon": "ApartmentOutlined",
+              "component": "PayEnterpriseRechargePage"
             }
           ]
         }

@@ -37,6 +37,9 @@ const componentMap = {
   PayCrossCheckPage: lazy(() => import("../pages/pay/amount-stat/PayCrossCheckPage")),
   PayImagetwinPage: lazy(() => import("../pages/pay/amount-stat/PayImagetwinPage")),
   PaySangerboxScopePage: lazy(() => import("../pages/pay/amount-stat/PaySangerboxScopePage")),
+  PayEnterpriseRechargePage: lazy(() =>
+    import("../pages/pay/amount-stat/PayEnterpriseRechargePage")
+  ),
   // 查重
   // -- CrossCheckPage
   CrossCheckAbnOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckAbnOrderPage")),
