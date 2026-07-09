@@ -71,6 +71,97 @@ const SERVICE_NAME_OPTIONS = [
 
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
 
+const NOTICE_LINK_STYLE = `
+  .notice-banner-content a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .notice-banner-content a:hover {
+    opacity: 0.85;
+  }
+  .notice-detail-content a {
+    color: #1677ff;
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .notice-detail-content a:hover {
+    color: #4096ff;
+  }
+`;
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escapeAttr(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function isSafeHref(href) {
+  if (!href) return false;
+  const value = href.trim();
+  if (value.startsWith("/") || value.startsWith("#")) return true;
+  try {
+    const url = new URL(value, window.location.origin);
+    return ["http:", "https:", "mailto:"].includes(url.protocol);
+  } catch {
+    return false;
+  }
+}
+
+/** 仅保留 a 标签，过滤其它 HTML，防止 XSS */
+function sanitizeNoticeHtml(content) {
+  if (!content) return "";
+
+  const serializeChildren = (el, serialize) =>
+    Array.from(el.childNodes).map((node) => serialize(node)).join("");
+
+  const serialize = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return escapeHtml(node.textContent);
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+    const tag = node.tagName.toLowerCase();
+    if (tag === "a") {
+      const href = (node.getAttribute("href") || "").trim();
+      if (!isSafeHref(href)) {
+        return serializeChildren(node, serialize);
+      }
+      const inner = serializeChildren(node, serialize);
+      return `<a href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
+    }
+    return serializeChildren(node, serialize);
+  };
+
+  return content
+    .split("\n")
+    .map((line) => {
+      const div = document.createElement("div");
+      div.innerHTML = line;
+      return serializeChildren(div, serialize);
+    })
+    .join("<br />");
+}
+
+/** 列表展示用：去掉 HTML 标签 */
+function stripNoticeHtml(content) {
+  if (!content) return "";
+  const div = document.createElement("div");
+  div.innerHTML = content;
+  return div.textContent || "";
+}
+
 /** 是否为自定义样式（type 为空且两色齐全） */
 function isCustomStyle(record) {
   return !record?.type && !!record?.backgroundColor && !!record?.textColor;
@@ -146,44 +237,56 @@ function BannerPreview({ data }) {
   if (!data || !data.content) return <Text type="secondary">暂无公告内容</Text>;
 
   const { background, color } = resolveNoticeStyle(data);
+  const htmlContent = sanitizeNoticeHtml(data.content);
 
-  const content = data.content.split("\n").map((line, index) => (
-    <span key={index}>
-      {line}&nbsp;&nbsp;&nbsp;
-    </span>
-  ));
+  const contentNode = (
+    <div
+      ref={contentRef}
+      className="notice-banner-content"
+      dangerouslySetInnerHTML={{ __html: htmlContent }}
+      style={{ color, display: "inline-block" }}
+    />
+  );
 
   return (
-    <Alert
-      style={{
-        background,
-        color,
-        border: "none",
-        borderRadius: 0,
-        overflow: "hidden",
-      }}
-      message={
-        <div ref={containerRef} style={{ width: "100%", textAlign: "center" }}>
-          {shouldScroll ? (
-            <Marquee gradient={false} speed={50} pauseOnHover style={{ color }}>
-              <div ref={contentRef}>{content}</div>
-            </Marquee>
-          ) : (
-            <div
-              ref={contentRef}
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                color,
-              }}
-            >
-              {content}
-            </div>
-          )}
-        </div>
-      }
-    />
+    <>
+      <style>{NOTICE_LINK_STYLE}</style>
+      <Alert
+        style={{
+          background,
+          color,
+          border: "none",
+          borderRadius: 0,
+          overflow: "hidden",
+        }}
+        message={
+          <div ref={containerRef} style={{ width: "100%", textAlign: "center" }}>
+            {shouldScroll ? (
+              <Marquee
+                gradient={false}
+                speed={50}
+                pauseOnHover
+                pauseOnClick
+                style={{ color }}
+              >
+                {contentNode}
+              </Marquee>
+            ) : (
+              <div
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  color,
+                }}
+              >
+                {contentNode}
+              </div>
+            )}
+          </div>
+        }
+      />
+    </>
   );
 }
 
@@ -232,6 +335,7 @@ export default function NoticePage() {
       dataIndex: "content",
       align: "center",
       ellipsis: true,
+      render: (content) => stripNoticeHtml(content),
     },
     {
       title: "类型",
@@ -498,6 +602,12 @@ export default function NoticePage() {
               <Text code>scholar.sangerbox.com</Text> 首页公告横幅
             </li>
             <li>服务名称支持自定义填写，用于绑定不同站点的公告</li>
+            <li>
+              公告内容支持 HTML 超链接，例如：维护通知，请
+              <Text code>
+                {"<a href=\"https://example.com\">点击这里</a>"}
+              </Text>
+            </li>
           </ul>
         }
       />
@@ -628,8 +738,12 @@ export default function NoticePage() {
             name="content"
             rules={[{ required: true, message: "请输入公告内容" }]}
             style={{ marginBottom: 12 }}
+            extra='支持换行；可使用 a 标签添加链接，如：<a href="https://example.com">点击查看</a>'
           >
-            <TextArea rows={2} placeholder="支持换行" />
+            <TextArea
+              rows={5}
+              placeholder='如：系统维护中，详情请<a href="https://example.com">点击这里</a>'
+            />
           </Form.Item>
 
           <Row gutter={12}>
@@ -795,6 +909,7 @@ export default function NoticePage() {
         <div style={{ marginTop: 16 }}>
           <Text type="secondary">公告内容</Text>
           <div
+            className="notice-detail-content"
             style={{
               marginTop: 8,
               padding: 12,
@@ -803,9 +918,10 @@ export default function NoticePage() {
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
             }}
-          >
-            {currentItem.content}
-          </div>
+            dangerouslySetInnerHTML={{
+              __html: sanitizeNoticeHtml(currentItem.content),
+            }}
+          />
         </div>
       </Modal>
     </PageCard>
