@@ -101,7 +101,6 @@ export default function FailedOrderList({ title, props }) {
         return (
           <Tooltip title="手动提交">
             <Button
-              size="small"
               icon={<UploadOutlined />}
               loading={commitLoadingMap[record.id]}
               onClick={() => {

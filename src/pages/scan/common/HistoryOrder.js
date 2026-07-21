@@ -278,7 +278,6 @@ export default function HistoryOrder({ props, title }) {
               <>
                 <Tooltip title={"下载链接"}>
                   <Button
-                    size="small"
                     icon={<DownloadOutlined />}
                     href={record.downloadUrl || undefined}
                     target="_blank"
@@ -287,7 +286,6 @@ export default function HistoryOrder({ props, title }) {
                 </Tooltip>
                 <Tooltip title={"查看文本"}>
                   <Button
-                    size="small"
                     icon={<LinkOutlined />}
                     onClick={() => {
                       setOpenText(true);
@@ -299,7 +297,6 @@ export default function HistoryOrder({ props, title }) {
             ) : (
               <Tooltip title="手动提交">
                 <Button
-                  size="small"
                   icon={<UploadOutlined />}
                   loading={commitLoadingMap[record.orderId]}
                   onClick={() => {

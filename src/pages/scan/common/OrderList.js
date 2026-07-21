@@ -101,7 +101,7 @@ export default function OrderList({ title, props }) {
       setLoading(false);
     }
   };
-  
+
   const renderHighlight = (text) => {
     if (!debouncedKeyword) return text;
 
@@ -117,11 +117,15 @@ export default function OrderList({ title, props }) {
 
   /** 表格列 */
   const columns = [
-    { title: "标题", dataIndex: "title", ellipsis: true, align: "center" },
+    {
+      title: "标题",
+      width: 100, dataIndex: "title", ellipsis: true, align: "center"
+    },
     { title: "创建时间", dataIndex: "createTime", align: "center" },
     {
       title: "订单号",
       width: 300,
+      ellipsis: true,
       dataIndex: "orderNo",
       align: "center",
       render: (v) => (
@@ -148,7 +152,11 @@ export default function OrderList({ title, props }) {
         return <Tag color={color}>{text}</Tag>;
       },
     },
-    { title: "更新时间", dataIndex: "updateTime", align: "center" },
+    {
+      title: "更新时间",
+      width: 200,
+      ellipsis: true, dataIndex: "updateTime", align: "center"
+    },
     {
       title: "邮箱",
       dataIndex: "email",
@@ -163,18 +171,70 @@ export default function OrderList({ title, props }) {
       ),
     },
     {
+      title: "链接",
+      align: "center",
+      render: (_, record) => {
+        const disabled = record.status !== 2;
+        return (<Space>
+          {
+            props !== "dupliSee" &&
+            <Tooltip title="查看在线链接">
+              <Button
+                icon={<LinkOutlined />}
+                disabled={disabled}
+                onClick={() => {
+                  if (!record.resultUrl)
+                    return message.warning("请先从右侧获取新链接");
+                  if (isExpired(record.expireTime) && props === "ithenticate")
+                    return message.warning("链接已过期");
+                  window.open(record.resultUrl);
+                }}
+              >在线链接</Button>
+            </Tooltip>
+          }
+          {props === "imagetwin" ? (
+            <Tooltip title="获取下载报告">
+              <Button
+                icon={<DownloadOutlined />}
+                href={record.localFileUrl || undefined}
+                target="_blank"
+                disabled={!record.localFileUrl}
+              >下载链接</Button>
+            </Tooltip>
+          ) : props === "ithenticate" ? (
+            <Tooltip title="获取新链接">
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => onGetNewLink(record.id)}
+              >获取新链接</Button>
+            </Tooltip>
+          ) : props === "dupliSee" ? (
+            <Tooltip title="获取下载报告">
+              <Button
+                icon={<DownloadOutlined />}
+                href={record.pdfReportUrl || undefined}
+                target="_blank"
+                disabled={!record.pdfReportUrl}
+              >下载链接</Button>
+            </Tooltip>
+          ) : null}
+
+        </Space>);
+
+      },
+    },
+    {
       title: "操作",
       align: "center",
-      width: 200,
+      width: 100,
       render: (_, record) => {
         const disabled = record.status !== 2;
         return (
           <Space>
-            {
+            {/* {
               props !== "dupliSee" &&
               <Tooltip title="查看结果链接">
                 <Button
-                  size="small"
                   icon={<LinkOutlined />}
                   disabled={disabled}
                   onClick={() => {
@@ -190,7 +250,6 @@ export default function OrderList({ title, props }) {
             {props === "imagetwin" ? (
               <Tooltip title="下载">
                 <Button
-                  size="small"
                   icon={<DownloadOutlined />}
                   href={record.localFileUrl || undefined}
                   target="_blank"
@@ -200,7 +259,6 @@ export default function OrderList({ title, props }) {
             ) : props === "ithenticate" ? (
               <Tooltip title="获取新链接">
                 <Button
-                  size="small"
                   icon={<ReloadOutlined />}
                   onClick={() => onGetNewLink(record.id)}
                 />
@@ -208,17 +266,15 @@ export default function OrderList({ title, props }) {
             ) : props === "dupliSee" ? (
               <Tooltip title="获取新链接">
                 <Button
-                  size="small"
                   icon={<DownloadOutlined />}
                   href={record.pdfReportUrl || undefined}
                   target="_blank"
                   disabled={!record.pdfReportUrl}
                 />
               </Tooltip>
-            ) :null}
+            ) :null} */}
             <Tooltip title="删除">
               <Button
-                size="small"
                 danger
                 icon={<DeleteOutlined />}
                 loading={deletingId === record.id}
@@ -350,21 +406,21 @@ export default function OrderList({ title, props }) {
           </Button>
         </div>
       ) : (
-          <Table
-            rowKey="id" loading={loading}
-            columns={columns}
-            dataSource={orderList}
-            pagination={{
-              current: pageNum,
-              pageSize,
-              total,
-              showSizeChanger: true,
-              onChange: (page, size) => {
-                setPageNum(page);
-                setPageSize(size);
-              },
-            }}
-          />
+        <Table
+          rowKey="id" loading={loading}
+          columns={columns}
+          dataSource={orderList}
+          pagination={{
+            current: pageNum,
+            pageSize,
+            total,
+            showSizeChanger: true,
+            onChange: (page, size) => {
+              setPageNum(page);
+              setPageSize(size);
+            },
+          }}
+        />
       )}
     </PageCard>
   );
