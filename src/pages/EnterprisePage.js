@@ -1,14 +1,15 @@
 import PageCard from "../components/PageCard";
 import { useEffect, useState, useRef } from "react";
-import { Table, Form, Input, Switch, Tooltip, Divider, Button, Modal, Space, message } from "antd";
+import { Table,Typography, Form, Input, Switch, Tooltip, Divider, Button, Modal, Space, message } from "antd";
 import {
     enterpriseAdd,
     enterprisePage,
     enterpriseDelete,
-    enterpriseList
+    enterpriseManualRecharge
 } from "../server/api";
-import { PlusOutlined, ExclamationCircleOutlined, ReloadOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { PlusOutlined, PropertySafetyOutlined, ExclamationCircleOutlined, ReloadOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
+const { Text } = Typography;
 export default function EnterprisePage() {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -16,13 +17,15 @@ export default function EnterprisePage() {
     const [pageNum, setPageNum] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [addOpen, setAddOpen] = useState(false);
+    const [addOpenRecharge, setAddOpenRecharge] = useState(false);
     const [currentItem, setCurrentItem] = useState({});
     const [openDel, setOpenDel] = useState(false);
     const [addForm] = Form.useForm();
+    const [addRechargeForm] = Form.useForm();
     const [btnLoading, setBtnLoading] = useState(false);
 
     const columns = [
-        { title: "企业名称", dataIndex: "enterpriseName", align: "center" },
+        { title: "企业/组织名称", dataIndex: "enterpriseName", align: "center" },
         { title: "联系人", dataIndex: "contactName", align: "center" },
         { title: "联系邮箱", dataIndex: "contactEmail", align: "center" },
         { title: "创建时间", dataIndex: "createTime", align: "center" },
@@ -33,31 +36,68 @@ export default function EnterprisePage() {
                 const yuan = (Number(value || 0) / 100).toFixed(2);
 
                 return (
-                    <span style={{ fontWeight: 600 }}>
-                        ￥{yuan}
-                    </span>
+                    
+                <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
+                ￥{yuan}
+                </Text>
                 );
             },
         },
-        { title: "状态", dataIndex: "status", align: "center" },
         {
             title: "操作",
-            dataIndex: "id",
+            align: "center",
             render: (_, record) => (
-                <Tooltip title="删除">
-                    <Button
-                        size="small"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => {
-                            setCurrentItem(record);
-                            setOpenDel(true);
-                        }}
-                    />
-                </Tooltip>
+                <Space>
+                    <Tooltip title="余额充值">
+                        <Button
+                            icon={<PropertySafetyOutlined />}
+                            onClick={() => {
+                                setCurrentItem(record);
+                                setAddOpenRecharge(true);
+                            }}
+                        >
+                            余额充值
+                        </Button>
+                    </Tooltip>
+                    <Tooltip title="删除">
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => {
+                                setCurrentItem(record);
+                                setOpenDel(true);
+                            }}
+                        >
+                            删除
+                        </Button>
+                    </Tooltip>
+                </Space>
             ),
         },
     ];
+
+    const handleAddRecharge = async (values) => {
+        try {
+            setBtnLoading(true);
+            const amountYuan = parseFloat(values.amount);
+            const amountFen = Math.round(amountYuan * 100);
+            const obj = {
+                enterpriseId: currentItem.id,
+                amount: amountFen,
+                remark: values.remark,
+            }
+            const res = await enterpriseManualRecharge(obj);
+            if (res?.code === 200) {
+                message.success(res?.message || `充值金额￥${amountYuan.toFixed(2)}成功！`);
+                handleList(pageNum, pageSize);
+                setAddOpenRecharge(false);
+            } else {
+                message.error(res?.message || '充值失败！');
+            }
+        } finally {
+            setBtnLoading(false);
+        }
+    }
 
     const handleList = async () => {
         try {
@@ -89,7 +129,7 @@ export default function EnterprisePage() {
             if (res?.code === 200) {
                 message.success(res?.message || '创建成功！');
                 handleList(pageNum, pageSize);
-            }else{
+            } else {
                 message.error(res?.message || '创建失败！');
             }
         } finally {
@@ -101,8 +141,6 @@ export default function EnterprisePage() {
         try {
             setBtnLoading(true);
             const res = await enterpriseDelete(currentItem.id);
-            console.log('res',res);
-                        
             if (res?.code === 200) {
                 message.success(res?.message || '删除企业成功！');
                 handleList(pageNum, pageSize);
@@ -120,10 +158,10 @@ export default function EnterprisePage() {
 
     return (
         <PageCard
-            title="企业管理"
+            title="企业/组织管理"
             rightActions={
                 <>
-                    <Tooltip title="新增企业">
+                    <Tooltip title="新增企业/组织">
                         <Button
                             icon={<PlusOutlined />}
                             type="primary"
@@ -131,7 +169,7 @@ export default function EnterprisePage() {
                                 setAddOpen(true);
                             }}
                         >
-                            新增企业
+                            新增企业/组织
                         </Button>
                     </Tooltip>
                     <Divider type="vertical" />
@@ -164,7 +202,7 @@ export default function EnterprisePage() {
                 }}
             />
             <Modal
-                title="创建企业"
+                title="创建企业/组织"
                 size='small'
                 open={addOpen}
                 onCancel={() => setAddOpen(false)}
@@ -175,9 +213,9 @@ export default function EnterprisePage() {
             >
                 <Form form={addForm} layout="vertical" onFinish={handleAdd}>
                     <Form.Item
-                        label="企业名称"
+                        label="企业/组织名称"
                         name="enterpriseName"
-                        rules={[{ required: true, message: "请输入企业名称" }]}
+                        rules={[{ required: true, message: "请输入企业/组织名称" }]}
                         normalize={(v) => v?.trim()}
                     >
                         <Input placeholder="请输入企业名称" />
@@ -207,7 +245,7 @@ export default function EnterprisePage() {
 
             </Modal>
             <Modal
-                title={"是否删除企业"}
+                title={"是否删除企业/组织"}
                 open={openDel}
                 onCancel={() => setOpenDel(false)}
                 onOk={handleDelete}
@@ -223,10 +261,55 @@ export default function EnterprisePage() {
                 >
                     <ExclamationCircleOutlined style={{ fontSize: "48px", color: "#ff4d4f" }} />
                     <div>
-                        您确定要删除企业
+                        您确定要删除企业/组织
                         <span style={{ fontWeight: 600 }}>{currentItem.enterpriseName}</span>吗？
                     </div>
                 </Space>
+
+            </Modal>
+
+            <Modal
+                title={`${currentItem.enterpriseName} -- 余额充值`}
+                open={addOpenRecharge}
+                onCancel={() => setAddOpenRecharge(false)}
+                onOk={() => addRechargeForm.submit()}
+                destroyOnHidden
+                okText="确认充值"
+                okButtonProps={{ loading: btnLoading }}
+            >
+
+
+                <Form form={addRechargeForm} layout="vertical" onFinish={handleAddRecharge}>
+                    <Form.Item
+                        label="充值金额"
+                        name="amount"
+                        rules={[
+                            { required: true, message: "请输入充值金额" },
+                            {
+                                validator: (_, value) => {
+                                    if (value && !/^\d+(\.\d{1,2})?$/.test(value)) {
+                                        return Promise.reject(new Error('金额最多保留两位小数'));
+                                    }
+                                    if (value && parseFloat(value) <= 0) {
+                                        return Promise.reject(new Error('请输入大于0的金额'));
+                                    }
+                                    return Promise.resolve();
+                                }
+                            }
+                        ]}
+                    >
+                        <Input placeholder="请输入金额（元）" addonAfter="元" />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="备注"
+                        name="remark"
+                        rules={[{ required: true, message: "请输入备注" }]}
+                        normalize={(v) => v?.trim()}
+                    >
+                        <Input placeholder="请输入备注" />
+                    </Form.Item>
+                </Form>
 
             </Modal>
         </PageCard>)

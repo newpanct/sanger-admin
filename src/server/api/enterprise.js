@@ -12,6 +12,7 @@ export const enterpriseDelete = (id) =>
 
 /* ---------------- 企业充值订单 ---------------- */
 export const enterpriseOrders = (obj) => postJson("/user/b2b/recharge/page/orders", obj);
+export const enterpriseManualRecharge = (obj) => postJson("/user/enterprise/manualRecharge", obj);
 
 export const enterpriseStatistics = () =>
   getBase("/user/b2b/recharge/statistics");

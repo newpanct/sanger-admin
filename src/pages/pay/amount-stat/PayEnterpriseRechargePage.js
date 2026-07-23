@@ -78,6 +78,13 @@ export default function PayEnterpriseRechargePage() {
       },
     },
     {
+      title: "创建时间",
+      dataIndex: "createTime",
+      align: "center",
+      render: (time) =>
+        time ? dayjs(time).format("YYYY-MM-DD HH:mm") : "---",
+    },
+    {
       title: "支付时间",
       dataIndex: "payTime",
       align: "center",
@@ -91,11 +98,12 @@ export default function PayEnterpriseRechargePage() {
       ellipsis: true,
     },
     {
-      title: "创建时间",
-      dataIndex: "createTime",
+      title: "备注",
+      dataIndex: "remark",
       align: "center",
-      render: (time) =>
-        time ? dayjs(time).format("YYYY-MM-DD HH:mm") : "-",
+      ellipsis: true,
+      render: (remark) =>
+        remark ? remark : "---",
     },
   ];
 

@@ -54,7 +54,7 @@
             },
             {
               "path": "enterprise-recharge",
-              "label": "企业充值",
+              "label": "企业/组织充值",
               "icon": "ApartmentOutlined",
               "component": "PayEnterpriseRechargePage"
             }
@@ -251,7 +251,7 @@
     },
     {
       "path": "enterprise",
-      "label": "企业管理",
+      "label": "企业/组织管理",
       "icon": "ApartmentOutlined",
       "component": "EnterprisePage"
     },
