@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Tag, Typography, Tooltip, Modal, message } from "antd";
-import { ReloadOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, Table, Tag, Form, Descriptions,Input, Typography, Space, Tooltip, Modal, message } from "antd";
+import {
+  ReloadOutlined, UploadOutlined,
+  RollbackOutlined,
+} from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import {
   commitImagetwin,
@@ -9,6 +12,7 @@ import {
   imagetwinFailedPageList,
   ithenticateFailedPageList,
   dupliseeFailedPageList,
+  refundExecute
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch } from "react-redux";
@@ -22,7 +26,10 @@ export default function FailedOrderList({ title, props }) {
   const [total, setTotal] = useState(0);
   const [commitLoadingMap, setCommitLoadingMap] = useState({});
   const [commitModalOpen, setCommitModalOpen] = useState(false);
+  const [rollbackOpen, setRollbackOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
+  const [refundForm] = Form.useForm();
+  const [refundLoading, setRefundLoading] = useState(false);
   const orderColumn = [
     {
       title: "标题",
@@ -94,21 +101,33 @@ export default function FailedOrderList({ title, props }) {
       },
     },
     {
-      title: "手动提交",
+      title: "操作",
       align: "center",
       width: 200,
       render: (_, record) => {
         return (
-          <Tooltip title="手动提交">
-            <Button
-              icon={<UploadOutlined />}
-              loading={commitLoadingMap[record.id]}
-              onClick={() => {
-                setCurrentRecord(record);
-                setCommitModalOpen(true);
-              }}
-            />
-          </Tooltip>
+          <Space>
+            <Tooltip title="手动提交">
+              <Button
+                icon={<UploadOutlined />}
+                loading={commitLoadingMap[record.id]}
+                onClick={() => {
+                  setCurrentRecord(record);
+                  setCommitModalOpen(true);
+                }}
+              >提交</Button>
+            </Tooltip>
+            <Tooltip title="退款">
+              <Button
+                loading={commitLoadingMap[record.id]}
+                onClick={() => {
+                  setCurrentRecord(record);
+                  setRollbackOpen(true);
+                }}
+                icon={<RollbackOutlined />}
+              >退款</Button>
+            </Tooltip>
+          </Space>
         );
       },
     },
@@ -132,7 +151,7 @@ export default function FailedOrderList({ title, props }) {
         response = await imagetwinFailedPageList(params);
       } else if (props === "ithenticate") {
         response = await ithenticateFailedPageList(params);
-      }else if (props === "dupliSee") {
+      } else if (props === "dupliSee") {
         response = await dupliseeFailedPageList(params);
       }
 
@@ -151,7 +170,6 @@ export default function FailedOrderList({ title, props }) {
     }
   };
 
-  // 误触弹出框
   const handleCommit = async (taskId) => {
     try {
       setCommitLoadingMap((prev) => ({ ...prev, [taskId]: true }));
@@ -177,6 +195,35 @@ export default function FailedOrderList({ title, props }) {
       console.error(error);
     } finally {
       setCommitLoadingMap((prev) => ({ ...prev, [taskId]: false }));
+    }
+  };
+
+
+
+  const handleRollback = async (reason) => {
+    if (!currentRecord) return;
+    try {
+      setRefundLoading(true);
+      const params = {
+        orderNo: currentRecord.orderNo,
+        reason: reason,
+        refundAmount: 1,
+      };
+      const res = await refundExecute(params);
+      if (res?.code === 200) {
+        message.success(res?.message || "退款成功");
+        handleOrderList(pageNum, pageSize);
+        setRollbackOpen(false);
+        setCurrentRecord(null);
+        refundForm.resetFields();
+      } else {
+        message.error(res?.message || "请联系管理员");
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("网络异常，请稍后重试");
+    } finally {
+      setRefundLoading(false);
     }
   };
 
@@ -215,36 +262,80 @@ export default function FailedOrderList({ title, props }) {
           },
         }}
       />
-      <Modal
-        open={commitModalOpen}
-        title="确认手动提交"
-        okText="确认提交"
-        cancelText="取消"
-        confirmLoading={commitLoadingMap[currentRecord?.id]}
-        onOk={async () => {
-          if (!currentRecord) return;
-          await handleCommit(currentRecord.id);
-        }}
-        onCancel={() => {
-          setCommitModalOpen(false);
-          setCurrentRecord(null);
-        }}
-        maskClosable={false}
-        destroyOnHidden
-      >
-        <Typography.Text>确认要手动提交以下订单吗？</Typography.Text>
+{/* 1. 优化确认提交 Modal：使用 Descriptions 替代原生标签，样式更统一 */}
+<Modal
+  open={commitModalOpen}
+  title="确认手动提交"
+  okText="确认提交"
+  cancelText="取消"
+  confirmLoading={commitLoadingMap[currentRecord?.id]}
+  onOk={() => currentRecord && handleCommit(currentRecord.id)}
+  onCancel={() => {
+    setCommitModalOpen(false);
+    setCurrentRecord(null);
+  }}
+  maskClosable={false}
+  destroyOnHidden
+>
+  <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
+    确认要手动提交以下订单吗？此操作将重新发起检测。
+  </Typography.Paragraph>
+  
+  {/* 使用 Ant Design 的 Descriptions 组件，排版更美观 */}
+  <Descriptions column={1} bordered size="small">
+    <Descriptions.Item label="文章标题">{currentRecord?.title || '-'}</Descriptions.Item>
+    <Descriptions.Item label="订单号">
+      <Typography.Text copyable>{currentRecord?.orderNo || '-'}</Typography.Text>
+    </Descriptions.Item>
+  </Descriptions>
+</Modal>
 
-        <div style={{ marginTop: 12 }}>
-          <p>
-            <strong>标题：</strong>
-            {currentRecord?.title}
-          </p>
-          <p>
-            <strong>订单号：</strong>
-            {currentRecord?.orderNo}
-          </p>
-        </div>
-      </Modal>
-    </PageCard>
+{/* 2. 优化退款 Modal：将 Form 与 Modal 更好地解耦，统一重置逻辑 */}
+<Modal
+  open={rollbackOpen}
+  title="确认退款"
+  okText="确认退款"
+  cancelText="取消"
+  confirmLoading={refundLoading}
+  onOk={() => refundForm.submit()}
+  onCancel={() => {
+    setRollbackOpen(false);
+    setCurrentRecord(null);
+    refundForm.resetFields(); // 统一在这里重置表单
+  }}
+  maskClosable={false}
+  destroyOnHidden
+>
+  <div style={{ marginBottom: 16 }}>
+    <Typography.Text>
+      订单标题：<Tag color="blue">{currentRecord?.title}</Tag>
+    </Typography.Text>
+    <br />
+    <Typography.Text style={{ marginTop: 8, display: 'inline-block' }}>
+      订单号：<Tag color="blue">{currentRecord?.orderNo}</Tag>
+    </Typography.Text>
+  </div>
+
+  <Form 
+    form={refundForm}
+    layout="vertical"
+    onFinish={(values) => handleRollback(values.reason)}
+    // 可以在这里加个初始化逻辑，但 destroyOnHidden 已经帮你处理了大部分情况
+  >
+    <Form.Item 
+      name="reason" 
+      label="退款原因"
+      rules={[{ required: true, message: "请输入退款原因" }]}
+    >
+      <Input.TextArea 
+        rows={4} 
+        placeholder="请详细说明退款原因..." 
+        maxLength={200} 
+        showCount 
+      />
+    </Form.Item>
+  </Form>
+</Modal>
+    </PageCard >
   );
 }

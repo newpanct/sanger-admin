@@ -61,3 +61,6 @@ export const statisticsIthenticate = (obj) =>
 
 export const statisticsSangerboxScope = (obj) =>
   postJson("/dedup/statistics/sangerboxscope", obj);
+
+export const refundExecute = (obj) =>
+  postJson("/admin/refund/execute", obj);

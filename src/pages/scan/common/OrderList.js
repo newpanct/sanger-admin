@@ -17,6 +17,8 @@ import {
   DeleteOutlined,
   SearchOutlined,
   DownloadOutlined,
+  VerticalAlignBottomOutlined,
+  QuestionCircleOutlined
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import PageCard from "../../../components/PageCard";
@@ -30,6 +32,101 @@ import {
   dupliSeeDeleteById,
 } from "../../../server/api";
 
+const SNAPSHOT_VIEW_BASE = "https://local.sangerbox.com/ith/snapshot_view/";
+
+
+const linkBtnGroupStyle = {
+  display: "inline-flex",
+  flexDirection: "column",
+  alignItems: "stretch",
+  gap: 4,
+  maxWidth: "100%",
+};
+const crossCheckLinkBtnStyle = {
+  width: "100%",
+  display: "inline-flex",
+  justifyContent: "flex-start",
+  alignItems: "center",
+  textAlign: "left",
+};
+function getSnapshotViewUrl(record) {
+  if (record.snapshotViewUrl) return record.snapshotViewUrl;
+  if (!record.resultUrl) return undefined;
+  const fileName = record.resultUrl.split("/").pop() || "";
+  if (!fileName.includes("_")) return undefined;
+  // resultUrl: .../{id}_{time}_{uuid}.pdf → keep id (before first _), prepend base
+  const suffix = fileName.split("_")[0];
+  return `${SNAPSHOT_VIEW_BASE}${suffix}`;
+}
+/** AIGC 下载按钮：问号在按钮外绝对定位，不占布局宽度；无链接时模拟 disabled */
+function AigcDownloadLinkButton({
+  url,
+  label,
+  tipLabel,
+  tipHelp,
+  btnStyle,
+  longTooltipProps,
+}) {
+  const hasUrl = !!url;
+
+  return (
+    <span style={{ position: "relative", display: "block", width: "100%" }}>
+      <Tooltip {...longTooltipProps} title={tipLabel}>
+        <Button
+          href={hasUrl ? url : undefined}
+          target="_blank"
+          onClick={!hasUrl ? (e) => e.preventDefault() : undefined}
+          style={{
+            ...btnStyle,
+            ...(!hasUrl
+              ? {
+                cursor: "not-allowed",
+                color: "rgba(0, 0, 0, 0.25)",
+                borderColor: "#d9d9d9",
+                background: "#f5f5f5",
+              }
+              : {}),
+          }}
+          icon={<VerticalAlignBottomOutlined />}
+        >
+          {label}
+        </Button>
+      </Tooltip>
+      {!hasUrl && (
+        <Tooltip {...longTooltipProps} title={tipHelp}>
+          <QuestionCircleOutlined
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            style={{
+              position: "absolute",
+              left: "100%",
+              top: "50%",
+              marginLeft: 4,
+              transform: "translateY(-50%)",
+              color: "rgba(0, 0, 0, 0.45)",
+              cursor: "help",
+              zIndex: 1,
+            }}
+          />
+        </Tooltip>
+      )}
+    </span>
+  );
+}
+
+const longTooltipProps = {
+  color: "#1677FF",
+  title: "该百分比表示可能是由 AI 生成的文本以及可能是由 AI 生成且经过 AI 改写的文本的总量。当前AI写作评估 可能并不准确 仅作参考 ,*%代表AIGC率低或未检测到AI生成的文本。",
+  overlayInnerStyle: {
+    maxWidth: 320,
+    whiteSpace: "normal",
+    fontSize: 12,
+    lineHeight: 1.5,
+    padding: "8px 12px",
+  },
+};
 export default function OrderList({ title, props }) {
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -147,6 +244,8 @@ export default function OrderList({ title, props }) {
           1: { text: "已付款", color: "default" },
           2: { text: "成功", color: "success" },
           3: { text: "失败", color: "error" },
+          4: { text: "稍后重试", color: "error" },
+          5: { text: "已退款", color: "warning" },
         };
         const { text, color } = map[status] || {};
         return <Tag color={color}>{text}</Tag>;
@@ -175,51 +274,104 @@ export default function OrderList({ title, props }) {
       align: "center",
       render: (_, record) => {
         const disabled = record.status !== 2;
-        return (<Space>
-          {
-            props !== "dupliSee" &&
-            <Tooltip title="查看在线链接">
-              <Button
-                icon={<LinkOutlined />}
-                disabled={disabled}
-                onClick={() => {
-                  if (!record.resultUrl)
-                    return message.warning("请先从右侧获取新链接");
-                  if (isExpired(record.expireTime) && props === "ithenticate")
-                    return message.warning("链接已过期");
-                  window.open(record.resultUrl);
-                }}
-              >在线链接</Button>
-            </Tooltip>
-          }
+
+        const snapshotViewHref = getSnapshotViewUrl(record);
+
+        return (<div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            width: "100%",
+          }}>
           {props === "imagetwin" ? (
-            <Tooltip title="获取下载报告">
-              <Button
-                icon={<DownloadOutlined />}
-                href={record.localFileUrl || undefined}
-                target="_blank"
-                disabled={!record.localFileUrl}
-              >下载链接</Button>
-            </Tooltip>
+            <div style={linkBtnGroupStyle}>
+              <Tooltip title="在线链接">
+                <span style={{ display: "block", width: "100%" }}>
+                  <Button
+                    href={record.resultUrl || undefined}
+                    target="_blank"
+                    disabled={!record.resultUrl}
+                    style={crossCheckLinkBtnStyle}
+                    icon={<LinkOutlined />}
+                  >
+                    在线链接
+                  </Button>
+                </span>
+              </Tooltip>
+              <Tooltip title="下载链接">
+                <span style={{ display: "block", width: "100%" }}>
+                  <Button
+                    href={record.localFileUrl || undefined}
+                    target="_blank"
+                    disabled={!record.localFileUrl}
+                    style={crossCheckLinkBtnStyle}
+                    icon={<VerticalAlignBottomOutlined />}
+                  >
+                    下载链接
+                  </Button>
+                </span>
+              </Tooltip>
+            </div>
           ) : props === "ithenticate" ? (
-            <Tooltip title="获取新链接">
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() => onGetNewLink(record.id)}
-              >获取新链接</Button>
-            </Tooltip>
+            <div style={linkBtnGroupStyle}>
+              <Tooltip {...longTooltipProps} title="在线预览链接">
+                <span style={{ display: "block", width: "100%" }}>
+                  <Button
+                    href={snapshotViewHref}
+                    target="_blank"
+                    icon={<LinkOutlined />}
+                    style={crossCheckLinkBtnStyle}
+                    disabled={!snapshotViewHref}
+                  >
+                    在线预览链接
+                  </Button>
+                </span>
+              </Tooltip>
+              <AigcDownloadLinkButton
+                url={record.aiReportDownloadUrl}
+                label="AIGC报告下载"
+                tipLabel={'AIGC报告下载'}
+                tipHelp={'早期版本不支持AI报告直接获取，可以在在线链接中查看'}
+                btnStyle={crossCheckLinkBtnStyle}
+                longTooltipProps={longTooltipProps}
+              />
+
+              <Tooltip {...longTooltipProps} title="相似性报告下载">
+                <span style={{ display: "block", width: "100%" }}>
+                  <Button
+                    href={record.resultUrl}
+                    target="_blank"
+                    disabled={!record.resultUrl}
+                    style={crossCheckLinkBtnStyle}
+                    icon={<VerticalAlignBottomOutlined />}
+                  >
+                    相似性报告下载
+                  </Button>
+                </span>
+              </Tooltip>
+            </div>
           ) : props === "dupliSee" ? (
-            <Tooltip title="获取下载报告">
-              <Button
-                icon={<DownloadOutlined />}
-                href={record.pdfReportUrl || undefined}
-                target="_blank"
-                disabled={!record.pdfReportUrl}
-              >下载链接</Button>
-            </Tooltip>
+            <div style={linkBtnGroupStyle}>
+              <Tooltip title={"下载链接"}>
+                <span style={{ display: "block", width: "100%" }}>
+                  <Button
+                    href={record.pdfReportUrl || undefined}
+                    target="_blank"
+                    disabled={!record.pdfReportUrl}
+                    style={crossCheckLinkBtnStyle}
+                    icon={<VerticalAlignBottomOutlined />}
+                  >
+                    下载链接
+                  </Button>
+                </span>
+              </Tooltip>
+            </div>
           ) : null}
 
-        </Space>);
+        </div>);
 
       },
     },

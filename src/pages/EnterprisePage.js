@@ -1,6 +1,6 @@
 import PageCard from "../components/PageCard";
 import { useEffect, useState, useRef } from "react";
-import { Table,Typography, Form, Input, Switch, Tooltip, Divider, Button, Modal, Space, message } from "antd";
+import { Table, Typography, Form, Input, Switch, Tooltip, Divider, Button, Modal, Space, message } from "antd";
 import {
     enterpriseAdd,
     enterprisePage,
@@ -36,10 +36,10 @@ export default function EnterprisePage() {
                 const yuan = (Number(value || 0) / 100).toFixed(2);
 
                 return (
-                    
-                <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
-                ￥{yuan}
-                </Text>
+
+                    <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
+                        ￥{yuan}
+                    </Text>
                 );
             },
         },
@@ -275,6 +275,7 @@ export default function EnterprisePage() {
                 onOk={() => addRechargeForm.submit()}
                 destroyOnHidden
                 okText="确认充值"
+                width={400}
                 okButtonProps={{ loading: btnLoading }}
             >
 
