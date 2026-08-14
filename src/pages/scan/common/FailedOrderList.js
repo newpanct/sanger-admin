@@ -200,14 +200,15 @@ export default function FailedOrderList({ title, props }) {
 
 
 
-  const handleRollback = async (reason) => {
+  const handleRollback = async (values) => {
     if (!currentRecord) return;
     try {
       setRefundLoading(true);
       const params = {
         orderNo: currentRecord.orderNo,
         email: currentRecord.email,
-        reason: reason,
+        reason: values.reason,
+        password: values.password,
         refundAmount: 1,
       };
       const res = await refundExecute(params);
@@ -222,7 +223,7 @@ export default function FailedOrderList({ title, props }) {
       }
     } catch (error) {
       console.error(error);
-      message.error("网络异常，请稍后重试");
+      message.error(error.message || "请联系管理员");
     } finally {
       setRefundLoading(false);
     }
@@ -324,8 +325,7 @@ export default function FailedOrderList({ title, props }) {
         <Form
           form={refundForm}
           layout="vertical"
-          onFinish={(values) => handleRollback(values.reason)}
-        // 可以在这里加个初始化逻辑，但 destroyOnHidden 已经帮你处理了大部分情况
+          onFinish={(values) => handleRollback(values)}
         >
           <Form.Item
             name="reason"
@@ -338,6 +338,13 @@ export default function FailedOrderList({ title, props }) {
               maxLength={200}
               showCount
             />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="密码"
+            rules={[{ required: true, message: "请输入密码" }]}
+          >
+            <Input.Password placeholder="请输入密码" />
           </Form.Item>
         </Form>
       </Modal>

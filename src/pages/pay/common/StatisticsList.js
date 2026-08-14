@@ -59,7 +59,7 @@ export default function StatisticsList({ title, props: apiKey }) {
         const params = {
           pageNum: page,
           pageSize: size,
-          date: date || undefined,
+          month: date || undefined,
         };
         const api = apiMap[apiKey];
         if (!api) throw new Error("未匹配到接口");
@@ -114,7 +114,27 @@ export default function StatisticsList({ title, props: apiKey }) {
       ),
     },
     {
-      title: "销售金额",
+      title: "退款订单数",
+      dataIndex: "refundCount",
+      align: "center",
+      render: (val) => (
+        <Tag color="blue" style={{ margin: 0 }}>
+          {Number(val || 0).toLocaleString("zh-CN")} 单
+        </Tag>
+      ),
+    },
+    {
+      title: "退款金额",
+      dataIndex: "refundAmount",
+      align: "center",
+      render: (val) => (
+        <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
+          ￥{formatAmount(val)}
+        </Text>
+      ),
+    },
+    {
+      title: "总销售金额",
       dataIndex: "amount",
       align: "center",
       render: (val) => (
