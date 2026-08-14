@@ -44,7 +44,7 @@ const { TextArea } = Input;
 // type → 样式映射（与首页 ActiveAlert 一致）
 const TYPE_STYLE_MAP = {
   info: { background: "#1677ff", color: "#fff" },
-  warning: { background: "#faad14", color: "#fff" },
+  warning: { background: "#FF6B00", color: "#fff" },
   error: { background: "#ff4d4f", color: "#fff" },
 };
 

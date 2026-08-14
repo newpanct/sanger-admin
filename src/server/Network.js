@@ -36,40 +36,50 @@ axiosInstance.interceptors.response.use(
 );
 
 const handleAuthExpired = () => {
-  window.location.href = "/login"; // 跳转登录页
+  window.location.href = "/login";
   message.info("登录超时，请重新登录");
   console.warn("登录超时，请重新登录");
   localStorage.clear();
 };
 
-// ================== 错误处理 ================== //
+const getErrorMessage = (error) =>
+  error.response?.data?.message ||
+  error.response?.data?.msg ||
+  error.message;
+
 const handleError = (error) => {
   if (error.response) {
     const status = error.response.status;
-    console.log("status", status);
+    const msg = getErrorMessage(error);
     switch (status) {
       case 401:
         handleAuthExpired();
         break;
+      case 403:
+        message.error(msg || "没有权限访问该资源");
+        break;
+      case 404:
+        message.error(msg || "请求的资源不存在");
+        break;
       case 413:
-        console.error("上传的文件过大，请选择较小的文件进行上传。");
+        message.error("上传文件过大，请选择较小的文件");
         break;
       case 500:
-        console.error("服务器内部错误，请联系管理员！");
+        message.error(msg || "服务器内部错误，请联系管理员");
         break;
       default:
-        console.error(
-          `请求失败 (${status}):`,
-          error.response.data || error.message
-        );
+        message.error(msg || `请求失败（${status}）`);
         break;
     }
   } else {
-    if (error.message === "Network Error") {
-      error.message =
-        "您的网络似乎有问题，可能开启了 VPN/代理，或者请尝试刷新页面。";
+    const isNetwork = error.message === "Network Error";
+    const msg = isNetwork
+      ? "网络异常，请检查网络或关闭 VPN 后重试"
+      : error.message || "请求失败";
+    if (isNetwork) {
+      error.message = msg;
     }
-    console.error("请求失败：", error.message);
+    message.error(msg);
   }
 };
 

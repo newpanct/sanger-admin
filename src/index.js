@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "antd/dist/reset.css";
 import reportWebVitals from "./reportWebVitals";
@@ -8,11 +8,16 @@ import zhCN from "antd/locale/zh_CN";
 import { Provider, useSelector } from "react-redux";
 import store, { persistor } from "./store";
 import { PersistGate } from "redux-persist/integration/react";
+import { applyThemeVars } from "./utils/theme";
 import "./index.css";
 
-// 包裹 ConfigProvider 的主题组件
 const ThemeContainer = () => {
   const { token } = useSelector((state) => state.theme);
+
+  useEffect(() => {
+    applyThemeVars(token);
+  }, [token]);
+
   return (
     <ConfigProvider locale={zhCN} theme={{ token }}>
       <App />

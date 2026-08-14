@@ -4,6 +4,7 @@ import {
   CalendarOutlined,
   ShoppingOutlined,
   PayCircleOutlined,
+  RollbackOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import dayjs from "dayjs";
@@ -82,13 +83,12 @@ export default function StatisticsList({ title, props: apiKey }) {
   );
 
   const pageSummary = useMemo(() => {
-    return list.reduce(
-      (acc, item) => ({
-        orderCount: acc.orderCount + Number(item.orderCount || 0),
-        amount: acc.amount + Number(item.amount || 0),
-      }),
-      { orderCount: 0, amount: 0 }
-    );
+    return {
+      totalAmount:list.reduce((acc, item) => acc + Number(item.amount || 0), 0),
+      totalOrderCount:list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
+      totalRefundCount:list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
+      totalRefundAmount:list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
+    }
   }, [list]);
 
   const columns = [
@@ -108,7 +108,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "orderCount",
       align: "center",
       render: (val) => (
-        <Tag color="blue" style={{ margin: 0 }}>
+        <Tag color="green" style={{ margin: 0 }}>
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -152,7 +152,7 @@ export default function StatisticsList({ title, props: apiKey }) {
   const statCards = [
     {
       title: "当前服务订单数",
-      value: pageSummary.orderCount,
+      value: pageSummary.totalOrderCount,
       suffix: "单",
       icon: <ShoppingOutlined />,
       color: "#1677ff",
@@ -160,7 +160,23 @@ export default function StatisticsList({ title, props: apiKey }) {
     },
     {
       title: "当前服务销售额",
-      value: formatAmount(pageSummary.amount),
+      value: formatAmount(pageSummary.totalAmount),
+      prefix: "￥",
+      icon: <PayCircleOutlined />,
+      color: "#cf1322",
+      bg: "#fff1f0",
+    },
+    {
+      title: "当前服务退款订单数",
+      value: pageSummary.totalRefundCount,
+      suffix: "单",
+      icon: <RollbackOutlined />,
+      color: "#1677ff",
+      bg: "#e6f4ff",
+    },
+    {
+      title: "当前服务退款金额",
+      value: formatAmount(pageSummary.totalRefundAmount),
       prefix: "￥",
       icon: <PayCircleOutlined />,
       color: "#cf1322",
@@ -216,7 +232,7 @@ export default function StatisticsList({ title, props: apiKey }) {
         <>
           <Row gutter={[16, 16]} style={{ margin: "12px 0 16px" }}>
             {statCards.map((item) => (
-              <Col key={item.title} xs={24} sm={12}>
+              <Col key={item.title} xs={24} sm={12} lg={6}>
                 <Card
                   size="small"
                   styles={{ body: { padding: "16px 20px" } }}

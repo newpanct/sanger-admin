@@ -1,0 +1,12 @@
+:root {
+  --app-primary: #1677ff;
+  --app-success: #52c41a;
+  --app-warning: #faad14;
+  --app-error: #ff4d4f;
+  --app-info: #1677ff;
+  --app-text: #333;
+  --app-text-secondary: #666;
+  --app-bg: #fff;
+  --app-bg-layout: #f5f7fa;
+  --app-amount: #cf1322;
+}
