@@ -82,6 +82,7 @@ export default function LinkPage() {
         {
             title: "操作",
             dataIndex: "id",
+            align: "center",
             render: (_, record) => (
                 <Space>
                     <Tooltip title="编辑">

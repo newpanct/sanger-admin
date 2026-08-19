@@ -183,100 +183,100 @@ const DashboardPage = () => {
         ))}
       </Row>
 
-{/* 异常订单提示 */}
-{(failedStat.paperCount > 0 ||
-  failedStat.imageCount > 0 ||
-  failedStat.dupliseeCount > 0 ||
-  failedStat.turnitinCount > 0) && (
-  <Card
-    size="small"
-    title="异常订单"
-    style={{ marginTop: 12 }}
-    styles={{ body: { padding: 12 } }}
-  >
-    <Row gutter={[12, 12]}>
-      {failedStat.paperCount > 0 && (
-        <Col md={3}>
+      {/* 异常订单提示 */}
+      {(failedStat.paperCount > 0 ||
+        failedStat.imageCount > 0 ||
+        failedStat.dupliseeCount > 0 ||
+        failedStat.turnitinCount > 0) && (
           <Card
             size="small"
-            hoverable
-            style={abnormalCardStyle()}
-            onClick={() =>
-              navigate("/scan/crosscheck/abnormal-orders")
-            }
+            title="异常订单"
+            style={{ marginTop: 12 }}
+            styles={{ body: { padding: 12 } }}
           >
-            <Statistic
-              title="CrossCheck"
-              value={failedStat.paperCount}
-              suffix="条"
-              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
-            />
-          </Card>
-        </Col>
-      )}
+            <Row gutter={[12, 12]}>
+              {failedStat.paperCount > 0 && (
+                <Col md={3}>
+                  <Card
+                    size="small"
+                    hoverable
+                    style={abnormalCardStyle()}
+                    onClick={() =>
+                      navigate("/scan/crosscheck/abnormal-orders")
+                    }
+                  >
+                    <Statistic
+                      title="CrossCheck"
+                      value={failedStat.paperCount}
+                      suffix="条"
+                      valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+                    />
+                  </Card>
+                </Col>
+              )}
 
-      {failedStat.imageCount > 0 && (
-        <Col md={3}>
-          <Card
-            size="small"
-            hoverable
-            style={abnormalCardStyle()}
-            onClick={() =>
-              navigate("/scan/imagetwin/abnormal-orders")
-            }
-          >
-            <Statistic
-              title="ImageTwin"
-              value={failedStat.imageCount}
-              suffix="条"
-              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
-            />
-          </Card>
-        </Col>
-      )}
+              {failedStat.imageCount > 0 && (
+                <Col md={3}>
+                  <Card
+                    size="small"
+                    hoverable
+                    style={abnormalCardStyle()}
+                    onClick={() =>
+                      navigate("/scan/imagetwin/abnormal-orders")
+                    }
+                  >
+                    <Statistic
+                      title="ImageTwin"
+                      value={failedStat.imageCount}
+                      suffix="条"
+                      valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+                    />
+                  </Card>
+                </Col>
+              )}
 
-      {failedStat.turnitinCount > 0 && (
-        <Col md={3}>
-          <Card
-            size="small"
-            hoverable
-            style={abnormalCardStyle()}
-            onClick={() =>
-              navigate("/scan/history/abnormal-orders")
-            }
-          >
-            <Statistic
-              title="Turnitin"
-              value={failedStat.turnitinCount}
-              suffix="条"
-              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
-            />
-          </Card>
-        </Col>
-      )}
+              {failedStat.turnitinCount > 0 && (
+                <Col md={3}>
+                  <Card
+                    size="small"
+                    hoverable
+                    style={abnormalCardStyle()}
+                    onClick={() =>
+                      navigate("/scan/history/abnormal-orders")
+                    }
+                  >
+                    <Statistic
+                      title="Turnitin"
+                      value={failedStat.turnitinCount}
+                      suffix="条"
+                      valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+                    />
+                  </Card>
+                </Col>
+              )}
 
-      {failedStat.dupliseeCount > 0 && (
-        <Col md={3}>
-          <Card
-            size="small"
-            hoverable
-            style={abnormalCardStyle()}
-            onClick={() =>
-              navigate("/scan/duplisee/abnormal-orders")
-            }
-          >
-            <Statistic
-              title="SangerboxScope"
-              value={failedStat.dupliseeCount}
-              suffix="条"
-              valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
-            />
+              {failedStat.dupliseeCount > 0 && (
+                <Col md={3}>
+                  <Card
+                    size="small"
+                    hoverable
+                    style={abnormalCardStyle()}
+                    onClick={() =>
+                      navigate("/scan/duplisee/abnormal-orders")
+                    }
+                  >
+                    <Statistic
+                      title="SangerboxScope"
+                      value={failedStat.dupliseeCount}
+                      suffix="条"
+                      valueStyle={{ color: "#ff4d4f", fontSize: 22 }}
+                    />
+                  </Card>
+                </Col>
+              )}
+            </Row>
           </Card>
-        </Col>
-      )}
-    </Row>
-  </Card>
-)}
+        )}
 
 
       {/* 月度订单柱状图 */}
