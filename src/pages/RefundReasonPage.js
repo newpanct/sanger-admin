@@ -1,6 +1,6 @@
 import PageCard from "../components/PageCard";
 import { ReloadOutlined,PlusOutlined } from "@ant-design/icons";
-import { Button,Tooltip,Divider } from "antd";
+import { Button,Tooltip,Divider,Empty } from "antd";
 export default function RefundReasonPage() {
     return (
         <PageCard
@@ -26,7 +26,7 @@ export default function RefundReasonPage() {
                 </Tooltip>
                 </>
             }>
-
+                <Empty description="功能开发中" />
         </PageCard>
     );
 }

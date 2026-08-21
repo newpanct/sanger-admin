@@ -11,16 +11,20 @@ import {
 } from "../server/api";
 import { useSelector } from "react-redux";
 import { Space } from "antd";
+import store from "../store";
+import { getHomePath } from "../utils/menu";
 const { Title, Text } = Typography;
 
 const Login = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [merchantForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [wxState, setWxState] = useState("");
   const [loginType, setLoginType] = useState("account"); // "account" | "wechat"
   const { token } = useSelector((state) => state.theme);
+  const goHome = () => {
+    navigate(getHomePath(store.getState().auth.menus));
+  };
   // 登录提交处理
   const onFinish = async (values) => {
     setLoading(true);
@@ -31,12 +35,7 @@ const Login = () => {
       };
       const res = await pwdAdminLogin(obj);
       if (res.code === 200) {
-        const token = res.data.token;
-        if(!token.startsWith("Bearer")){
-          navigate("/merchant/control/information");
-        }else{
-          navigate("/dashboard");
-        }
+        goHome();
         message.success(res.message || "登录成功");
       } else {
         message.warning(res.message || "登录失败");
@@ -110,12 +109,7 @@ const Login = () => {
       const res = await weChatLoginStatus(wxState);
 
       if (res?.data.status === "confirmed") {
-        const token = res?.data.user.token;
-        if(!token.startsWith("Bearer")){
-          navigate("/merchant/control/information");
-        }else{
-          navigate("/dashboard");
-        }
+        goHome();
         setWxState("");
         clearInterval(timer);
         message.success(res.message || "登录成功！");

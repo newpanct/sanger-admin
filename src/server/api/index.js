@@ -15,3 +15,6 @@ export * from "./enterprise";
 export * from "./service";
 export * from "./deprecated";
 export * from "./notice";
+export * from "./menu";
+export * from "./roleMenu";
+export * from "./pay";

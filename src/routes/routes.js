@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from "react";
+import { useSelector } from "react-redux";
 import { useRoutes, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout";
 import adminMenu from "../data/menu.json";
-import merchantMenu from "../data/merchantMenu.json";
 import Login from "../pages/LoginPage";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../pages/NotFoundPage";
@@ -39,6 +40,9 @@ const componentMap = {
   PaySangerboxScopePage: lazy(() => import("../pages/pay/amount-stat/PaySangerboxScopePage")),
   PayEnterpriseRechargePage: lazy(() =>
     import("../pages/pay/amount-stat/PayEnterpriseRechargePage")
+  ),
+  PayPersonalAccountDetailPage: lazy(() =>
+    import("../pages/pay/PayPersonalAccountDetailPage")
   ),
   // 查重
   // -- CrossCheckPage
@@ -97,14 +101,17 @@ const componentMap = {
   NoticePage:lazy(()=>import("../pages/web/NoticePage")),
   // 退款理由管理
   RefundReasonPage:lazy(()=>import("../pages/RefundReasonPage")),
+  // 菜单管理
+  MenuListPage: lazy(() => import("../pages/menu-manage/MenuListPage")),
+  RoleMenuPage: lazy(() => import("../pages/menu-manage/RoleMenuPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };
 
 // 生成路由
 const generateRoutes = (menus) =>
-  menus
-    .map((item, index) => {
+  (menus || [])
+    .map((item) => {
       if (!item.path) return null;
       if (item.children?.length) {
         return {
@@ -131,27 +138,18 @@ const generateRoutes = (menus) =>
 
 //  权限路由导航
 const AppRoutes = () => {
-  const adminRoutes = generateRoutes(adminMenu);
-  const merchantRoutes = generateRoutes(merchantMenu);
+  const menus = useSelector((state) => state.auth.menus);
+  const adminRoutes = generateRoutes(menus?.length ? menus : adminMenu);
   const routes = useRoutes([
     { path: "/login", element: <Login /> },
+    { path: "/", element: <Navigate to="/dashboard" /> },
     {
-      element: <PrivateRoute allow={["admin", "superAdmin"]} />,
+      element: <PrivateRoute />,
       children: [
         {
           path: "/",
           element: <AdminLayout />,
           children: [...adminRoutes, { path: "*", element: <NotFoundPage /> }],
-        },
-      ],
-    },
-    {
-      element: <PrivateRoute allow={["merchant"]} />,
-      children: [
-        {
-          path: "/merchant",
-          element: <AdminLayout />,
-          children: [...merchantRoutes, { path: "*", element: <NotFoundPage /> }],
         },
       ],
     },

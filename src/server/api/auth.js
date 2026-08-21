@@ -1,19 +1,24 @@
 import { getBase, postJson } from "./_helpers";
 import { setAuth, clearAuth } from "../../store";
 import store from "../../store";
+import { normalizeMenus } from "../../utils/menu";
 
 // 统一处理登录响应：解析角色并 dispatch auth（消除 pwdAdminLogin / weChatLoginStatus 的重复逻辑）
 const handleLoginAuth = (userData) => {
-  const { token, isSuper } = userData;
-  let role = isSuper === 1 ? "superAdmin" : "admin";
-  if (!token.startsWith("Bearer")) {
-    role = "merchant";
-  }
+  const role = "admin";
   store.dispatch(
     setAuth({
-      token,
+      token: userData.token,
       role,
+      roleId: userData.role,
+      roleName: userData.roleName,
+      id: userData.id,
       username: userData.nickname,
+      avatar: userData.avatar,
+      email: userData.email,
+      phone: userData.phone,
+      isBindWechat: userData.isBindWechat,
+      menus: normalizeMenus(userData.menus),
       merchantBalance: userData.balance,
       wechatName: userData.wechatName,
       merchantId: userData.merchantId,

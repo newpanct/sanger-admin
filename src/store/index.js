@@ -19,8 +19,16 @@ const authSlice = createSlice({
   initialState: {
     token: null,
     role: null,
-    wechatName:null,
+    roleId: null,
+    roleName: null,
+    id: null,
+    wechatName: null,
     username: null,
+    avatar: null,
+    email: null,
+    phone: null,
+    isBindWechat: null,
+    menus: [],
     merchantId: null,
     merchantBalance: null,
   },
@@ -28,7 +36,15 @@ const authSlice = createSlice({
     setAuth: (state, action) => {
       state.token = action.payload.token;
       state.role = action.payload.role;
+      state.roleId = action.payload.roleId;
+      state.roleName = action.payload.roleName;
+      state.id = action.payload.id;
       state.username = action.payload.username;
+      state.avatar = action.payload.avatar;
+      state.email = action.payload.email;
+      state.phone = action.payload.phone;
+      state.isBindWechat = action.payload.isBindWechat;
+      state.menus = action.payload.menus || [];
       state.wechatName = action.payload.wechatName;
       state.merchantId = action.payload.merchantId;
       state.merchantBalance = action.payload.merchantBalance;
@@ -36,18 +52,29 @@ const authSlice = createSlice({
     clearAuth: (state) => {
       state.token = null;
       state.role = null;
+      state.roleId = null;
+      state.roleName = null;
+      state.id = null;
       state.wechatName = null;
       state.username = null;
+      state.avatar = null;
+      state.email = null;
+      state.phone = null;
+      state.isBindWechat = null;
+      state.menus = [];
       state.merchantId = null;
       state.merchantBalance = null;
     },
     updateMerchantBalance: (state, action) => {
       state.merchantBalance = action.payload;
     },
+    updateMenus: (state, action) => {
+      state.menus = action.payload || [];
+    },
   },
 });
 
-export const { setAuth, clearAuth, updateMerchantBalance } = authSlice.actions;
+export const { setAuth, clearAuth, updateMerchantBalance, updateMenus } = authSlice.actions;
 
 // ---- 组合 reducer ----
 const rootReducer = combineReducers({

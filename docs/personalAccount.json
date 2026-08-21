@@ -1,0 +1,548 @@
+{
+  "apifoxProject": "1.0.0",
+  "$schema": {
+    "app": "apifox",
+    "type": "project",
+    "version": "1.2.0"
+  },
+  "info": {
+    "name": "sangerbox",
+    "description": "",
+    "mockRule": {
+      "rules": [],
+      "enableSystemRule": true
+    }
+  },
+  "projectSetting": {
+    "id": "7579036",
+    "auth": {},
+    "securityScheme": {},
+    "gateway": [],
+    "language": "zh-CN",
+    "apiStatuses": [
+      "developing",
+      "testing",
+      "released",
+      "deprecated"
+    ],
+    "mockSettings": {},
+    "preProcessors": [],
+    "postProcessors": [],
+    "advancedSettings": {
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      }
+    },
+    "initialDisabledMockIds": [],
+    "servers": [
+      {
+        "id": "default",
+        "name": "默认服务",
+        "moduleId": 6728897
+      }
+    ],
+    "cloudMock": {
+      "enable": false,
+      "security": "free",
+      "tokenKey": "apifoxToken",
+      "isCreatedAutomaticallyByDefaultConfigFromAdmin": true
+    }
+  },
+  "apiCollection": [
+    {
+      "name": "根目录",
+      "id": 73385094,
+      "auth": {},
+      "securityScheme": {},
+      "parentId": 0,
+      "serverId": "",
+      "description": "",
+      "identityPattern": {
+        "httpApi": {
+          "type": "methodAndPath",
+          "bodyType": "",
+          "fields": []
+        }
+      },
+      "shareSettings": {},
+      "visibility": "SHARED",
+      "moduleId": 6728897,
+      "preProcessors": [
+        {
+          "id": "inheritProcessors",
+          "type": "inheritProcessors",
+          "data": {}
+        }
+      ],
+      "postProcessors": [
+        {
+          "id": "inheritProcessors",
+          "type": "inheritProcessors",
+          "data": {}
+        }
+      ],
+      "inheritPostProcessors": {},
+      "inheritPreProcessors": {},
+      "items": [
+        {
+          "name": "订单管理",
+          "id": 93923361,
+          "auth": {},
+          "securityScheme": {},
+          "parentId": 0,
+          "serverId": "",
+          "description": "",
+          "identityPattern": {
+            "httpApi": {
+              "type": "inherit",
+              "bodyType": "",
+              "fields": []
+            }
+          },
+          "shareSettings": {},
+          "visibility": "INHERITED",
+          "moduleId": 6728897,
+          "preProcessors": [
+            {
+              "id": "inheritProcessors",
+              "type": "inheritProcessors",
+              "data": {}
+            }
+          ],
+          "postProcessors": [
+            {
+              "id": "inheritProcessors",
+              "type": "inheritProcessors",
+              "data": {}
+            }
+          ],
+          "inheritPostProcessors": {},
+          "inheritPreProcessors": {},
+          "items": [
+            {
+              "name": "用户个人账户明细查询",
+              "api": {
+                "id": "504461240",
+                "method": "post",
+                "path": "/admin/order/account",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "150063620",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/306459440"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/306470070",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "用户个人账户明细查询",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 6,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "socketCollection": [],
+  "docCollection": [],
+  "webSocketCollection": [],
+  "socketIOCollection": [],
+  "mcpClientCollection": [],
+  "responseCollection": [],
+  "schemaCollection": [
+    {
+      "id": 17607876,
+      "name": "根目录",
+      "visibility": "SHARED",
+      "moduleId": 6728897,
+      "items": [
+        {
+          "name": "RListDedupOrderAccountVo",
+          "displayName": "",
+          "id": "#/definitions/306459440",
+          "description": "",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "响应状态码"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "响应消息"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/306459439",
+                    "description": "查重订单服务类型汇总 VO（admin端 Feign 反序列化用）"
+                  },
+                  "description": "响应数据"
+                }
+              },
+              "x-apifox-orders": [
+                "code",
+                "message",
+                "data"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "DedupOrderAccountQuery",
+          "displayName": "",
+          "id": "#/definitions/306470070",
+          "description": "用户个人账户明细查询参数",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "用户邮箱"
+                }
+              },
+              "x-apifox-orders": [
+                "email"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "DedupOrderAccountVo",
+          "displayName": "",
+          "id": "#/definitions/306459439",
+          "description": "查重订单服务类型汇总 VO（admin端 Feign 反序列化用）",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "serviceType": {
+                  "type": "string",
+                  "description": "服务类型（imagetwin/ithenticate/sangerboxscope）"
+                },
+                "totalOrderCount": {
+                  "type": "integer",
+                  "description": "订单数",
+                  "format": "int64"
+                },
+                "totalAmount": {
+                  "type": "number",
+                  "description": "总金额（元）"
+                },
+                "successCount": {
+                  "type": "integer",
+                  "description": "成功数",
+                  "format": "int64"
+                },
+                "failedCount": {
+                  "type": "integer",
+                  "description": "失败数",
+                  "format": "int64"
+                },
+                "failedRefundedCount": {
+                  "type": "integer",
+                  "description": "失败已退款数",
+                  "format": "int64"
+                },
+                "failedUnrefundedCount": {
+                  "type": "integer",
+                  "description": "失败未退款数",
+                  "format": "int64"
+                }
+              },
+              "x-apifox-orders": [
+                "serviceType",
+                "totalOrderCount",
+                "totalAmount",
+                "successCount",
+                "failedCount",
+                "failedRefundedCount",
+                "failedUnrefundedCount"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        }
+      ]
+    }
+  ],
+  "securitySchemeCollection": [],
+  "oasComponentCollection": [],
+  "requestCollection": [
+    {
+      "name": "根目录",
+      "children": [],
+      "ordering": [
+        "requestFolder.8069990"
+      ],
+      "items": []
+    }
+  ],
+  "environments": [],
+  "commonScripts": [],
+  "globalVariables": [],
+  "commonParameters": {
+    "id": 1032731,
+    "createdAt": "2026-08-17T06:30:54.000Z",
+    "updatedAt": "2026-08-17T06:30:54.000Z",
+    "deletedAt": null,
+    "parameters": {
+      "header": [
+        {
+          "name": "Authorization",
+          "defaultEnable": true,
+          "type": "string",
+          "id": "lzF9OLcuzI",
+          "defaultValue": "Bearer 03d461651c5e43588cc3d9f9bca0601a"
+        }
+      ]
+    },
+    "projectId": 7538463,
+    "creatorId": 1938609,
+    "editorId": 1938609
+  },
+  "customFunctions": [],
+  "projectTestCaseCategories": [
+    {
+      "id": 5071344,
+      "name": "正向",
+      "description": "有效的输入和正确的预期结果，代表典型的用法。"
+    },
+    {
+      "id": 5071345,
+      "name": "负向",
+      "description": "消极的、无效的输入，如缺少字段、错误的类型、不支持的方法等。"
+    },
+    {
+      "id": 5071346,
+      "name": "边界值",
+      "description": "极端或边缘条件，如最大字符串长度、空值、零、null等"
+    },
+    {
+      "id": 5071347,
+      "name": "安全性",
+      "description": "可能暴露API安全性风险的测试用例。"
+    },
+    {
+      "id": 5071348,
+      "name": "其他",
+      "description": "其他未归属的测试用例。"
+    }
+  ],
+  "projectTestCaseTags": [
+    {
+      "id": 16123269,
+      "name": "仅传必要字段",
+      "description": "仅发送具有有效值的必填字段，省略所有可选字段，以测试最小有效请求。"
+    },
+    {
+      "id": 16123270,
+      "name": "语义合法",
+      "description": "使用语法正确且在业务逻辑或域上下文中也有意义的值。"
+    },
+    {
+      "id": 16123271,
+      "name": "覆盖枚举组合",
+      "description": "对所有枚举型参数，应用正交设计系统地构建参数及其枚举值的测试用例组合，专用于测试枚举覆盖率"
+    },
+    {
+      "id": 16123272,
+      "name": "其他正向",
+      "description": "提供符合API规范的真实有效的输入，产生正确和预期的结果。"
+    },
+    {
+      "id": 16123273,
+      "name": "缺失必填字段",
+      "description": "在请求主体或参数中省略一个或多个必需字段。"
+    },
+    {
+      "id": 16123274,
+      "name": "无效值",
+      "description": "提供的值类型和格式正确，但在逻辑上对该字段无效。"
+    },
+    {
+      "id": 16123275,
+      "name": "类型错误",
+      "description": "使用数据类型不正确的值，例如发送字符串而不是整数。"
+    },
+    {
+      "id": 16123276,
+      "name": "格式错误",
+      "description": "以不正确的格式提供值，例如，错误的日期模式，格式错误的电子邮件地址。"
+    },
+    {
+      "id": 16123277,
+      "name": "语义非法",
+      "description": "使用语法正确且格式正确的值，这些值在逻辑上不可能或违反域规则。"
+    },
+    {
+      "id": 16123278,
+      "name": "其他负向",
+      "description": "提供无效或意外的输入，应触发错误处理或拒绝API。"
+    },
+    {
+      "id": 16123279,
+      "name": "Null",
+      "description": "必须是 JSON 字面量 `null`（不是空的，也不是 \"null\"）。"
+    },
+    {
+      "id": 16123280,
+      "name": "零值",
+      "description": "必须是数字字面值0。"
+    },
+    {
+      "id": 16123281,
+      "name": "空值",
+      "description": "必须是\"\"。"
+    },
+    {
+      "id": 16123282,
+      "name": "极大值",
+      "description": "Max/min值 - 为数字或日期字段提供精确的最小值和最大值。"
+    },
+    {
+      "id": 16123283,
+      "name": "极小值",
+      "description": "Max/min值 - 为数字或日期字段提供精确的最小值和最大值。"
+    },
+    {
+      "id": 16123284,
+      "name": "超出最大边界值",
+      "description": "过长/过短字符串 - 提供超出允许的最小或最大边界的值。"
+    },
+    {
+      "id": 16123285,
+      "name": "超出最小边界值",
+      "description": "过长/过短字符串 - 提供超出允许的最小或最大边界的值。"
+    },
+    {
+      "id": 16123286,
+      "name": "字符串过长",
+      "description": "超出范围的值 - 提供大于允许的最大长度或小于要求的最小长度的字符串。"
+    },
+    {
+      "id": 16123287,
+      "name": "字符串过短",
+      "description": "超出范围的值 - 提供大于允许的最大长度或小于要求的最小长度的字符串。"
+    },
+    {
+      "id": 16123288,
+      "name": "对象级别授权缺失",
+      "description": "对象级别授权缺失 - 用户在没有适当授权的情况下访问或操作数据对象。"
+    },
+    {
+      "id": 16123289,
+      "name": "访问控制",
+      "description": "基于角色、权限或属性来限制用户能访问哪些资源、能执行哪些操作"
+    },
+    {
+      "id": 16123290,
+      "name": "认证失败",
+      "description": "认证失败 - 认证薄弱、配置错误或被绕过，导致未授权访问。"
+    },
+    {
+      "id": 16123291,
+      "name": "SQL注入",
+      "description": "在输入字段中插入恶意SQL代码，测试是否存在SQL注入漏洞。"
+    },
+    {
+      "id": 16123292,
+      "name": "XSS注入",
+      "description": "注入JavaScript或HTML标签来测试跨站点脚本漏洞。"
+    },
+    {
+      "id": 16123293,
+      "name": "模糊输入",
+      "description": "发送大型或随机生成的有效载荷，以测试输入的有效性和稳定性。"
+    },
+    {
+      "id": 16123294,
+      "name": "命令行注入",
+      "description": "将shell命令插入输入以测试命令执行漏洞。"
+    },
+    {
+      "id": 16123295,
+      "name": "JSON注入",
+      "description": "插入恶意或意外的JSON结构来测试解析和验证。"
+    },
+    {
+      "id": 16123296,
+      "name": "NoSQL注入",
+      "description": "提供NoSQL特定的恶意查询或操作符来测试注入漏洞。"
+    },
+    {
+      "id": 16123297,
+      "name": "其他",
+      "description": "其他未归属的测试用例。"
+    }
+  ],
+  "projectAssociations": [],
+  "moduleSettings": [
+    {
+      "id": "6728897",
+      "name": "默认模块",
+      "description": "",
+      "moduleVariables": [],
+      "openApiInfo": {}
+    }
+  ]
+}

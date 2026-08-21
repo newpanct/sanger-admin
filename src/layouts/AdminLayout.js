@@ -74,13 +74,12 @@ import {
   CloudServerOutlined ,
   DesktopOutlined ,
 } from "@ant-design/icons";
-import { adminLogout, getFailed, refreshMerchantBalance } from "../server/api";
+import { adminLogout, getFailed } from "../server/api";
 import adminMenu from "../data/menu.json";
-import merchantMenu from "../data/merchantMenu.json";
 import { useDispatch, useSelector } from "react-redux";
 import { setThemeToken } from "../store/themeSlice";
 import { useIdleLogout } from "../hooks/useIdleLogout";
-import { clearAuth, persistor, updateMerchantBalance } from "../store";
+import { clearAuth, persistor } from "../store";
 import { setMenuBadges, clearAllMenuBadge } from "../store/menuBadgeSlice";
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -137,12 +136,11 @@ const iconMap = {
 };
 const computeFullPath = (item, parentPath = "") => {
   if (!item.path) return "";
-  // 商户菜单相对路径拼接 /merchant
-  const pathPrefix = item.isMerchant ? "/merchant" : "";
-  const base = parentPath || pathPrefix;
-  return base ? `${base}/${item.path}`.replace(/\/+/g, "/") : `/${item.path}`;
+  return parentPath
+    ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
+    : `/${item.path}`;
 };
-const generateMenuItems = (menus, role, badgeMap = {}, parentPath = "") =>
+const generateMenuItems = (menus, badgeMap = {}, parentPath = "") =>
   menus
     .filter((item) => !item.hidden)
     .map((item) => {
@@ -151,12 +149,8 @@ const generateMenuItems = (menus, role, badgeMap = {}, parentPath = "") =>
       let childrenItems;
       let hasChildrenBadge = false;
       if (item.children?.length) {
-        childrenItems = generateMenuItems(
-          item.children,
-          role,
-          badgeMap,
-          fullPath
-        );
+        childrenItems = generateMenuItems(item.children, badgeMap, fullPath);
+        if (!childrenItems.length) return null;
         hasChildrenBadge = childrenItems.some((child) =>
           child.label?.props?.children?.some?.((c) => c?.type === Badge)
         );
@@ -181,28 +175,28 @@ const generateMenuItems = (menus, role, badgeMap = {}, parentPath = "") =>
         icon: IconComponent ? <IconComponent /> : null,
         children: childrenItems,
       };
-});
+    })
+    .filter(Boolean);
 const AdminLayout = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.theme);
-  const role = useSelector((state) => state.auth.role);
-  const menuSource = role === "merchant" ? merchantMenu : adminMenu;
+  const authMenus = useSelector((state) => state.auth.menus);
+  const menuSource = authMenus?.length ? authMenus : adminMenu;
   const name = useSelector((state) => state.auth.username);
-  const username = name.slice(0, 3);
-  const merchantBalance = useSelector((state) => state.auth.merchantBalance);
-  const merchantId = useSelector((state) => state.auth.merchantId);
+  const roleName = useSelector((state) => state.auth.roleName);
+  const avatar = useSelector((state) => state.auth.avatar);
+  const username = (name || "").slice(0, 3);
   const badgeMap = useSelector((state) => state.menuBadge.badges);
   const [theme, setTheme] = useState("light");
   const [collapsed, setCollapsed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [colorDrawerVisible, setColorDrawerVisible] = useState(false);
   const [openKeys, setOpenKeys] = useState([]);
-  const menuPrefix = role === "merchant" ? "/merchant" : "";
   const rootSubmenuKeys = menuSource
     .filter((item) => !item.hidden && item.children?.length)
-    .map((item) => computeFullPath(item, menuPrefix));
+    .map((item) => computeFullPath(item));
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => !openKeys.includes(key));
@@ -219,94 +213,65 @@ const AdminLayout = () => {
     }
   };
   const [show, setShow] = useState(false);
-  const manageTitle = role === "merchant" ? "商户管理" : "桑格管理";
+  const manageTitle = "桑格管理";
 
   const splitKeyToPaths = (key) => {
     return key.replace(/^\//, "").split("/");
   };
-  const normalizeSelectedKey = (selectedKey, role) => {
-    if (!selectedKey) return "";
-  
-    // 仅 merchant 需要去掉前缀
-    if (role === "merchant") {
-      return selectedKey.replace(/^\/merchant/, "") || "/";
-    }
-  
-    return selectedKey;
-  };
   // 侧边栏
-  const menuItems = generateMenuItems(
-    menuSource,
-    role,
-    badgeMap,
-    role === "merchant" ? "/merchant" : ""
-  );
-  // 刷新余额
-  const refreshBalance = async () => {
-    if (!merchantId) return;
-
-    const res = await refreshMerchantBalance(merchantId);
-    if (res?.code === 200) {
-      dispatch(updateMerchantBalance(res?.data));
-    }
-  };
+  const menuItems = generateMenuItems(menuSource, badgeMap);
   // 刷新数据
-  const refreshDate = async(role) => {
-    if(role === "merchant"){
-      refreshBalance();
-    }else{
-      const res = await getFailed();
-      if(res?.code === 200){
-        const data = res?.data || {};
-        dispatch(
-          setMenuBadges([
-            {
-              path: "/scan/crosscheck/abnormal-orders",
-              value: data?.paperCount,
-            },
-            {
-              path: "/scan/imagetwin/abnormal-orders",
-              value: data?.imageCount,
-            },
-            {
-              path: "/scan/history/abnormal-orders",
-              value: data?.turnitinCount,
-            },
-            {
-              path: "/scan/duplisee/abnormal-orders",
-              value: data?.dupliseeCount,
-            },
-          ])
-        )
-      }
+  const refreshDate = async () => {
+    const res = await getFailed();
+    if (res?.code === 200) {
+      const data = res?.data || {};
+      dispatch(
+        setMenuBadges([
+          {
+            path: "/scan/crosscheck/abnormal-orders",
+            value: data?.paperCount,
+          },
+          {
+            path: "/scan/imagetwin/abnormal-orders",
+            value: data?.imageCount,
+          },
+          {
+            path: "/scan/history/abnormal-orders",
+            value: data?.turnitinCount,
+          },
+          {
+            path: "/scan/duplisee/abnormal-orders",
+            value: data?.dupliseeCount,
+          },
+        ])
+      );
     }
   };
-  const getBreadcrumbByKey = (menus, selectedKey, role) => {
+  const getBreadcrumbByKey = (menus, selectedKey) => {
     if (!selectedKey) return [];
-    const normalizedKey = normalizeSelectedKey(selectedKey, role);
-    const paths = splitKeyToPaths(normalizedKey);
-  
+    const paths = splitKeyToPaths(selectedKey);
+
     const result = [];
     let currentMenus = menus;
-  
+
     for (const path of paths) {
       const match = currentMenus.find((m) => m.path === path);
       if (!match) break;
-  
+
       result.push({
         key: path,
         title: match.label,
       });
-  
+
       currentMenus = match.children || [];
     }
-  
+
     return result;
   };
   // 面包屑
   const breadcrumbItems = [
     { key: "home", title: manageTitle },
-    ...getBreadcrumbByKey(menuSource, location.pathname,role),
+    ...getBreadcrumbByKey(menuSource, location.pathname),
   ];
   
 
@@ -385,29 +350,23 @@ const AdminLayout = () => {
 
   // 监听全屏状态变化
   useIdleLogout();
-  // 仅在路由或角色变化时刷新异常订单/余额，避免 render 期副作用
+  // 仅在路由变化时刷新异常订单角标，避免 render 期副作用
   useEffect(() => {
-    refreshDate(role);
+    refreshDate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname, role]);
+  }, [location.pathname]);
 
   // 根据当前路由自动展开对应父级菜单
   useEffect(() => {
-    const pathname = location.pathname;
-    if (role === "merchant" && !pathname.startsWith("/merchant")) return;
-
-    const relative = role === "merchant"
-      ? pathname.replace(/^\/merchant/, "") || "/"
-      : pathname;
-    const segments = relative.replace(/^\//, "").split("/").filter(Boolean);
+    const segments = location.pathname.replace(/^\//, "").split("/").filter(Boolean);
     const keys = [];
-    let acc = menuPrefix;
+    let acc = "";
     for (let i = 0; i < segments.length - 1; i++) {
       acc = `${acc}/${segments[i]}`.replace(/\/+/g, "/");
       keys.push(acc);
     }
     setOpenKeys(keys);
-  }, [location.pathname, role, menuPrefix]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -567,17 +526,6 @@ const AdminLayout = () => {
 
             {/* 右侧用户信息 + 颜色设置*/}
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              { merchantBalance !== undefined && merchantBalance !== null && (
-                <Tooltip title="刷新余额">
-                  <Button
-                    type="text"
-                    className="p-0 m-0"
-                    onClick={() => refreshBalance()}
-                  >
-                    当前余额：{merchantBalance}
-                  </Button>
-                </Tooltip>
-              )}
               <Tooltip title="注销登录">
                 <Button
                   type="text"
@@ -587,12 +535,13 @@ const AdminLayout = () => {
                   }}
                 >
                   <Avatar
+                    // src={avatar || undefined}
                     style={{
                       backgroundColor: token.colorPrimary,
                       fontSize: 14,
                     }}
                   >
-                    {username}
+                    {roleName?.slice(0, 2)}
                   </Avatar>
                 </Button>
               </Tooltip>

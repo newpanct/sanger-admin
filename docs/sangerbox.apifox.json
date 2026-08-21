@@ -1,0 +1,1021 @@
+{
+  "apifoxProject": "1.0.0",
+  "$schema": {
+    "app": "apifox",
+    "type": "project",
+    "version": "1.2.0"
+  },
+  "info": {
+    "name": "sangerbox",
+    "description": "",
+    "mockRule": {
+      "rules": [],
+      "enableSystemRule": true
+    }
+  },
+  "projectSetting": {
+    "id": "7579036",
+    "auth": {},
+    "securityScheme": {},
+    "gateway": [],
+    "language": "zh-CN",
+    "apiStatuses": [
+      "developing",
+      "testing",
+      "released",
+      "deprecated"
+    ],
+    "mockSettings": {},
+    "preProcessors": [],
+    "postProcessors": [],
+    "advancedSettings": {
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      }
+    },
+    "initialDisabledMockIds": [],
+    "servers": [
+      {
+        "id": "default",
+        "name": "默认服务",
+        "moduleId": 6728897
+      }
+    ],
+    "cloudMock": {
+      "enable": false,
+      "security": "free",
+      "tokenKey": "apifoxToken",
+      "isCreatedAutomaticallyByDefaultConfigFromAdmin": true
+    }
+  },
+  "apiCollection": [
+    {
+      "name": "根目录",
+      "id": 73385094,
+      "auth": {},
+      "securityScheme": {},
+      "parentId": 0,
+      "serverId": "",
+      "description": "",
+      "identityPattern": {
+        "httpApi": {
+          "type": "methodAndPath",
+          "bodyType": "",
+          "fields": []
+        }
+      },
+      "shareSettings": {},
+      "visibility": "SHARED",
+      "moduleId": 6728897,
+      "preProcessors": [
+        {
+          "id": "inheritProcessors",
+          "type": "inheritProcessors",
+          "data": {}
+        }
+      ],
+      "postProcessors": [
+        {
+          "id": "inheritProcessors",
+          "type": "inheritProcessors",
+          "data": {}
+        }
+      ],
+      "inheritPostProcessors": {},
+      "inheritPreProcessors": {},
+      "items": [
+        {
+          "name": "菜单管理",
+          "id": 93999685,
+          "auth": {},
+          "securityScheme": {},
+          "parentId": 0,
+          "serverId": "",
+          "description": "",
+          "identityPattern": {
+            "httpApi": {
+              "type": "inherit",
+              "bodyType": "",
+              "fields": []
+            }
+          },
+          "shareSettings": {},
+          "visibility": "INHERITED",
+          "moduleId": 6728897,
+          "preProcessors": [
+            {
+              "id": "inheritProcessors",
+              "type": "inheritProcessors",
+              "data": {}
+            }
+          ],
+          "postProcessors": [
+            {
+              "id": "inheritProcessors",
+              "type": "inheritProcessors",
+              "data": {}
+            }
+          ],
+          "inheritPostProcessors": {},
+          "inheritPreProcessors": {},
+          "items": [
+            {
+              "name": "新增菜单",
+              "api": {
+                "id": "504893692",
+                "method": "post",
+                "path": "/admin/menu/add",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "113059526",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/227581040"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/306811248",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "新增菜单",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 12,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "更新菜单",
+              "api": {
+                "id": "504893693",
+                "method": "post",
+                "path": "/admin/menu/update",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "197189912",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/227581040"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/306811248",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "更新菜单",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 18,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "删除菜单",
+              "api": {
+                "id": "504893694",
+                "method": "get",
+                "path": "/admin/menu/delete/{menuId}",
+                "parameters": {
+                  "path": [
+                    {
+                      "id": "menuId#0",
+                      "name": "menuId",
+                      "required": true,
+                      "description": "",
+                      "type": "integer",
+                      "schema": {
+                        "type": "integer"
+                      }
+                    }
+                  ],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "156879988",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/227581040"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "none",
+                  "parameters": [],
+                  "oasExtensions": ""
+                },
+                "description": "删除菜单",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 24,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "分页查询菜单（顶级菜单，含下级子菜单）",
+              "api": {
+                "id": "504893695",
+                "method": "post",
+                "path": "/admin/menu/page",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "158820807",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/306811250"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/306811251",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "分页查询菜单（顶级菜单，含下级子菜单）",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 30,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "批量更新菜单排序",
+              "api": {
+                "id": "504893696",
+                "method": "post",
+                "path": "/admin/menu/batchSort",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "176922795",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/227581040"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/306811252",
+                      "description": "菜单排序更新 DTO"
+                    },
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "批量更新菜单排序",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 36,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "socketCollection": [],
+  "docCollection": [],
+  "webSocketCollection": [],
+  "socketIOCollection": [],
+  "mcpClientCollection": [],
+  "responseCollection": [],
+  "schemaCollection": [
+    {
+      "id": 17607876,
+      "name": "根目录",
+      "visibility": "SHARED",
+      "moduleId": 6728897,
+      "items": [
+        {
+          "name": "RVoid",
+          "displayName": "",
+          "id": "#/definitions/227581040",
+          "description": "",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "响应状态码"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "响应消息"
+                },
+                "data": {
+                  "description": "响应数据",
+                  "type": "null"
+                }
+              },
+              "x-apifox-orders": [
+                "code",
+                "message",
+                "data"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "SgMenuEntity",
+          "displayName": "",
+          "id": "#/definitions/306811248",
+          "description": "菜单实体",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "",
+                  "format": "int64"
+                },
+                "parentId": {
+                  "type": "integer",
+                  "description": "父菜单ID（0=顶级菜单）",
+                  "format": "int64"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "菜单名称"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "路由路径"
+                },
+                "component": {
+                  "type": "string",
+                  "description": "前端组件路径"
+                },
+                "icon": {
+                  "type": "string",
+                  "description": "菜单图标"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "description": "排序值（越小越靠前）"
+                },
+                "visible": {
+                  "type": "integer",
+                  "description": "是否可见（0=隐藏 1=显示）"
+                },
+                "status": {
+                  "type": "integer",
+                  "description": "状态（0=禁用 1=启用）"
+                },
+                "type": {
+                  "type": "integer",
+                  "description": "菜单类型（1=目录 2=菜单 3=按钮/权限点）"
+                },
+                "createTime": {
+                  "type": "string",
+                  "description": "",
+                  "x-apifox-mock": "@datetime"
+                },
+                "updateTime": {
+                  "type": "string",
+                  "description": "",
+                  "x-apifox-mock": "@datetime"
+                }
+              },
+              "x-apifox-orders": [
+                "id",
+                "parentId",
+                "name",
+                "path",
+                "component",
+                "icon",
+                "sortOrder",
+                "visible",
+                "status",
+                "type",
+                "createTime",
+                "updateTime"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "RPageResultMenuVo",
+          "displayName": "",
+          "id": "#/definitions/306811250",
+          "description": "",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "响应状态码"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "响应消息"
+                },
+                "data": {
+                  "$ref": "#/definitions/306811249",
+                  "description": "响应数据"
+                }
+              },
+              "x-apifox-orders": [
+                "code",
+                "message",
+                "data"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "PageModel",
+          "displayName": "",
+          "id": "#/definitions/306811251",
+          "description": "",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "pageNum": {
+                  "type": "integer",
+                  "description": "当前页码，从 1 开始",
+                  "default": 1
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "每页条数，默认 10",
+                  "default": 10
+                }
+              },
+              "x-apifox-orders": [
+                "pageNum",
+                "pageSize"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "MenuSortDTO",
+          "displayName": "",
+          "id": "#/definitions/306811252",
+          "description": "菜单排序更新 DTO",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "菜单ID",
+                  "format": "int64"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "description": "排序值（越小越靠前）"
+                }
+              },
+              "x-apifox-orders": [
+                "id",
+                "sortOrder"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "PageResultMenuVo",
+          "displayName": "",
+          "id": "#/definitions/306811249",
+          "description": "响应数据",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "records": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/306811246",
+                    "description": "菜单 VO（支持树形结构）"
+                  },
+                  "description": "当前页的数据记录列表\n数据 列表"
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "总记录数",
+                  "format": "int64"
+                },
+                "size": {
+                  "type": "integer",
+                  "description": "每页显示记录数",
+                  "format": "int64"
+                },
+                "current": {
+                  "type": "integer",
+                  "description": "当前页码",
+                  "format": "int64"
+                },
+                "pages": {
+                  "type": "integer",
+                  "description": "总页数",
+                  "format": "int64"
+                }
+              },
+              "x-apifox-orders": [
+                "records",
+                "total",
+                "size",
+                "current",
+                "pages"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "MenuVo",
+          "displayName": "",
+          "id": "#/definitions/306811246",
+          "description": "菜单 VO（支持树形结构）",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "菜单ID",
+                  "format": "int64"
+                },
+                "parentId": {
+                  "type": "integer",
+                  "description": "父菜单ID",
+                  "format": "int64"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "菜单名称"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "路由路径"
+                },
+                "component": {
+                  "type": "string",
+                  "description": "前端组件路径"
+                },
+                "icon": {
+                  "type": "string",
+                  "description": "菜单图标"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "description": "排序值"
+                },
+                "visible": {
+                  "type": "integer",
+                  "description": "是否可见 0=隐藏 1=显示"
+                },
+                "type": {
+                  "type": "integer",
+                  "description": "菜单类型 1=目录 2=菜单 3=按钮/权限点"
+                },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/306811246",
+                    "description": "菜单 VO（支持树形结构）"
+                  },
+                  "description": "子菜单列表"
+                }
+              },
+              "x-apifox-orders": [
+                "id",
+                "parentId",
+                "name",
+                "path",
+                "component",
+                "icon",
+                "sortOrder",
+                "visible",
+                "type",
+                "children"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        }
+      ]
+    }
+  ],
+  "securitySchemeCollection": [],
+  "oasComponentCollection": [],
+  "requestCollection": [
+    {
+      "name": "根目录",
+      "children": [],
+      "ordering": [
+        "requestFolder.8069990"
+      ],
+      "items": []
+    }
+  ],
+  "environments": [],
+  "commonScripts": [],
+  "globalVariables": [],
+  "commonParameters": {
+    "id": 1032731,
+    "createdAt": "2026-08-17T06:30:54.000Z",
+    "updatedAt": "2026-08-17T06:30:54.000Z",
+    "deletedAt": null,
+    "parameters": {
+      "header": [
+        {
+          "name": "Authorization",
+          "defaultEnable": true,
+          "type": "string",
+          "id": "lzF9OLcuzI",
+          "defaultValue": "Bearer 03d461651c5e43588cc3d9f9bca0601a"
+        }
+      ]
+    },
+    "projectId": 7538463,
+    "creatorId": 1938609,
+    "editorId": 1938609
+  },
+  "customFunctions": [],
+  "projectTestCaseCategories": [
+    {
+      "id": 5071344,
+      "name": "正向",
+      "description": "有效的输入和正确的预期结果，代表典型的用法。"
+    },
+    {
+      "id": 5071345,
+      "name": "负向",
+      "description": "消极的、无效的输入，如缺少字段、错误的类型、不支持的方法等。"
+    },
+    {
+      "id": 5071346,
+      "name": "边界值",
+      "description": "极端或边缘条件，如最大字符串长度、空值、零、null等"
+    },
+    {
+      "id": 5071347,
+      "name": "安全性",
+      "description": "可能暴露API安全性风险的测试用例。"
+    },
+    {
+      "id": 5071348,
+      "name": "其他",
+      "description": "其他未归属的测试用例。"
+    }
+  ],
+  "projectTestCaseTags": [
+    {
+      "id": 16123269,
+      "name": "仅传必要字段",
+      "description": "仅发送具有有效值的必填字段，省略所有可选字段，以测试最小有效请求。"
+    },
+    {
+      "id": 16123270,
+      "name": "语义合法",
+      "description": "使用语法正确且在业务逻辑或域上下文中也有意义的值。"
+    },
+    {
+      "id": 16123271,
+      "name": "覆盖枚举组合",
+      "description": "对所有枚举型参数，应用正交设计系统地构建参数及其枚举值的测试用例组合，专用于测试枚举覆盖率"
+    },
+    {
+      "id": 16123272,
+      "name": "其他正向",
+      "description": "提供符合API规范的真实有效的输入，产生正确和预期的结果。"
+    },
+    {
+      "id": 16123273,
+      "name": "缺失必填字段",
+      "description": "在请求主体或参数中省略一个或多个必需字段。"
+    },
+    {
+      "id": 16123274,
+      "name": "无效值",
+      "description": "提供的值类型和格式正确，但在逻辑上对该字段无效。"
+    },
+    {
+      "id": 16123275,
+      "name": "类型错误",
+      "description": "使用数据类型不正确的值，例如发送字符串而不是整数。"
+    },
+    {
+      "id": 16123276,
+      "name": "格式错误",
+      "description": "以不正确的格式提供值，例如，错误的日期模式，格式错误的电子邮件地址。"
+    },
+    {
+      "id": 16123277,
+      "name": "语义非法",
+      "description": "使用语法正确且格式正确的值，这些值在逻辑上不可能或违反域规则。"
+    },
+    {
+      "id": 16123278,
+      "name": "其他负向",
+      "description": "提供无效或意外的输入，应触发错误处理或拒绝API。"
+    },
+    {
+      "id": 16123279,
+      "name": "Null",
+      "description": "必须是 JSON 字面量 `null`（不是空的，也不是 \"null\"）。"
+    },
+    {
+      "id": 16123280,
+      "name": "零值",
+      "description": "必须是数字字面值0。"
+    },
+    {
+      "id": 16123281,
+      "name": "空值",
+      "description": "必须是\"\"。"
+    },
+    {
+      "id": 16123282,
+      "name": "极大值",
+      "description": "Max/min值 - 为数字或日期字段提供精确的最小值和最大值。"
+    },
+    {
+      "id": 16123283,
+      "name": "极小值",
+      "description": "Max/min值 - 为数字或日期字段提供精确的最小值和最大值。"
+    },
+    {
+      "id": 16123284,
+      "name": "超出最大边界值",
+      "description": "过长/过短字符串 - 提供超出允许的最小或最大边界的值。"
+    },
+    {
+      "id": 16123285,
+      "name": "超出最小边界值",
+      "description": "过长/过短字符串 - 提供超出允许的最小或最大边界的值。"
+    },
+    {
+      "id": 16123286,
+      "name": "字符串过长",
+      "description": "超出范围的值 - 提供大于允许的最大长度或小于要求的最小长度的字符串。"
+    },
+    {
+      "id": 16123287,
+      "name": "字符串过短",
+      "description": "超出范围的值 - 提供大于允许的最大长度或小于要求的最小长度的字符串。"
+    },
+    {
+      "id": 16123288,
+      "name": "对象级别授权缺失",
+      "description": "对象级别授权缺失 - 用户在没有适当授权的情况下访问或操作数据对象。"
+    },
+    {
+      "id": 16123289,
+      "name": "访问控制",
+      "description": "基于角色、权限或属性来限制用户能访问哪些资源、能执行哪些操作"
+    },
+    {
+      "id": 16123290,
+      "name": "认证失败",
+      "description": "认证失败 - 认证薄弱、配置错误或被绕过，导致未授权访问。"
+    },
+    {
+      "id": 16123291,
+      "name": "SQL注入",
+      "description": "在输入字段中插入恶意SQL代码，测试是否存在SQL注入漏洞。"
+    },
+    {
+      "id": 16123292,
+      "name": "XSS注入",
+      "description": "注入JavaScript或HTML标签来测试跨站点脚本漏洞。"
+    },
+    {
+      "id": 16123293,
+      "name": "模糊输入",
+      "description": "发送大型或随机生成的有效载荷，以测试输入的有效性和稳定性。"
+    },
+    {
+      "id": 16123294,
+      "name": "命令行注入",
+      "description": "将shell命令插入输入以测试命令执行漏洞。"
+    },
+    {
+      "id": 16123295,
+      "name": "JSON注入",
+      "description": "插入恶意或意外的JSON结构来测试解析和验证。"
+    },
+    {
+      "id": 16123296,
+      "name": "NoSQL注入",
+      "description": "提供NoSQL特定的恶意查询或操作符来测试注入漏洞。"
+    },
+    {
+      "id": 16123297,
+      "name": "其他",
+      "description": "其他未归属的测试用例。"
+    }
+  ],
+  "projectAssociations": [],
+  "moduleSettings": [
+    {
+      "id": "6728897",
+      "name": "默认模块",
+      "description": "",
+      "moduleVariables": [],
+      "openApiInfo": {}
+    }
+  ]
+}
