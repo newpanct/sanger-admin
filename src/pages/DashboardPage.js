@@ -189,7 +189,7 @@ const DashboardPage = () => {
         failedStat.dupliseeCount > 0 ||
         failedStat.turnitinCount > 0) && (
           <Card
-            size="small"
+
             title="异常订单"
             style={{ marginTop: 12 }}
             styles={{ body: { padding: 12 } }}
@@ -198,7 +198,7 @@ const DashboardPage = () => {
               {failedStat.paperCount > 0 && (
                 <Col md={3}>
                   <Card
-                    size="small"
+
                     hoverable
                     style={abnormalCardStyle()}
                     onClick={() =>
@@ -218,7 +218,7 @@ const DashboardPage = () => {
               {failedStat.imageCount > 0 && (
                 <Col md={3}>
                   <Card
-                    size="small"
+
                     hoverable
                     style={abnormalCardStyle()}
                     onClick={() =>
@@ -238,7 +238,7 @@ const DashboardPage = () => {
               {failedStat.turnitinCount > 0 && (
                 <Col md={3}>
                   <Card
-                    size="small"
+
                     hoverable
                     style={abnormalCardStyle()}
                     onClick={() =>
@@ -258,7 +258,7 @@ const DashboardPage = () => {
               {failedStat.dupliseeCount > 0 && (
                 <Col md={3}>
                   <Card
-                    size="small"
+
                     hoverable
                     style={abnormalCardStyle()}
                     onClick={() =>
@@ -282,13 +282,13 @@ const DashboardPage = () => {
       {/* 月度订单柱状图 */}
       <Row gutter={[16, 16]} style={{ marginTop: 12 }}>
         <Col xs={24} md={12}>
-          <Card size="small" title="月订单数">
+          <Card title="月订单数">
             <Column {...moonSingleConfig} />
           </Card>
         </Col>
 
         <Col xs={24} md={12}>
-          <Card size="small" title="月营收">
+          <Card title="月营收">
             <Column {...moonAmountConfig} />
           </Card>
         </Col>

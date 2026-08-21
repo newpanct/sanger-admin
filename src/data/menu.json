@@ -6,6 +6,18 @@
       "component": "DashboardPage"
     },
     {
+      "path": "model-billing",
+      "label": "模型计费",
+      "icon": "PropertySafetyOutlined",
+      "component": "ModelBillingPage"
+    },
+    {
+      "path": "link",
+      "label": "链接管理",
+      "icon": "LinkOutlined",
+      "component": "LinkPage"
+    },
+    {
       "path": "merchant-manage",
       "label": "商户管理",
       "icon": "ShopOutlined",
@@ -59,6 +71,12 @@
               "component": "PayEnterpriseRechargePage"
             }
           ]
+        },
+        {
+          "path": "personal-account-detail",
+          "label": "个人账户明细查询",
+          "icon": "UserOutlined",
+          "component": "PayPersonalAccountDetailPage"
         }
       ]
     },
@@ -206,31 +224,6 @@
       ]
     },
     {
-      "path": "email",
-      "label": "邮件模板管理",
-      "icon": "MailOutlined",
-      "component": "EmailPage"
-    },
-    {
-      "path": "wechat",
-      "label": "微信公众号",
-      "icon": "WechatOutlined",
-      "children": [
-        {
-          "path": "keyword",
-          "label": "关键词回复",
-          "icon": "CommentOutlined",
-          "component": "KeywordPage"
-        }
-      ]
-    },
-    {
-      "path": "model-billing",
-      "label": "模型计费",
-      "icon": "PropertySafetyOutlined",
-      "component": "ModelBillingPage"
-    },
-    {
       "path": "user",
       "label": "用户管理",
       "icon": "TeamOutlined",
@@ -242,18 +235,6 @@
           "component": "MemberPage"
         }
       ]
-    },
-    {
-      "path": "link",
-      "label": "链接管理",
-      "icon": "LinkOutlined",
-      "component": "LinkPage"
-    },
-    {
-      "path": "enterprise",
-      "label": "企业/组织管理",
-      "icon": "ApartmentOutlined",
-      "component": "EnterprisePage"
     },
     {
       "path": "web",
@@ -273,5 +254,36 @@
           "component": "ServerPage"
         }
       ]
+    },
+    {
+      "path": "wechat",
+      "label": "微信公众号",
+      "icon": "WechatOutlined",
+      "children": [
+        {
+          "path": "keyword",
+          "label": "关键词回复",
+          "icon": "CommentOutlined",
+          "component": "KeywordPage"
+        }
+      ]
+    },
+    {
+      "path": "email",
+      "label": "邮件模板管理",
+      "icon": "MailOutlined",
+      "component": "EmailPage"
+    },
+    {
+      "path": "refund-reason",
+      "label": "退款理由管理",
+      "icon": "MoneyCollectOutlined",
+      "component": "RefundReasonPage"
+    },
+    {
+      "path": "enterprise",
+      "label": "企业/组织管理",
+      "icon": "ApartmentOutlined",
+      "component": "EnterprisePage"
     }
   ]

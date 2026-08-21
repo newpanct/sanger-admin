@@ -95,6 +95,8 @@ const componentMap = {
   // 网页
   ServerPage:lazy(()=>import("../pages/web/ServerPage")),
   NoticePage:lazy(()=>import("../pages/web/NoticePage")),
+  // 退款理由管理
+  RefundReasonPage:lazy(()=>import("../pages/RefundReasonPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,
 };

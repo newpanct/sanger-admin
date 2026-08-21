@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Button,
   Table,
-  Typography,
   Tag,
   Space,
   Tooltip,
@@ -22,6 +21,7 @@ import {
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import PageCard from "../../../components/PageCard";
+import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import {
   imagetwinPageList,
   ithenticatePageList,
@@ -117,7 +117,7 @@ function AigcDownloadLinkButton({
 }
 
 const longTooltipProps = {
-  color: "#1677FF",
+  color: "var(--app-info)",
   title: "该百分比表示可能是由 AI 生成的文本以及可能是由 AI 生成且经过 AI 改写的文本的总量。当前AI写作评估 可能并不准确 仅作参考 ,*%代表AIGC率低或未检测到AI生成的文本。",
   overlayInnerStyle: {
     maxWidth: 320,
@@ -204,7 +204,7 @@ export default function OrderList({ title, props }) {
 
     return (
       <Highlighter
-        highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+        highlightStyle={{ backgroundColor: "var(--app-highlight)", padding: 0 }}
         searchWords={[debouncedKeyword]}
         autoEscape
         textToHighlight={text ? text.toString() : ""}
@@ -222,16 +222,12 @@ export default function OrderList({ title, props }) {
     {
       title: "订单号",
       width: 300,
-      ellipsis: true,
       dataIndex: "orderNo",
       align: "center",
       render: (v) => (
-        <Typography.Text
-          copyable={{ text: v }}
-          style={{ whiteSpace: "nowrap" }}
-        >
+        <CopyableEllipsisText text={v}>
           {renderHighlight(v)}
-        </Typography.Text>
+        </CopyableEllipsisText>
       ),
     },
     {
@@ -258,15 +254,13 @@ export default function OrderList({ title, props }) {
     },
     {
       title: "邮箱",
+      width: 220,
       dataIndex: "email",
       align: "center",
       render: (v) => (
-        <Typography.Text
-          copyable={{ text: v }}
-          style={{ whiteSpace: "nowrap" }}
-        >
+        <CopyableEllipsisText text={v}>
           {renderHighlight(v)}
-        </Typography.Text>
+        </CopyableEllipsisText>
       ),
     },
     {
@@ -378,53 +372,11 @@ export default function OrderList({ title, props }) {
     {
       title: "操作",
       align: "center",
-      width: 100,
+      width: 120,
       render: (_, record) => {
         const disabled = record.status !== 2;
         return (
           <Space>
-            {/* {
-              props !== "dupliSee" &&
-              <Tooltip title="查看结果链接">
-                <Button
-                  icon={<LinkOutlined />}
-                  disabled={disabled}
-                  onClick={() => {
-                    if (!record.resultUrl)
-                      return message.warning("请先从右侧获取新链接");
-                    if (isExpired(record.expireTime) && props === "ithenticate")
-                      return message.warning("链接已过期");
-                    window.open(record.resultUrl);
-                  }}
-                />
-              </Tooltip>
-            }
-            {props === "imagetwin" ? (
-              <Tooltip title="下载">
-                <Button
-                  icon={<DownloadOutlined />}
-                  href={record.localFileUrl || undefined}
-                  target="_blank"
-                  disabled={!record.localFileUrl}
-                />
-              </Tooltip>
-            ) : props === "ithenticate" ? (
-              <Tooltip title="获取新链接">
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={() => onGetNewLink(record.id)}
-                />
-              </Tooltip>
-            ) : props === "dupliSee" ? (
-              <Tooltip title="获取新链接">
-                <Button
-                  icon={<DownloadOutlined />}
-                  href={record.pdfReportUrl || undefined}
-                  target="_blank"
-                  disabled={!record.pdfReportUrl}
-                />
-              </Tooltip>
-            ) :null} */}
             <Tooltip title="删除">
               <Button
                 danger
@@ -432,7 +384,9 @@ export default function OrderList({ title, props }) {
                 loading={deletingId === record.id}
                 disabled={deletingId === record.id}
                 onClick={() => onDeleteOrder(record.id)}
-              />
+              >
+                删除
+              </Button>
             </Tooltip>
           </Space>
         );

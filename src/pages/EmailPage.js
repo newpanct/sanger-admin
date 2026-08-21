@@ -174,11 +174,12 @@ export default function EmailPage() {
     {
       title: "操作",
       align: "center",
+      width: 300,
       render: (_, record) => (
         <Space>
           <Tooltip title="编辑">
             <Button
-              size="small"
+              
               icon={<EditOutlined />}
               onClick={() => {
                 setEditMode(true);
@@ -193,23 +194,27 @@ export default function EmailPage() {
 
                 setContentHtml(record.content);
               }}
-            />
+            >
+              编辑
+            </Button>
           </Tooltip>
 
           <Tooltip title="查看邮件模板详情">
             <Button
-              size="small"
+              
               icon={<EyeOutlined />}
               onClick={() => {
                 setPreviewHtml(record.content);
                 setPreviewOpen(true);
               }}
-            />
+            >
+              查看
+            </Button>
           </Tooltip>
 
           <Tooltip title="删除">
             <Button
-              size="small"
+              
               danger
               icon={<DeleteOutlined />}
               disabled={record.deletable !== 0}
@@ -217,7 +222,9 @@ export default function EmailPage() {
                 setCurrentRecord(record);
                 setConfirmOpen(true);
               }}
-            />
+            >
+              删除
+            </Button>
           </Tooltip>
         </Space>
       ),
@@ -508,7 +515,7 @@ export default function EmailPage() {
                 邮件 HTML 模板
                 <Tooltip title="自动格式化 HTML">
                   <Button
-                    size="small"
+                    
                     icon={<FormatPainterOutlined />}
                     type="link"
                     onClick={() => {

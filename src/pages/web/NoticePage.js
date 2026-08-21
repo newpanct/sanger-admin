@@ -357,22 +357,22 @@ export default function NoticePage() {
       title: "操作",
       dataIndex: "id",
       align: "center",
-      width: 140,
+      width: 300,
       render: (_, record) => (
         <Space>
           <Tooltip title="查看">
             <Button
-              size="small"
               icon={<EyeOutlined />}
               onClick={() => {
                 setCurrentItem(record);
                 setOpenView(true);
               }}
-            />
+            >
+              查看
+            </Button>
           </Tooltip>
           <Tooltip title="编辑">
             <Button
-              size="small"
               icon={<EditOutlined />}
               onClick={() => {
                 setCurrentItem(record);
@@ -391,18 +391,22 @@ export default function NoticePage() {
                     : null,
                 });
               }}
-            />
+            >
+              编辑
+            </Button>
           </Tooltip>
           <Tooltip title="删除">
             <Button
-              size="small"
+              
               danger
               icon={<DeleteOutlined />}
               onClick={() => {
                 setCurrentItem(record);
                 setOpenDel(true);
               }}
-            />
+            >
+              删除
+            </Button>
           </Tooltip>
         </Space>
       ),
@@ -692,7 +696,7 @@ export default function NoticePage() {
         <Form
           form={addForm}
           layout="vertical"
-          size="small"
+          
           onFinish={handleSave}
           initialValues={{
             styleMode: "type",
@@ -859,7 +863,7 @@ export default function NoticePage() {
           <BannerPreview data={currentItem} />
         </div>
 
-        <Descriptions column={2} bordered size="small">
+        <Descriptions column={2} bordered >
           <Descriptions.Item label="服务名称" span={2}>
             <Space direction="vertical" size={0}>
               <span>{currentItem.serviceName}</span>

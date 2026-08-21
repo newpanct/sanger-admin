@@ -88,6 +88,8 @@ export default function StatisticsList({ title, props: apiKey }) {
       totalOrderCount:list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
       totalRefundCount:list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
       totalRefundAmount:list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
+      pendingRefundAmount:list.reduce((acc, item) => acc + Number(item.pendingRefundAmount || 0), 0),
+      netIncome:list.reduce((acc, item) => acc + Number(item.netIncome || 0), 0),
     }
   }, [list]);
 
@@ -108,7 +110,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "orderCount",
       align: "center",
       render: (val) => (
-        <Tag color="green" style={{ margin: 0 }}>
+        <Tag variant="solid" color="var(--app-success)" style={{ margin: 0 }}>
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -118,7 +120,17 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "refundCount",
       align: "center",
       render: (val) => (
-        <Tag color="blue" style={{ margin: 0 }}>
+        <Tag color="var(--app-primary)" style={{ margin: 0 }}>
+          {Number(val || 0).toLocaleString("zh-CN")} 单
+        </Tag>
+      ),
+    },
+    {
+      title: "未退款订单数",
+      dataIndex: "unrefundCount",
+      align: "center",
+      render: (val) => (
+        <Tag color="var(--app-warning)" style={{ margin: 0 }}>
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -128,7 +140,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "refundAmount",
       align: "center",
       render: (val) => (
-        <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
+        <Text strong style={{ color: "var(--app-amount)", fontSize: 15 }}>
           ￥{formatAmount(val)}
         </Text>
       ),
@@ -138,7 +150,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "amount",
       align: "center",
       render: (val) => (
-        <Text strong style={{ color: "#cf1322", fontSize: 15 }}>
+        <Text strong style={{ color: "var(--app-amount)", fontSize: 15 }}>
           ￥{formatAmount(val)}
         </Text>
       ),
@@ -177,6 +189,22 @@ export default function StatisticsList({ title, props: apiKey }) {
     {
       title: "当前服务退款金额",
       value: formatAmount(pageSummary.totalRefundAmount),
+      prefix: "￥",
+      icon: <PayCircleOutlined />,
+      color: "#cf1322",
+      bg: "#fff1f0",
+    },
+    {
+      title: "当前服务待退款金额",
+      value: formatAmount(pageSummary.pendingRefundAmount),
+      prefix: "￥",
+      icon: <PayCircleOutlined />,
+      color: "#cf1322",
+      bg: "#fff1f0",
+    },
+    {
+      title: "当前服务净收入",
+      value: formatAmount(pageSummary.netIncome),
       prefix: "￥",
       icon: <PayCircleOutlined />,
       color: "#cf1322",
@@ -232,7 +260,7 @@ export default function StatisticsList({ title, props: apiKey }) {
         <>
           <Row gutter={[16, 16]} style={{ margin: "12px 0 16px" }}>
             {statCards.map((item) => (
-              <Col key={item.title} xs={24} sm={12} lg={6}>
+              <Col key={item.title} lg={4}>
                 <Card
                   size="small"
                   styles={{ body: { padding: "16px 20px" } }}

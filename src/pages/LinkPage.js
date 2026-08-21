@@ -87,25 +87,27 @@ export default function LinkPage() {
                 <Space>
                     <Tooltip title="编辑">
                         <Button
-                            size="small"
                             icon={<EditOutlined />}
                             onClick={() => {
                                 setCurrentItem(record);
                                 setOpenAdd(true);
                                 addForm.setFieldsValue(record);
                             }}
-                        />
+                        >
+                            编辑
+                        </Button>
                     </Tooltip>
                     <Tooltip title="删除">
                         <Button
-                            size="small"
                             danger
                             icon={<DeleteOutlined />}
                             onClick={() => {
                                 setCurrentItem(record);
                                 setOpenDel(true);
                             }}
-                        />
+                        >
+                            删除
+                        </Button>
                     </Tooltip>
                 </Space>
             ),

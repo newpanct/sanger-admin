@@ -84,7 +84,6 @@ export default function MerchantBalancePage() {
           <Space>
             <Tooltip title="增加商户余额">
               <Button
-                size="small"
                 icon={<PlusOutlined />}
                 onClick={() => {
                   setActionType("add");
@@ -92,11 +91,12 @@ export default function MerchantBalancePage() {
                   setAmount("");
                   setOpen(true);
                 }}
-              />
+              >
+                增加
+              </Button>
             </Tooltip>
             <Tooltip title="扣减商户余额">
               <Button
-                size="small"
                 danger
                 icon={<MinusOutlined />}
                 onClick={() => {
@@ -105,7 +105,9 @@ export default function MerchantBalancePage() {
                   setAmount("");
                   setOpen(true);
                 }}
-              />
+              >
+                扣减
+              </Button>
             </Tooltip>
           </Space>
         );

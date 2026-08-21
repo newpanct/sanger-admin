@@ -74,7 +74,7 @@ export default function ModelBillingPage() {
       key: `${record.month}-${index}`, // 础保子表 key 唯一
       date: `${item.summaryStartDate} -- ${item.summaryDate}` // 生成“时间段”
     }));
-  
+
     return (
       <Table
         rowKey="key"
@@ -88,13 +88,13 @@ export default function ModelBillingPage() {
   const handleList = async () => {
     try {
       setLoading(true);
-  
+
       // 并行请求两个接口
       const [resMonthly, resRealTime] = await Promise.all([
         summaryByMonth(),
         realTimeSummary()
       ]);
-  
+
       // 处理月度分组数据
       let monthlyData = [];
       if (resMonthly?.code === 200) {
@@ -103,21 +103,21 @@ export default function ModelBillingPage() {
         message.error(resMonthly?.message || '获取月度汇总失败');
         return;
       }
-  
+
       // 处理实时扁平数据
       const realTimeData = resRealTime?.code === 200 ? resRealTime.data || [] : [];
-  
+
       // 将 monthlyData 转为 Map，便于按 month 查找
       const monthMap = new Map();
       monthlyData.forEach(item => {
         monthMap.set(item.month, { ...item, detailList: [...(item.detailList || [])] });
       });
-  
+
       // 遍历实时数据，按 summaryDate 归类到对应月份
       realTimeData.forEach(item => {
         if (!item.summaryDate) return;
         const month = item.summaryDate.substring(0, 7); // "2026-01"
-  
+
         if (monthMap.has(month)) {
           // 已存在该月，追加到 detailList
           monthMap.get(month).detailList.push(item);
@@ -129,25 +129,25 @@ export default function ModelBillingPage() {
           });
         }
       });
-  
+
       // 转回数组，并计算汇总字段
       const records = Array.from(monthMap.values()).map(item => {
         const detailList = item.detailList || [];
-  
+
         const totalPromptTokens = detailList.reduce(
           (sum, d) => sum + (d.totalPromptTokens || 0),
           0
         );
-  
+
         const totalCompletionTokens = detailList.reduce(
           (sum, d) => sum + (d.totalCompletionTokens || 0),
           0
         );
-  
+
         const totalCost = parseFloat(
           detailList.reduce((sum, d) => sum + (d.totalCost || 0), 0).toFixed(3)
         );
-  
+
         return {
           ...item,
           key: item.month,
@@ -156,11 +156,11 @@ export default function ModelBillingPage() {
           totalCost,
         };
       });
-  
+
       // 设置状态
       setList(records);      // 如果 list 用于其他地方，也可设为 records
       setAllList(records);   // 主表数据
-  
+
     } catch (error) {
       console.error('合并数据失败:', error);
       message.error('获取数据失败，请稍后重试');
@@ -258,6 +258,10 @@ export default function ModelBillingPage() {
         columns={columns}
         expandable={{ expandedRowRender, defaultExpandedRowKeys: ["0"] }}
         dataSource={allList}
+        pagination={{
+          showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 条`,
+        }}
       />
     </PageCard>
   );

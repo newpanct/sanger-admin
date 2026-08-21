@@ -120,7 +120,6 @@ export default function HistoryOrder({ props, title }) {
         <Space>
           <Button
             type="primary"
-            size="small"
             icon={<SearchOutlined />}
             style={{ width: 90 }}
             onClick={() => {
@@ -131,7 +130,7 @@ export default function HistoryOrder({ props, title }) {
             搜索
           </Button>
           <Button
-            size="small"
+            
             style={{ width: 90 }}
             onClick={() => {
               clearFilters();
@@ -142,7 +141,7 @@ export default function HistoryOrder({ props, title }) {
           </Button>
           <Button
             type="link"
-            size="small"
+            
             onClick={() => {
               close();
             }}
@@ -282,7 +281,9 @@ export default function HistoryOrder({ props, title }) {
                     href={record.downloadUrl || undefined}
                     target="_blank"
                     disabled={!record.downloadUrl}
-                  />
+                  >
+                    下载链接
+                  </Button>
                 </Tooltip>
                 <Tooltip title={"查看文本"}>
                   <Button
@@ -291,7 +292,9 @@ export default function HistoryOrder({ props, title }) {
                       setOpenText(true);
                       setCurrentText(record.txtContent);
                     }}
-                  />
+                  >
+                    查看文本
+                  </Button>
                 </Tooltip>
               </>
             ) : (
@@ -303,7 +306,9 @@ export default function HistoryOrder({ props, title }) {
                     setCurrentOrder(record);
                     setCommitModalOpen(true);
                   }}
-                />
+                >
+                  手动提交
+                </Button>
               </Tooltip>
             )}
           </Space>
@@ -397,17 +402,6 @@ export default function HistoryOrder({ props, title }) {
       }
       extraActions={
         <Space>
-          {/* 订单号搜索 */}
-          <Input
-            allowClear
-            prefix={<SearchOutlined />}
-            style={{ width: 200 }}
-            placeholder="搜索订单号"
-            value={inputOrderNo}
-            onChange={(e) => setInputOrderNo(e.target.value)}
-          />
-          <Divider type="vertical" />
-
           {/* 手机号搜索 */}
           <Input
             allowClear
@@ -416,6 +410,16 @@ export default function HistoryOrder({ props, title }) {
             placeholder="搜索手机号"
             value={inputMobile}
             onChange={(e) => setInputMobile(e.target.value)}
+          />
+          <Divider type="vertical" />
+          {/* 订单号搜索 */}
+          <Input
+            allowClear
+            prefix={<SearchOutlined />}
+            style={{ width: 200 }}
+            placeholder="搜索订单号"
+            value={inputOrderNo}
+            onChange={(e) => setInputOrderNo(e.target.value)}
           />
         </Space>
       }

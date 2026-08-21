@@ -18,6 +18,7 @@ import {
   message,
 } from "antd";
 import {
+  MoneyCollectOutlined ,
   MoonOutlined,
   SunOutlined,
   ShopOutlined,
@@ -131,7 +132,8 @@ const iconMap = {
   ShoppingOutlined,
   MailOutlined,
   GiftOutlined,
-  LinkOutlined
+  LinkOutlined,
+  MoneyCollectOutlined 
 };
 const computeFullPath = (item, parentPath = "") => {
   if (!item.path) return "";
@@ -167,7 +169,6 @@ const generateMenuItems = (menus, role, badgeMap = {}, parentPath = "") =>
           <Badge
             count={badgeValue === true ? 0 : badgeValue}
             dot={badgeValue === true || hasChildrenBadge}
-            size="small"
           />
         </Space>
       ) : (

@@ -47,7 +47,7 @@ const MerchantPage = () => {
     acc[cur.value] = cur.label;
     return acc;
   }, {});
-  
+
   const columns = [
     {
       title: "商户ID",
@@ -87,7 +87,7 @@ const MerchantPage = () => {
     //     );
     //   },
     // },
-    
+
     { title: "邮箱", dataIndex: "email", ellipsis: true, align: "center" },
     {
       title: "创建时间",
@@ -103,24 +103,27 @@ const MerchantPage = () => {
         return (
           <Space>
             <Tooltip title={"修改密码"}>
-            <Button
-                size="small"
+              <Button
                 icon={<KeyOutlined />}
                 onClick={() => {
                   setCurrentMerchant(record);
                   setOpenUpdate(true);
                 }}
-              />
+              >
+                修改密码
+              </Button>
             </Tooltip>
             <Tooltip title={"权限管理"}>
-            <Button
-                size="small"
+              <Button
                 icon={<SettingOutlined />}
                 onClick={() => {
                   setCurrentMerchant(record);
                   setOpenPermiss(true);
                 }}
-              /></Tooltip>
+              >
+                权限管理
+              </Button>
+            </Tooltip>
           </Space>
         );
       },
@@ -142,7 +145,7 @@ const MerchantPage = () => {
         setMerchantList(records);
         setTotal(total);
       } else {
-        message.error(response?.message ||  "请联系管理员！");
+        message.error(response?.message || "请联系管理员！");
       }
     } catch (error) {
       const errMsg = error?.message || "获取商户数据失败，请重试";
@@ -213,24 +216,28 @@ const MerchantPage = () => {
         />
       }
       rightActions={
-        <Space>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={handleCreateBtn}
-          >
-            创建商户
-          </Button>
+        <>
+          <Tooltip title={"创建商户"}>
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={handleCreateBtn}
+            >
+              创建商户
+            </Button>
+          </Tooltip>
           <Divider type="vertical" />
-          <Button
-            type="primary"
-            icon={<ReloadOutlined />}
-            onClick={() => handleMerchantList()}
-            loading={loading}
-          >
-            刷新数据
-          </Button>
-        </Space>
+          <Tooltip title={"刷新数据"}>
+            <Button
+              type="primary"
+              icon={<ReloadOutlined />}
+              onClick={() => handleMerchantList()}
+              loading={loading}
+            >
+              刷新数据
+            </Button>
+          </Tooltip>
+        </>
       }
     >
       {errorMsg ? (
