@@ -13,7 +13,8 @@ import {
   imagetwinFailedPageList,
   ithenticateFailedPageList,
   dupliseeFailedPageList,
-  refundExecute
+  refundExecute,
+  refundReasonListAll,
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch } from "react-redux";
@@ -31,6 +32,8 @@ export default function FailedOrderList({ title, props }) {
   const [currentRecord, setCurrentRecord] = useState(null);
   const [refundForm] = Form.useForm();
   const [refundLoading, setRefundLoading] = useState(false);
+  const [refundReasons, setRefundReasons] = useState([]);
+  const selectedReason = Form.useWatch("reason", refundForm);
   const orderColumn = [
     {
       title: "标题",
@@ -113,6 +116,7 @@ export default function FailedOrderList({ title, props }) {
                 onClick={() => {
                   setCurrentRecord(record);
                   setRollbackOpen(true);
+                  fetchRefundReasons();
                 }}
                 icon={<RollbackOutlined />}
               >退款</Button>
@@ -189,6 +193,16 @@ export default function FailedOrderList({ title, props }) {
   };
 
 
+
+  const fetchRefundReasons = async () => {
+    const res = await refundReasonListAll();
+    if (res?.code === 200) {
+      setRefundReasons(res?.data || []);
+    } else {
+      message.error(res?.message || "获取退款理由失败");
+      setRefundReasons([]);
+    }
+  };
 
   const handleRollback = async (values) => {
     if (!currentRecord) return;
@@ -330,6 +344,25 @@ export default function FailedOrderList({ title, props }) {
               showCount
             />
           </Form.Item>
+          {refundReasons.length > 0 && (
+            <div style={{ marginTop: -8, marginBottom: 16 }}>
+              <Typography.Text type="secondary" style={{ display: "block", marginBottom: 8 }}>
+                快捷选择
+              </Typography.Text>
+              <Space wrap size={[8, 8]}>
+                {refundReasons.map((item) => (
+                  <Tag
+                    key={item.id}
+                    color={selectedReason === item.reason ? "blue" : undefined}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => refundForm.setFieldsValue({ reason: item.reason })}
+                  >
+                    {item.reason}
+                  </Tag>
+                ))}
+              </Space>
+            </div>
+          )}
           <Form.Item
             name="password"
             label="密码"
