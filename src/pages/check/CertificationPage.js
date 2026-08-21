@@ -14,6 +14,7 @@ import {
 } from "../../server/api";
 import { DownloadOutlined, ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
+import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import Highlighter from "react-highlight-words";
 const { Search } = Input;
 const CertificationPage = () => {
@@ -81,7 +82,9 @@ const CertificationPage = () => {
       title: "邮箱",
       key: "email",
       dataIndex: "email",
+      width: 220,
       align: "center",
+      render: (v) => <CopyableEllipsisText text={v} />,
     },
     {
       title: "更新时间",

@@ -1,4 +1,5 @@
 import PageCard from "../components/PageCard";
+import CopyableEllipsisText from "../components/CopyableEllipsisText";
 import { useEffect, useState } from "react";
 import {
     Table,
@@ -275,7 +276,9 @@ export default function EnterprisePage() {
         {
             title: "联系邮箱",
             dataIndex: "contactEmail",
+            width: 220,
             align: "center",
+            render: (v) => <CopyableEllipsisText text={v} />,
         },
         {
             title: "状态",
@@ -383,6 +386,7 @@ export default function EnterprisePage() {
                     pageSize,
                     total,
                     showSizeChanger: true,
+                    showTotal: (t) => `共 ${t} 条`,
                     onChange: (page, size) => {
                         setPageNum(page);
                         setPageSize(size);

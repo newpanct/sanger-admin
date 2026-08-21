@@ -339,6 +339,7 @@ export default function EmailPage() {
           pageSize,
           total,
           showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 条`,
           onChange: (page, size) => {
             setPageNum(page);
             setPageSize(size);

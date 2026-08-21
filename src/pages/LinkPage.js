@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PageCard from "../components/PageCard";
+import CopyableEllipsisText from "../components/CopyableEllipsisText";
 import {
     Button,
     Divider,
@@ -49,7 +50,12 @@ export default function LinkPage() {
             title: "服务访问URL",
             dataIndex: "serviceUrl",
             align: "center",
-            render: (path) => <Text copyable={{ text: path }}>{path}</Text>,
+            render: (text) =>
+                text ? (
+                    <CopyableEllipsisText text={text} />
+                ) : (
+                    <span style={{ color: '#ccc', fontStyle: 'italic' }}>暂无使用</span>
+                )
         },
         {
             title: "上线状态",
@@ -217,6 +223,7 @@ export default function LinkPage() {
                     pageSize,
                     total,
                     showSizeChanger: true,
+                    showTotal: (t) => `共 ${t} 条`,
                     onChange: (page, size) => {
                         setPageNum(page);
                         setPageSize(size);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import PageCard from "../../components/PageCard";
+import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import { Table, Select, Input, message, Tag, Space, Button } from "antd";
 import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { couponPageList } from "../../server/api";
@@ -88,20 +89,26 @@ export default function PromoCodePage() {
         {
             title: "使用邮箱",
             dataIndex: "usedByEmail",
-            width: 180,
+            width: 220,
             align: "center",
-            ellipsis: true,
-            // 提示逻辑：如果没有值显示“暂无使用”
-            render: (text) => text || <span style={{ color: '#ccc', fontStyle: 'italic' }}>暂无使用</span>
+            render: (text) =>
+                text ? (
+                    <CopyableEllipsisText text={text} />
+                ) : (
+                    <span style={{ color: '#ccc', fontStyle: 'italic' }}>暂无使用</span>
+                )
         },
         {
             title: "使用订单",
             dataIndex: "usedOrderNo",
-            width: 200,
+            width: 240,
             align: "center",
-            ellipsis: true,
-            // 提示逻辑
-            render: (text) => text || <span style={{ color: '#ccc' }}>--</span>
+            render: (text) =>
+                text ? (
+                    <CopyableEllipsisText text={text} />
+                ) : (
+                    <span style={{ color: '#ccc' }}>--</span>
+                )
         },
         {
             title: "折扣类型",

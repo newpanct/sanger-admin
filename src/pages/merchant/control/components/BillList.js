@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Table } from "antd";
 import { Tag } from "antd";
+import CopyableEllipsisText from "../../../../components/CopyableEllipsisText";
 
 /**
  * 可复用账单表格卡片组件
@@ -23,7 +24,13 @@ export default function OrderTableCard({
 }) {
   const columns = [
     { title: "账单类型", dataIndex: "type", ellipsis: true, align: "center" },
-    { title: "订单号", dataIndex: "orderNo", ellipsis: true, align: "center" },
+    {
+      title: "订单号",
+      dataIndex: "orderNo",
+      width: 240,
+      align: "center",
+      render: (v) => <CopyableEllipsisText text={v} />,
+    },
     { title: "购买数量", dataIndex: "count", ellipsis: true, align: "center" },
     {
       title: "变动前金额",
@@ -99,6 +106,7 @@ export default function OrderTableCard({
           pageSize,
           total,
           showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 条`,
           onChange: onPageChange,
         }}
       />

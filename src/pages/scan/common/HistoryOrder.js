@@ -13,6 +13,7 @@ import {
   Modal,
 } from "antd";
 import PageCard from "../../../components/PageCard";
+import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import {
   DownloadOutlined,
   LinkOutlined,
@@ -196,9 +197,25 @@ export default function HistoryOrder({ props, title }) {
     {
       title: "订单号",
       dataIndex: "orderId",
-      ellipsis: true,
+      width: 240,
       align: "center",
       ...getColumnSearchProps("orderNo", "订单号"),
+      render: (text) => {
+        const highlightText = searchTexts.orderNo;
+        const content = highlightText ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+            searchWords={[highlightText]}
+            autoEscape
+            textToHighlight={text ? text.toString() : ""}
+          />
+        ) : (
+          text
+        );
+        return (
+          <CopyableEllipsisText text={text}>{content}</CopyableEllipsisText>
+        );
+      },
     },
     // { title: "代理订单ID", dataIndex: "agentOrderId", ellipsis: true, align: "center" },
     // { title: "支付订单编号", dataIndex: "orderNo", ellipsis: true, align: "center", },
@@ -445,6 +462,7 @@ export default function HistoryOrder({ props, title }) {
             pageSize,
             total,
             showSizeChanger: true,
+            showTotal: (t) => `共 ${t} 条`,
             onChange: (page, size) => {
               setPageNum(page);
               setPageSize(size);

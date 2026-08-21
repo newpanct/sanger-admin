@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
+import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import {
   enterpriseOrders,
   enterpriseStatistics,
@@ -48,8 +49,9 @@ export default function PayEnterpriseRechargePage() {
     {
       title: "订单号",
       dataIndex: "orderNo",
+      width: 240,
       align: "center",
-      ellipsis: true,
+      render: (v) => <CopyableEllipsisText text={v} />,
     },
     {
       title: "企业名称",
@@ -94,8 +96,9 @@ export default function PayEnterpriseRechargePage() {
     {
       title: "操作人邮箱",
       dataIndex: "operatorEmail",
+      width: 220,
       align: "center",
-      ellipsis: true,
+      render: (v) => <CopyableEllipsisText text={v} />,
     },
     {
       title: "备注",
@@ -213,6 +216,7 @@ export default function PayEnterpriseRechargePage() {
           pageSize,
           total,
           showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 条`,
           onChange: (page, size) => {
             setPageNum(page);
             setPageSize(size);

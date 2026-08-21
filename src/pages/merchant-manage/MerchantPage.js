@@ -24,6 +24,7 @@ import {
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import PageCard from "../../components/PageCard";
+import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import { merchantPageList, merchantRegister } from "../../server/api";
 import UpdatePwd from "./components/UpdatePwd";
 import PermissionSettings from "./components/PermissionSettings";
@@ -88,7 +89,13 @@ const MerchantPage = () => {
     //   },
     // },
 
-    { title: "邮箱", dataIndex: "email", ellipsis: true, align: "center" },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+      width: 220,
+      align: "center",
+      render: (v) => <CopyableEllipsisText text={v} />,
+    },
     {
       title: "创建时间",
       dataIndex: "createTime",
@@ -261,6 +268,7 @@ const MerchantPage = () => {
             pageSize,
             total,
             showSizeChanger: true,
+            showTotal: (t) => `共 ${t} 条`,
             onChange: (page, size) => {
               setPageNum(page);
               setPageSize(size);

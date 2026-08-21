@@ -521,6 +521,7 @@ export default function OrderList({ title, props }) {
             pageSize,
             total,
             showSizeChanger: true,
+            showTotal: (t) => `共 ${t} 条`,
             onChange: (page, size) => {
               setPageNum(page);
               setPageSize(size);

@@ -31,6 +31,7 @@ import {
   ProfileOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
+import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import steps from "../../data/step.json";
 import baseURL from "../../server/Network";
 const { Text } = Typography;
@@ -112,7 +113,9 @@ const ManuscriptPage = () => {
       title: "邮箱",
       key: "email",
       dataIndex: "email",
+      width: 220,
       align: "center",
+      render: (v) => <CopyableEllipsisText text={v} />,
     },
     {
       title: "进度状态",

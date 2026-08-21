@@ -5,6 +5,7 @@ import {
   RollbackOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
+import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import {
   commitImagetwin,
   commitIthenticate,
@@ -47,14 +48,9 @@ export default function FailedOrderList({ title, props }) {
     {
       title: "订单号",
       dataIndex: "orderNo",
+      width: 240,
       align: "center",
-      render: (orderNo) => {
-        return (
-          <Typography.Paragraph copyable style={{ margin: "0" }}>
-            {orderNo}
-          </Typography.Paragraph>
-        );
-      },
+      render: (orderNo) => <CopyableEllipsisText text={orderNo} />,
     },
     {
       title: "支付状态",
@@ -76,15 +72,9 @@ export default function FailedOrderList({ title, props }) {
     {
       title: "邮箱",
       dataIndex: "email",
+      width: 220,
       align: "center",
-      ellipsis: true,
-      render: (orderNo) => {
-        return (
-          <Typography.Paragraph copyable style={{ margin: "0" }}>
-            {orderNo}
-          </Typography.Paragraph>
-        );
-      },
+      render: (email) => <CopyableEllipsisText text={email} />,
     },
     {
       title: "更新时间",
@@ -257,6 +247,7 @@ export default function FailedOrderList({ title, props }) {
           pageSize,
           total,
           showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 条`,
           onChange: (page, size) => {
             setPageNum(page);
             setPageSize(size);
@@ -287,7 +278,7 @@ export default function FailedOrderList({ title, props }) {
         <Descriptions column={1} bordered size="small">
           <Descriptions.Item label="文章标题">{currentRecord?.title || '-'}</Descriptions.Item>
           <Descriptions.Item label="订单号">
-            <Typography.Text copyable>{currentRecord?.orderNo || '-'}</Typography.Text>
+            <CopyableEllipsisText text={currentRecord?.orderNo} />
           </Descriptions.Item>
         </Descriptions>
       </Modal>
