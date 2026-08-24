@@ -280,6 +280,7 @@ const JournalPage = () => {
       <Skeleton loading={spinning} active paragraph={{ rows: 6 }}>
         {/* 表格结构改为UserPage的<Column>子组件形式 */}
         <Table
+          size="middle"
           rowKey="id" // 保持原有rowKey
           dataSource={JournalArr} // 保持原有数据源
           bordered // 保持边框样式

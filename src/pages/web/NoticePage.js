@@ -633,6 +633,7 @@ export default function NoticePage() {
       </div>
 
       <Table
+        size="middle"
         rowKey="id"
         loading={loading}
         dataSource={list}

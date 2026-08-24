@@ -334,6 +334,7 @@ const ManuscriptPage = () => {
     >
       <Skeleton loading={spinning} active paragraph={{ rows: 6 }}>
         <Table
+          size="middle"
           rowKey="manuscriptId"
           columns={columns}
           dataSource={manuscriptArr}

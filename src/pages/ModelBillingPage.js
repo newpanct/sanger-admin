@@ -77,6 +77,7 @@ export default function ModelBillingPage() {
 
     return (
       <Table
+        size="middle"
         rowKey="key"
         columns={childColumns}
         dataSource={childData}
@@ -254,6 +255,7 @@ export default function ModelBillingPage() {
       </Row>
 
       <Table
+        size="middle"
         rowKey="key"
         columns={columns}
         expandable={{ expandedRowRender, defaultExpandedRowKeys: ["0"] }}

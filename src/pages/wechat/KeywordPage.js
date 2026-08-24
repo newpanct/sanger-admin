@@ -253,6 +253,7 @@ export default function KeywordPage() {
       }
     >
       <Table
+        size="middle"
         rowKey="id"
         loading={loading}
         dataSource={list}

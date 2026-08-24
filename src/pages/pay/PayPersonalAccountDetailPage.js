@@ -162,6 +162,7 @@ export default function PayPersonalAccountDetailPage() {
             }
         >
             <Table
+                size="middle"
                 rowKey="serviceType"
                 loading={loading}
                 dataSource={list}

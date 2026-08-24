@@ -227,6 +227,7 @@ export default function RefundReasonPage() {
             }
         >
             <Table
+                size="middle"
                 rowKey="id"
                 loading={loading}
                 dataSource={list}

@@ -451,6 +451,7 @@ export default function HistoryOrder({ props, title }) {
         </div>
       ) : (
         <Table
+          size="middle"
           rowKey="id"
           loading={loading}
           columns={columns}

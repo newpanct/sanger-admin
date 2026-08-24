@@ -214,6 +214,7 @@ export default function LinkPage() {
             }
         >
             <Table
+                size="middle"
                 rowKey="id"
                 loading={loading}
                 dataSource={list}

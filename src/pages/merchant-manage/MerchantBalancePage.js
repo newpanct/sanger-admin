@@ -212,6 +212,7 @@ export default function MerchantBalancePage() {
         </div>
       ) : (
         <Table
+          size="middle"
           rowKey="id"
           loading={loading}
           dataSource={list}

@@ -205,6 +205,7 @@ export default function PayEnterpriseRechargePage() {
       </Skeleton>
 
       <Table
+        size="middle"
         rowKey={(record) =>
           record.orderNo || `${record.createTime}-${record.enterpriseName}`
         }

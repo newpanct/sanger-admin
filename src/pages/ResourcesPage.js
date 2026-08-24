@@ -178,6 +178,7 @@ export default function ResourcesPage() {
       }
     >
       <Table
+        size="middle"
         rowKey="id"
         loading={loading}
         dataSource={list}

@@ -97,6 +97,7 @@ export default function OrderTableCard({
   return (
     <Card size="small" title={title}>
       <Table
+        size="middle"
         rowKey="id"
         loading={loading}
         columns={columns}

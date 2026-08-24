@@ -160,6 +160,7 @@ export default function ListTable({title,props,status}) {
       }
     >
       <Table
+        size="middle"
         rowKey={"id"}
         columns={columns}
         loading={tableLoading}

@@ -377,6 +377,7 @@ export default function EnterprisePage() {
         >
             {/* 企业列表 */}
             <Table
+                size="middle"
                 rowKey="id"
                 loading={loading}
                 dataSource={list}

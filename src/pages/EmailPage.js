@@ -330,6 +330,7 @@ export default function EmailPage() {
       }
     >
       <Table
+        size="middle"
         rowKey="id"
         loading={loading}
         dataSource={list}

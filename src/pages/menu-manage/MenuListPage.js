@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import PageCard from "../../components/PageCard";
 import {
     Button,
@@ -29,8 +29,9 @@ import {
     EditOutlined,
     ArrowUpOutlined,
     ArrowDownOutlined,
+    HolderOutlined,
 } from "@ant-design/icons";
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
     arrayMove,
@@ -142,10 +143,11 @@ function renderIcon(name) {
     return <IconComp />;
 }
 
-function normalizeTree(nodes = []) {
+function normalizeTree(nodes = [], level = 0) {
     return nodes.map((item) => ({
         ...item,
-        children: item.children?.length ? normalizeTree(item.children) : undefined,
+        _level: level,
+        children: item.children?.length ? normalizeTree(item.children, level + 1) : undefined,
     }));
 }
 
@@ -191,18 +193,51 @@ function findNodeMeta(tree, id, parentId = 0, siblings = tree) {
     return null;
 }
 
+const RowContext = createContext({});
+
+const DragHandle = () => {
+    const { setActivatorNodeRef, listeners } = useContext(RowContext);
+    return (
+        <Tooltip title="拖拽排序">
+            <Button
+                type="text"
+                size="small"
+                icon={<HolderOutlined />}
+                style={{ cursor: "move", color: "rgba(0,0,0,0.45)" }}
+                ref={setActivatorNodeRef}
+                {...listeners}
+            />
+        </Tooltip>
+    );
+};
+
 const DragRow = (props) => {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        setActivatorNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
         id: String(props["data-row-key"]),
     });
     const style = {
         ...props.style,
         transform: CSS.Translate.toString(transform),
         transition,
-        cursor: "move",
         ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
     };
-    return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
+    const contextValue = useMemo(
+        () => ({ setActivatorNodeRef, listeners }),
+        [setActivatorNodeRef, listeners]
+    );
+    return (
+        <RowContext.Provider value={contextValue}>
+            <tr {...props} ref={setNodeRef} style={style} {...attributes} />
+        </RowContext.Provider>
+    );
 };
 
 function toTreeSelectData(nodes = [], disabledIds = new Set()) {
@@ -230,11 +265,6 @@ export default function MenuListPage() {
     const [expandedKeys, setExpandedKeys] = useState([]);
     const [addForm] = Form.useForm();
     const sortableIds = useMemo(() => flattenIds(list).map(String), [list]);
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: { distance: 8 },
-        })
-    );
 
     const handleList = async (nextPageNum = pageNum, nextPageSize = pageSize) => {
         try {
@@ -380,7 +410,7 @@ export default function MenuListPage() {
     };
 
     const handleVisibleChange = async (record, checked) => {
-        const { children, createTime, updateTime, ...rest } = record;
+        const { children, createTime, updateTime, _level, ...rest } = record;
         try {
             const res = await menuUpdate({
                 ...rest,
@@ -414,6 +444,49 @@ export default function MenuListPage() {
             title: "菜单名称",
             dataIndex: "name",
             align: "center",
+            render: (name, record) => {
+                const hasChildren = !!record.children?.length;
+                const expanded = expandedKeys.some((key) => String(key) === String(record.id));
+                return (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 4,
+                        }}
+                    >
+                        <DragHandle />
+                        {hasChildren ? (
+                            <button
+                                type="button"
+                                className={
+                                    expanded
+                                        ? "ant-table-row-expand-icon ant-table-row-expand-icon-expanded"
+                                        : "ant-table-row-expand-icon ant-table-row-expand-icon-collapsed"
+                                }
+                                style={{ float: "none" }}
+                                aria-label={expanded ? "收起" : "展开"}
+                                aria-expanded={expanded}
+                                onClick={() => {
+                                    setExpandedKeys((prev) =>
+                                        expanded
+                                            ? prev.filter((key) => String(key) !== String(record.id))
+                                            : [...prev, record.id]
+                                    );
+                                }}
+                            />
+                        ) : (
+                            <button
+                                type="button"
+                                className="ant-table-row-expand-icon ant-table-row-expand-icon-spaced"
+                                style={{ float: "none" }}
+                                aria-hidden
+                            />
+                        )}
+                        <span>{name}</span>
+                    </div>
+                );
+            },
         },
         {
             title: "路径",
@@ -569,12 +642,12 @@ export default function MenuListPage() {
             }
         >
             <DndContext
-                sensors={sensors}
                 modifiers={[restrictToVerticalAxis]}
                 onDragEnd={onDragEnd}
             >
                 <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
                     <Table
+                        size="middle"
                         rowKey="id"
                         loading={loading}
                         dataSource={list}
@@ -585,6 +658,7 @@ export default function MenuListPage() {
                         expandable={{
                             expandedRowKeys: expandedKeys,
                             onExpandedRowsChange: setExpandedKeys,
+                            showExpandColumn: false,
                         }}
                         pagination={{
                             current: pageNum,

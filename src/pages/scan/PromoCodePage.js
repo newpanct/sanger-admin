@@ -225,6 +225,7 @@ export default function PromoCodePage() {
             }
         >
             <Table
+                size="middle"
                 rowKey="id"
                 columns={codeColumn}
                 dataSource={list}

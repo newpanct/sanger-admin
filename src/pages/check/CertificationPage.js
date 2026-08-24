@@ -213,6 +213,7 @@ const CertificationPage = () => {
       ) : (
         <Skeleton loading={spinning} active paragraph={{ rows: 6 }}>
           <Table
+            size="middle"
             rowKey="id"
             columns={columns}
             dataSource={certificationArr}

@@ -252,6 +252,7 @@ export default function FailedOrderList({ title, props }) {
       }
     >
       <Table
+        size="middle"
         rowKey="id"
         columns={orderColumn}
         dataSource={orderList}

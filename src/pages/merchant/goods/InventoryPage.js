@@ -449,6 +449,7 @@ export default function InventoryPage() {
   /** 表格视图 */
   const renderTableView = () => (
     <Table
+      size="middle"
       rowKey="id"
       loading={loading}
       columns={columns}
