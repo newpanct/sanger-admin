@@ -1,5 +1,37 @@
 const hasChildren = (item) => Array.isArray(item?.children) && item.children.length > 0;
 
+export const flattenMenus = (nodes = [], acc = []) => {
+    const seen = new Set(acc.map((item) => item.id));
+    const walk = (list = []) => {
+        list.forEach((item) => {
+            if (!item) return;
+            const { children, _level, ...rest } = item;
+            if (rest.id != null && !seen.has(rest.id)) {
+                seen.add(rest.id);
+                acc.push(rest);
+            }
+            if (children?.length) walk(children);
+        });
+    };
+    walk(nodes);
+    return acc;
+};
+
+export const buildMenuTree = (flat = [], parentId = 0, level = 0) =>
+    flat
+        .filter((item) => String(item.parentId ?? 0) === String(parentId))
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+        .map((item) => {
+            const children = buildMenuTree(flat, item.id, level + 1);
+            return {
+                ...item,
+                _level: level,
+                children: children.length ? children : undefined,
+            };
+        });
+
+export const normalizeMenuTree = (nodes = []) => buildMenuTree(flattenMenus(nodes));
+
 export const normalizeMenus = (menus = []) =>
   [...(menus || [])]
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))

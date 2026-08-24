@@ -21,19 +21,12 @@ import {
     assignRoleMenus,
     getRoleMenuTree,
     refreshAuthMenus,
+    roleListAll,
 } from "../../server/api";
 import store from "../../store";
+import { normalizeMenuTree } from "../../utils/menu";
 
 const { Text } = Typography;
-
-const ROLE_OPTIONS = [{ value: 8, label: "开发者" }];
-
-function normalizeTree(nodes = []) {
-    return nodes.map((item) => ({
-        ...item,
-        children: item.children?.length ? normalizeTree(item.children) : undefined,
-    }));
-}
 
 function collectExpandKeys(nodes = [], acc = []) {
     nodes.forEach((item) => {
@@ -51,7 +44,7 @@ function toIdList(keys = []) {
 
 export default function RoleMenuPage() {
     const [role, setRole] = useState();
-    const [roleOptions, setRoleOptions] = useState(ROLE_OPTIONS);
+    const [roleOptions, setRoleOptions] = useState([]);
     const [allMenus, setAllMenus] = useState([]);
     const [previewMenus, setPreviewMenus] = useState([]);
     const [checkedKeys, setCheckedKeys] = useState([]);
@@ -64,12 +57,31 @@ export default function RoleMenuPage() {
 
     const treeFieldNames = { title: "name", key: "id", children: "children" };
 
+    const loadRoles = async () => {
+        const res = await roleListAll();
+        if (res?.code === 200) {
+            setRoleOptions(
+                (res?.data || []).map((item) => ({
+                    value: item.roleCode,
+                    label:
+                        item.roleCode != null
+                            ? `${item.roleName}（${item.roleCode}）`
+                            : item.roleName,
+                    disabled: item.status === 0,
+                }))
+            );
+        } else {
+            message.error(res?.message || "获取角色列表失败！");
+            setRoleOptions([]);
+        }
+    };
+
     const loadAllMenus = async () => {
         try {
             setListLoading(true);
-            const res = await menuPage({ pageNum: 1, pageSize: 100 });
+            const res = await menuPage();
             if (res?.code === 200) {
-                const records = normalizeTree(res?.data?.records || []);
+                const records = normalizeMenuTree(res?.data?.records || res?.data);
                 setAllMenus(records);
                 setExpandedKeys(collectExpandKeys(records));
             } else {
@@ -95,7 +107,7 @@ export default function RoleMenuPage() {
                 message.error(idsRes?.message || "获取角色菜单失败！");
             }
             if (treeRes?.code === 200) {
-                const preview = normalizeTree(treeRes?.data || []);
+                const preview = normalizeMenuTree(treeRes?.data || []);
                 setPreviewMenus(preview);
                 setPreviewExpandedKeys(collectExpandKeys(preview));
             } else {
@@ -114,18 +126,6 @@ export default function RoleMenuPage() {
         if (value !== undefined && value !== null && value !== "") {
             loadRoleData(value);
         }
-    };
-
-    const handleRoleSearch = (text) => {
-        const trimmed = String(text || "").trim();
-        if (/^\d+$/.test(trimmed)) {
-            const num = Number(trimmed);
-            if (!ROLE_OPTIONS.some((item) => item.value === num)) {
-                setRoleOptions([...ROLE_OPTIONS, { value: num, label: `角色 ${num}` }]);
-                return;
-            }
-        }
-        setRoleOptions(ROLE_OPTIONS);
     };
 
     const handleSave = async () => {
@@ -149,11 +149,13 @@ export default function RoleMenuPage() {
     };
 
     const handleRefresh = () => {
+        loadRoles();
         loadAllMenus();
         loadRoleData();
     };
 
     useEffect(() => {
+        loadRoles();
         loadAllMenus();
     }, []);
 
@@ -166,8 +168,8 @@ export default function RoleMenuPage() {
                 <Select
                     showSearch
                     allowClear
-                    placeholder="请选择或输入角色ID"
-                    style={{ width: 220 }}
+                    placeholder="请选择角色"
+                    style={{ width: 240 }}
                     value={role}
                     options={roleOptions}
                     filterOption={(input, option) =>
@@ -176,7 +178,6 @@ export default function RoleMenuPage() {
                             .toLowerCase()
                             .includes(input.toLowerCase())
                     }
-                    onSearch={handleRoleSearch}
                     onChange={handleRoleChange}
                 />
             </Space>

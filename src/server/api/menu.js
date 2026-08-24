@@ -1,6 +1,6 @@
 import { getBase, postJson } from "./_helpers";
 
-export const menuPage = (obj) => postJson("/user/admin/menu/page", obj);
+export const menuPage = () => getBase("/user/admin/menu/list");
 
 export const menuAdd = (obj) => postJson("/user/admin/menu/add", obj);
 

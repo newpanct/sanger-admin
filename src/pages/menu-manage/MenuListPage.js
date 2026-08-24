@@ -48,6 +48,7 @@ import {
     batchSort,
     refreshAuthMenus,
 } from "../../server/api";
+import { normalizeMenuTree } from "../../utils/menu";
 
 const TYPE_MAP = {
     1: { label: "目录", color: "blue" },
@@ -132,6 +133,7 @@ const PAGE_COMPONENT_OPTIONS = [
     "NoticePage",
     "RefundReasonPage",
     "MenuListPage",
+    "RoleListPage",
     "RoleMenuPage",
 ].map((value) => ({ value }));
 
@@ -141,14 +143,6 @@ function renderIcon(name) {
         return null;
     }
     return <IconComp />;
-}
-
-function normalizeTree(nodes = [], level = 0) {
-    return nodes.map((item) => ({
-        ...item,
-        _level: level,
-        children: item.children?.length ? normalizeTree(item.children, level + 1) : undefined,
-    }));
 }
 
 function collectIds(node, acc = new Set()) {
@@ -269,9 +263,9 @@ export default function MenuListPage() {
     const handleList = async (nextPageNum = pageNum, nextPageSize = pageSize) => {
         try {
             setLoading(true);
-            const res = await menuPage({ pageNum: nextPageNum, pageSize: nextPageSize });
+            const res = await menuPage();
             if (res?.code === 200) {
-                const records = normalizeTree(res?.data?.records || []);
+                const records = normalizeMenuTree(res?.data?.records || res?.data);
                 setList(records);
                 setTotal(res?.data?.total || 0);
                 setExpandedKeys([]);
@@ -317,12 +311,12 @@ export default function MenuListPage() {
             setBtnLoading(true);
             const res = await menuDelete(currentItem.id);
             if (res?.code === 200) {
-                message.success(res?.message || "删除菜单成功！");
+                message.success(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}成功！`);
                 setOpenDel(false);
                 handleList();
                 refreshAuthMenus();
             } else {
-                message.error(res?.message || "删除菜单失败！");
+                message.error(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}失败！`);
             }
         } finally {
             setBtnLoading(false);
@@ -453,6 +447,7 @@ export default function MenuListPage() {
                             display: "flex",
                             alignItems: "center",
                             gap: 4,
+                            paddingLeft: (record._level || 0) * 20,
                         }}
                     >
                         <DragHandle />
@@ -590,7 +585,7 @@ export default function MenuListPage() {
                                     编辑
                                 </Button>
                             </Tooltip>
-                            <Tooltip title="删除菜单">
+                            <Tooltip title={`删除${TYPE_MAP[record.type]?.label || "菜单"}`}>
                                 <Button
                                     danger
                                     icon={<DeleteOutlined />}
@@ -649,6 +644,7 @@ export default function MenuListPage() {
                     <Table
                         size="middle"
                         rowKey="id"
+                        indentSize={0}
                         loading={loading}
                         dataSource={list}
                         columns={columns}
@@ -676,7 +672,7 @@ export default function MenuListPage() {
             </DndContext>
 
             <Modal
-                title="删除菜单"
+                title={`删除${TYPE_MAP[currentItem.type]?.label || "菜单"}`}
                 open={openDel}
                 onCancel={() => setOpenDel(false)}
                 onOk={handleDelete}
@@ -692,10 +688,20 @@ export default function MenuListPage() {
                 >
                     <ExclamationCircleOutlined style={{ fontSize: "48px", color: "#ff4d4f" }} />
                     <div>
-                        您确定要删除菜单
+                        您确定要删除{TYPE_MAP[currentItem.type]?.label || "菜单"}
                         <span style={{ fontWeight: 600 }}> {currentItem.name} </span>
                         吗？
                     </div>
+                    {currentItem.type === 1 && currentItem.children?.length > 0 && (
+                        <div style={{ color: "#ff4d4f" }}>
+                            该目录下还有子菜单，删除后子级也会一并移除。
+                        </div>
+                    )}
+                    {currentItem.type === 2 && currentItem.children?.length > 0 && (
+                        <div style={{ color: "#ff4d4f" }}>
+                            该菜单下还有子项，删除后子级也会一并移除。
+                        </div>
+                    )}
                 </Space>
             </Modal>
 

@@ -192,7 +192,7 @@ export default function MemberPage() {
   };
 
   return (
-    <PageCard title="会员管理">
+    <PageCard title="SangerBox会员">
       <Row gutter={16} className="mt-2">
         {/* 单个补偿 */}
         <Col span={12}>

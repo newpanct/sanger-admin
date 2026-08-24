@@ -103,6 +103,7 @@ const componentMap = {
   RefundReasonPage:lazy(()=>import("../pages/RefundReasonPage")),
   // 菜单管理
   MenuListPage: lazy(() => import("../pages/menu-manage/MenuListPage")),
+  RoleListPage: lazy(() => import("../pages/menu-manage/RoleListPage")),
   RoleMenuPage: lazy(() => import("../pages/menu-manage/RoleMenuPage")),
   // 通用空容器 (带 Outlet)
   LayoutOutlet: () => <Outlet />,

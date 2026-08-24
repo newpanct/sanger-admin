@@ -17,5 +17,6 @@ export * from "./deprecated";
 export * from "./notice";
 export * from "./menu";
 export * from "./roleMenu";
+export * from "./role";
 export * from "./pay";
 export * from "./refundReason";
