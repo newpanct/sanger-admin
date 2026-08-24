@@ -127,6 +127,7 @@ const PAGE_COMPONENT_OPTIONS = [
     "ModelBillingPage",
     "KeywordPage",
     "MemberPage",
+    "UserListPage",
     "LinkPage",
     "EnterprisePage",
     "ServerPage",

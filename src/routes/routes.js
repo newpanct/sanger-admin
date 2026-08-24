@@ -89,8 +89,9 @@ const componentMap = {
   SalesConsumptionPage:lazy(()=>import("../pages/merchant/goods/SalesConsumptionPage")),
   InventoryPage:lazy(()=>import("../pages/merchant/goods/InventoryPage")),
 
-  // 会员管理
+  // 用户管理
   MemberPage:lazy(()=>import("../pages/user/MemberPage")),
+  UserListPage:lazy(()=>import("../pages/user/UserListPage")),
   // 链接管理
   LinkPage:lazy(()=>import("../pages/LinkPage")),
   // 企业

@@ -59,7 +59,7 @@ export default function PromoCodePage() {
     const codeColumn = [
         {
             title: "优惠码",
-            width: 300,
+            width: 240,
             dataIndex: "couponCode",
             align: "center",
             fixed: "left",
@@ -89,7 +89,7 @@ export default function PromoCodePage() {
         {
             title: "使用邮箱",
             dataIndex: "usedByEmail",
-            width: 220,
+            width: 200,
             align: "center",
             render: (text) =>
                 text ? (
@@ -101,7 +101,7 @@ export default function PromoCodePage() {
         {
             title: "使用订单",
             dataIndex: "usedOrderNo",
-            width: 240,
+            width: 200,
             align: "center",
             render: (text) =>
                 text ? (

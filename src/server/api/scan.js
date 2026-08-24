@@ -52,6 +52,8 @@ export const dupliSeeDeleteById = (id) =>
 /* ---------------- 通用 ---------------- */
 export const getResLink = (id) => getBase("/dedup/task/getNewUrl", { id });
 
+export const ignoreTask = (obj) => postJson("/dedup/admin/task/ignore", obj);
+
 /* ---------------- 订单统计 ---------------- */
 export const statisticsImagetwin = (obj) =>
   postJson("/dedup/statistics/imagetwin", obj);

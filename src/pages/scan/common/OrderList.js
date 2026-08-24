@@ -240,7 +240,7 @@ export default function OrderList({ title, props }) {
           1: { text: "已付款", color: "default" },
           2: { text: "成功", color: "success" },
           3: { text: "失败", color: "error" },
-          4: { text: "稍后重试", color: "error" },
+          4: { text: "人工已处理  ", color: "error" },
           5: { text: "已退款", color: "warning" },
         };
         const { text, color } = map[status] || {};

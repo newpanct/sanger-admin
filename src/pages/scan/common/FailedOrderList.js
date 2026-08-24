@@ -3,6 +3,7 @@ import { Button, Table, Tag, Form, Descriptions, Input, Typography, Space, Toolt
 import {
   ReloadOutlined, UploadOutlined,
   RollbackOutlined,
+  EyeInvisibleOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
@@ -15,6 +16,7 @@ import {
   dupliseeFailedPageList,
   refundExecute,
   refundReasonListAll,
+  ignoreTask,
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch } from "react-redux";
@@ -29,9 +31,12 @@ export default function FailedOrderList({ title, props }) {
   const [commitLoadingMap, setCommitLoadingMap] = useState({});
   const [commitModalOpen, setCommitModalOpen] = useState(false);
   const [rollbackOpen, setRollbackOpen] = useState(false);
+  const [ignoreOpen, setIgnoreOpen] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [refundForm] = Form.useForm();
+  const [ignoreForm] = Form.useForm();
   const [refundLoading, setRefundLoading] = useState(false);
+  const [ignoreLoading, setIgnoreLoading] = useState(false);
   const [refundReasons, setRefundReasons] = useState([]);
   const selectedReason = Form.useWatch("reason", refundForm);
   const orderColumn = [
@@ -96,7 +101,7 @@ export default function FailedOrderList({ title, props }) {
     {
       title: "操作",
       align: "center",
-      width: 200,
+      width: 280,
       render: (_, record) => {
         return (
           <Space>
@@ -121,6 +126,17 @@ export default function FailedOrderList({ title, props }) {
                 icon={<RollbackOutlined />}
               >退款</Button>
             </Tooltip>
+            <Tooltip title="忽略">
+              <Button
+                icon={<EyeInvisibleOutlined />}
+                loading={ignoreLoading && currentRecord?.id === record.id}
+                onClick={() => {
+                  setCurrentRecord(record);
+                  ignoreForm.resetFields();
+                  setIgnoreOpen(true);
+                }}
+              >忽略</Button>
+            </Tooltip>
           </Space>
         );
       },
@@ -131,6 +147,18 @@ export default function FailedOrderList({ title, props }) {
     imagetwin: commitImagetwin,
     ithenticate: commitIthenticate,
     dupliSee: commitDuplisee,
+  };
+
+  const taskTypeMap = {
+    imagetwin: "imagetwin",
+    ithenticate: "ithenticate",
+    dupliSee: "duplisee",
+  };
+
+  const pathMap = {
+    imagetwin: "/scan/imagetwin/abnormal-orders",
+    ithenticate: "/scan/crosscheck/abnormal-orders",
+    dupliSee: "/scan/duplisee/abnormal-orders",
   };
 
   const handleOrderList = async (page = pageNum, size = pageSize) => {
@@ -173,11 +201,6 @@ export default function FailedOrderList({ title, props }) {
       if (res?.code === 200) {
         message.success(res?.message || "手动提交成功");
         handleOrderList(pageNum, pageSize);
-        const pathMap = {
-          imagetwin: "/scan/imagetwin/abnormal-orders",
-          ithenticate: "/scan/crosscheck/abnormal-orders",
-          dupliSee: "/scan/duplisee/abnormal-orders",
-        };
         setCommitModalOpen(false);
         setCurrentRecord(null);
         const path = pathMap[props];
@@ -192,7 +215,38 @@ export default function FailedOrderList({ title, props }) {
     }
   };
 
-
+  const handleIgnore = async (values) => {
+    if (!currentRecord) return;
+    const taskType = taskTypeMap[props];
+    if (!taskType) {
+      message.error("未匹配到任务类型");
+      return;
+    }
+    try {
+      setIgnoreLoading(true);
+      const res = await ignoreTask({
+        taskId: currentRecord.id,
+        taskType,
+        ignoreReason: values.ignoreReason?.trim() || undefined,
+      });
+      if (res?.code === 200) {
+        message.success(res?.message || "忽略成功");
+        handleOrderList(pageNum, pageSize);
+        setIgnoreOpen(false);
+        setCurrentRecord(null);
+        ignoreForm.resetFields();
+        const path = pathMap[props];
+        if (path) dispatch(decreaseMenuBadge(path));
+      } else {
+        message.error(res?.message || "请联系管理员");
+      }
+    } catch (error) {
+      console.error(error);
+      message.error(error.message || "请联系管理员");
+    } finally {
+      setIgnoreLoading(false);
+    }
+  };
 
   const fetchRefundReasons = async () => {
     const res = await refundReasonListAll();
@@ -370,6 +424,42 @@ export default function FailedOrderList({ title, props }) {
             rules={[{ required: true, message: "请输入密码" }]}
           >
             <Input.Password placeholder="请输入密码" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        open={ignoreOpen}
+        title="确认忽略"
+        okText="确认忽略"
+        cancelText="取消"
+        confirmLoading={ignoreLoading}
+        onOk={() => ignoreForm.submit()}
+        onCancel={() => {
+          setIgnoreOpen(false);
+          setCurrentRecord(null);
+          ignoreForm.resetFields();
+        }}
+        maskClosable={false}
+        destroyOnHidden
+      >
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          忽略后该任务将从异常列表临时删除，确认忽略以下订单吗？
+        </Typography.Paragraph>
+        <Descriptions column={1} bordered size="small" style={{ marginBottom: 16 }}>
+          <Descriptions.Item label="文章标题">{currentRecord?.title || "--"}</Descriptions.Item>
+          <Descriptions.Item label="订单号">
+            <CopyableEllipsisText text={currentRecord?.orderNo} />
+          </Descriptions.Item>
+        </Descriptions>
+        <Form form={ignoreForm} layout="vertical" onFinish={handleIgnore}>
+          <Form.Item name="ignoreReason" label="忽略原因">
+            <Input.TextArea
+              rows={3}
+              placeholder="选填，可填写忽略原因或备注"
+              maxLength={200}
+              showCount
+            />
           </Form.Item>
         </Form>
       </Modal>

@@ -15,3 +15,8 @@ export const queryByModileOrUserId = (mobileOrUserId) =>
 
 // 优惠码分页
 export const couponPageList = (obj) => postJson("/admin/coupon/pageList", obj);
+
+export const adminUserPageList = (obj) => postJson("/user/admin/pageList", obj);
+
+export const assignUserRole = (obj) => postJson("/user/admin/assignRole", obj);
+
