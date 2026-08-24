@@ -217,7 +217,6 @@ const CertificationPage = () => {
             rowKey="id"
             columns={columns}
             dataSource={certificationArr}
-            bordered
             pagination={{
               current: currentPage,
               pageSize: pageSize,

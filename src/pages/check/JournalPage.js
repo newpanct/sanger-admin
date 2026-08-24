@@ -283,7 +283,6 @@ const JournalPage = () => {
           size="middle"
           rowKey="id" // 保持原有rowKey
           dataSource={JournalArr} // 保持原有数据源
-          bordered // 保持边框样式
           pagination={{
             current: pageNumber,
             pageSize: pageSize,

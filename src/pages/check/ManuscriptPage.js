@@ -338,7 +338,6 @@ const ManuscriptPage = () => {
           rowKey="manuscriptId"
           columns={columns}
           dataSource={manuscriptArr}
-          bordered
           pagination={{
             current: currentPage,
             pageSize: pageSize,

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import {
   ReloadOutlined,
   CalendarOutlined,
@@ -6,6 +6,7 @@ import {
   PayCircleOutlined,
   RollbackOutlined,
 } from "@ant-design/icons";
+import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import PageCard from "../../../components/PageCard";
 import dayjs from "dayjs";
 import {
@@ -27,6 +28,9 @@ import {
   statisticsIthenticate,
   statisticsImagetwin,
   statisticsSangerboxScope,
+  refundImageTwin,
+  refundIthenticate,
+  refundDuplisee,
 } from "../../../server/api";
 
 const { Text } = Typography;
@@ -37,6 +41,53 @@ const formatAmount = (val) =>
     maximumFractionDigits: 2,
   });
 
+const displayValue = (val) =>
+  val === null || val === undefined || val === "" ? "--" : val;
+
+const toMonth = (date) => {
+  if (!date) return "";
+  const value = String(date);
+  return value.length >= 7 ? value.slice(0, 7) : value;
+};
+
+const PAY_STATUS_MAP = {
+  1: { text: "成功", color: "success" },
+  0: { text: "失败", color: "error" },
+};
+
+const REFUND_STATUS_MAP = {
+  0: { text: "未退款", color: "default" },
+  1: { text: "已退款", color: "green" },
+  2: { text: "退款失败", color: "error" },
+};
+
+const getTaskStatusMeta = (status, apiKey) => {
+  const map = {
+    1: { text: "已付款", color: "blue" },
+    2: { text: "成功", color: "success" },
+    3: { text: "失败", color: "error" },
+    4: { text: "等待中", color: "warning" },
+    5:
+      apiKey === "ithenticate"
+        ? { text: "已退款", color: "orange" }
+        : { text: "重新提交", color: "default" },
+    6: { text: "已退款", color: "orange" },
+  };
+  return map[status] || null;
+};
+
+const statisticsApiMap = {
+  imagetwin: statisticsImagetwin,
+  ithenticate: statisticsIthenticate,
+  sangerboxscope: statisticsSangerboxScope,
+};
+
+const refundApiMap = {
+  imagetwin: refundImageTwin,
+  ithenticate: refundIthenticate,
+  sangerboxscope: refundDuplisee,
+};
+
 export default function StatisticsList({ title, props: apiKey }) {
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,12 +96,9 @@ export default function StatisticsList({ title, props: apiKey }) {
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
-
-  const apiMap = {
-    imagetwin: statisticsImagetwin,
-    ithenticate: statisticsIthenticate,
-    sangerboxscope: statisticsSangerboxScope,
-  };
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [refundCache, setRefundCache] = useState({});
+  const refundFetchedRef = useRef({});
 
   const handleStatisticsList = useCallback(
     async (page = pageNum, size = pageSize) => {
@@ -62,13 +110,16 @@ export default function StatisticsList({ title, props: apiKey }) {
           pageSize: size,
           month: date || undefined,
         };
-        const api = apiMap[apiKey];
+        const api = statisticsApiMap[apiKey];
         if (!api) throw new Error("未匹配到接口");
         const res = await api(params);
         if (res?.code === 200) {
           const { records = [], total: totalCount = 0 } = res.data || {};
           setList(records);
           setTotal(totalCount);
+          setRefundCache({});
+          setExpandedRowKeys([]);
+          refundFetchedRef.current = {};
         } else {
           message.error(res?.message || "请联系管理员！");
         }
@@ -82,14 +133,57 @@ export default function StatisticsList({ title, props: apiKey }) {
     [apiKey, date, pageNum, pageSize]
   );
 
+  const loadRefundOrders = async (record) => {
+    const month = toMonth(record?.date);
+    if (!month || refundFetchedRef.current[month]) return;
+    refundFetchedRef.current[month] = true;
+
+    setRefundCache((prev) => ({
+      ...prev,
+      [month]: { loading: true, loaded: false, list: [] },
+    }));
+
+    const api = refundApiMap[apiKey];
+    if (!api) {
+      setRefundCache((prev) => ({
+        ...prev,
+        [month]: { loading: false, loaded: true, list: [] },
+      }));
+      return;
+    }
+
+    const res = await api(month);
+    if (res?.code === 200) {
+      setRefundCache((prev) => ({
+        ...prev,
+        [month]: { loading: false, loaded: true, list: res?.data || [] },
+      }));
+    } else {
+      message.error(res?.message || "获取退款订单失败");
+      refundFetchedRef.current[month] = false;
+      setRefundCache((prev) => ({
+        ...prev,
+        [month]: { loading: false, loaded: false, list: [] },
+      }));
+    }
+  };
+
+  const handleExpand = (expanded, record) => {
+    const key = record.date;
+    setExpandedRowKeys((prev) =>
+      expanded ? [...new Set([...prev, key])] : prev.filter((item) => item !== key)
+    );
+    if (expanded) loadRefundOrders(record);
+  };
+
   const pageSummary = useMemo(() => {
     return {
-      totalAmount:list.reduce((acc, item) => acc + Number(item.amount || 0), 0),
-      totalOrderCount:list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
-      totalRefundCount:list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
-      totalRefundAmount:list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
-      pendingRefundAmount:list.reduce((acc, item) => acc + Number(item.pendingRefundAmount || 0), 0),
-      netIncome:list.reduce((acc, item) => acc + Number(item.netIncome || 0), 0),
+      totalAmount: list.reduce((acc, item) => acc + Number(item.amount || 0), 0),
+      totalOrderCount: list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
+      totalRefundCount: list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
+      totalRefundAmount: list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
+      pendingRefundAmount: list.reduce((acc, item) => acc + Number(item.pendingRefundAmount || 0), 0),
+      netIncome: list.reduce((acc, item) => acc + Number(item.netIncome || 0), 0),
     }
   }, [list]);
 
@@ -212,6 +306,91 @@ export default function StatisticsList({ title, props: apiKey }) {
     },
   ];
 
+  const childColumns = [
+    {
+      title: "标题",
+      dataIndex: "title",
+      align: "center",
+      ellipsis: true,
+      render: displayValue,
+    },
+    {
+      title: "订单号",
+      dataIndex: "orderNo",
+      align: "center",
+      render: (orderNo) =>
+        orderNo ? <CopyableEllipsisText text={orderNo} /> : "--",
+    },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+      align: "center",
+      render: (email) => (email ? <CopyableEllipsisText text={email} /> : "--"),
+    },
+    {
+      title: "任务状态",
+      dataIndex: "status",
+      align: "center",
+      render: (status) => {
+        const meta = getTaskStatusMeta(status, apiKey);
+        return meta ? <Tag color={meta.color}>{meta.text}</Tag> : "--";
+      },
+    },
+    {
+      title: "支付状态",
+      dataIndex: "payStatus",
+      align: "center",
+      render: (status) => {
+        if (status === null || status === undefined || status === "") return "--";
+        const meta = PAY_STATUS_MAP[status];
+        return meta ? <Tag color={meta.color}>{meta.text}</Tag> : displayValue(status);
+      },
+    },
+    {
+      title: "退款状态",
+      dataIndex: "refundStatus",
+      align: "center",
+      render: (status) => {
+        if (status === null || status === undefined || status === "") return "--";
+        const meta = REFUND_STATUS_MAP[status];
+        return meta ? <Tag color={meta.color}>{meta.text}</Tag> : displayValue(status);
+      },
+    },
+    {
+      title: "备注",
+      dataIndex: "remark",
+      align: "center",
+      render: displayValue,
+    },
+    {
+      title: "创建时间",
+      dataIndex: "createTime",
+      align: "center",
+      render: displayValue,
+    },
+    {
+      title: "更新时间",
+      dataIndex: "updateTime",
+      align: "center",
+      render: displayValue,
+    },
+  ];
+
+  const expandedRowRender = (record) => {
+    const month = toMonth(record?.date);
+    const cache = refundCache[month] || { loading: false, list: [] };
+    return (
+      <Table
+        size="middle"
+        rowKey="id"
+        loading={cache.loading}
+        columns={childColumns}
+        dataSource={cache.list}
+        pagination={false}
+      />
+    );
+  };
+
   return (
     <PageCard
       title={title}
@@ -298,10 +477,14 @@ export default function StatisticsList({ title, props: apiKey }) {
           <Table
             rowKey="date"
             size="middle"
-            bordered
             loading={loading}
             columns={columns}
             dataSource={list}
+            expandable={{
+              expandedRowKeys,
+              onExpand: handleExpand,
+              expandedRowRender,
+            }}
             pagination={{
               current: pageNum,
               pageSize,
