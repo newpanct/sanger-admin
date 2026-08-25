@@ -83,9 +83,11 @@ export default function ModelBillingPage() {
       title: "总费用",
       dataIndex: "totalCost",
       align: "center",
-      render: (totalCost) => {
-        return <Tag>{totalCost} 元</Tag>;
-      },
+      render: (value) => (
+          <Text strong className="text-[15px] text-red-700">
+              ￥{(Number(value || 0) / 100).toFixed(2)}
+          </Text>
+      ),
     },
     {
       title: "月份",
@@ -121,9 +123,11 @@ export default function ModelBillingPage() {
       title: "费用",
       dataIndex: "totalCost",
       align: "center",
-      render: (totalCost) => {
-        return <Tag>{totalCost} 元</Tag>;
-      },
+      render: (value) => (
+          <Text strong className="text-[15px] text-red-700">
+              ￥{(Number(value || 0) / 100).toFixed(2)}
+          </Text>
+      ),
     },
     { title: "时间段", dataIndex: "date", align: "center" },
   ];

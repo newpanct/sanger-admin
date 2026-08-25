@@ -91,7 +91,9 @@ export default function PayPersonalAccountDetailPage() {
                 val === null || val === undefined || val === "" ? (
                     "--"
                 ) : (
-                    <span style={{ fontWeight: 600, color: "#cf1322" }}>￥{formatYuan(val)}</span>
+                    <Text strong className="text-[15px] text-red-700">
+                        ￥{(Number(val || 0) / 100).toFixed(2)}
+                    </Text>
                 ),
         },
         {

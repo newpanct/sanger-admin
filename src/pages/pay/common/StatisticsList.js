@@ -101,6 +101,8 @@ export default function StatisticsList({ title, props: apiKey }) {
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [pendingRefundAmount, setPendingRefundAmount] = useState(0);
+  const [netIncome, setNetIncome] = useState(0);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [refundCache, setRefundCache] = useState({});
   const refundFetchedRef = useRef({});
@@ -119,9 +121,16 @@ export default function StatisticsList({ title, props: apiKey }) {
         if (!api) throw new Error("未匹配到接口");
         const res = await api(params);
         if (res?.code === 200) {
-          const { records = [], total: totalCount = 0 } = res.data || {};
+          const {
+            records = [],
+            total: totalCount = 0,
+            pendingRefundAmount: pending = 0,
+            netIncome: income = 0,
+          } = res.data || {};
           setList(records);
           setTotal(totalCount);
+          setPendingRefundAmount(Number(pending) || 0);
+          setNetIncome(Number(income) || 0);
           setStatTick((tick) => tick + 1);
           setRefundCache({});
           setExpandedRowKeys([]);
@@ -188,10 +197,10 @@ export default function StatisticsList({ title, props: apiKey }) {
       totalOrderCount: list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
       totalRefundCount: list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
       totalRefundAmount: list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
-      pendingRefundAmount: list.reduce((acc, item) => acc + Number(item.pendingRefundAmount || 0), 0),
-      netIncome: list.reduce((acc, item) => acc + Number(item.netIncome || 0), 0),
-    }
-  }, [list]);
+      pendingRefundAmount,
+      netIncome,
+    };
+  }, [list, pendingRefundAmount, netIncome]);
 
   const columns = [
     {
@@ -210,7 +219,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "orderCount",
       align: "center",
       render: (val) => (
-        <Tag variant="solid" color="var(--app-success)" style={{ margin: 0 }}>
+        <Tag variant="filled" color="success">
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -220,7 +229,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "refundCount",
       align: "center",
       render: (val) => (
-        <Tag color="var(--app-primary)" style={{ margin: 0 }}>
+        <Tag variant="filled" color="error">
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -230,7 +239,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "unrefundCount",
       align: "center",
       render: (val) => (
-        <Tag color="var(--app-warning)" style={{ margin: 0 }}>
+          <Tag variant="filled" color="warning">
           {Number(val || 0).toLocaleString("zh-CN")} 单
         </Tag>
       ),
@@ -240,7 +249,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "refundAmount",
       align: "center",
       render: (val) => (
-        <Text strong style={{ color: "var(--app-amount)", fontSize: 15 }}>
+        <Text strong className="text-[15px] text-red-700">
           ￥{formatAmount(val)}
         </Text>
       ),
@@ -250,7 +259,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       dataIndex: "amount",
       align: "center",
       render: (val) => (
-        <Text strong style={{ color: "var(--app-amount)", fontSize: 15 }}>
+        <Text strong className="text-[15px] text-red-700">
           ￥{formatAmount(val)}
         </Text>
       ),

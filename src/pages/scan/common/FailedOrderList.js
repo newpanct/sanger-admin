@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Table, Tag, Form, Descriptions, Input, Typography, Space, Tooltip, Modal, message } from "antd";
+import { Button, Table, Tag, Form, Descriptions, Input, Typography, Space, Tooltip, Modal, message, Flex, theme } from "antd";
 import {
   ReloadOutlined, UploadOutlined,
   RollbackOutlined,
@@ -19,10 +19,29 @@ import {
   ignoreTask,
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+const findMenuPath = (menus = [], component, parentPath = "") => {
+  for (const item of menus) {
+    const fullPath = parentPath
+      ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
+      : `/${item.path}`;
+    if (item.component === component) return fullPath;
+    if (item.children?.length) {
+      const nested = findMenuPath(item.children, component, fullPath);
+      if (nested) return nested;
+    }
+  }
+  return null;
+};
 
 export default function FailedOrderList({ title, props }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { token } = theme.useToken();
+  const authMenus = useSelector((state) => state.auth.menus);
+  const refundReasonPath = findMenuPath(authMenus, "RefundReasonPage");
   const [loading, setLoading] = useState(false);
   const [orderList, setOrderList] = useState([]);
   const [pageNum, setPageNum] = useState(1);
@@ -399,11 +418,24 @@ export default function FailedOrderList({ title, props }) {
               showCount
             />
           </Form.Item>
-          {refundReasons.length > 0 && (
-            <div style={{ marginTop: -8, marginBottom: 16 }}>
-              <Typography.Text type="secondary" style={{ display: "block", marginBottom: 8 }}>
-                快捷选择
-              </Typography.Text>
+          <div style={{ marginTop: -8, marginBottom: 16 }}>
+            <Flex justify="space-between" align="center" style={{ marginBottom: 8 }}>
+              <Typography.Text type="secondary">快捷选择</Typography.Text>
+              {refundReasonPath ? (
+                <Typography.Link
+                  onClick={() => {
+                    setRollbackOpen(false);
+                    setCurrentRecord(null);
+                    refundForm.resetFields();
+                    navigate(refundReasonPath);
+                  }}
+                  style={{ color: token.colorPrimary }}
+                >
+                  自定义快捷退款原因
+                </Typography.Link>
+              ) : null}
+            </Flex>
+            {refundReasons.length > 0 ? (
               <Space wrap size={[8, 8]}>
                 {refundReasons.map((item) => (
                   <Tag
@@ -416,8 +448,13 @@ export default function FailedOrderList({ title, props }) {
                   </Tag>
                 ))}
               </Space>
-            </div>
-          )}
+            ) : (
+              <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                暂无快捷原因
+                {refundReasonPath ? "，可前往管理页添加" : ""}
+              </Typography.Text>
+            )}
+          </div>
           <Form.Item
             name="password"
             label="密码"
