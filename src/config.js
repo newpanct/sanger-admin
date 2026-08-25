@@ -119,7 +119,17 @@ const config = {
         </div>
     </body>
     </html>
-    `
+    `,
+
+    // 默认主题色
+    presetColors:[
+        "#1890ff", // 默认蓝色
+        "#00b42a", // 绿色
+        "#ff7d00", // 橙色
+        "#f53f3f", // 红色
+        "#722ed1", // 紫色
+        "#0fc6c2", // 青色
+      ]
   };
   
   export default config;

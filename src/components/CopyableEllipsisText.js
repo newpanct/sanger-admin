@@ -1,5 +1,6 @@
 import React from "react";
-import { Typography } from "antd";
+import { Typography, theme } from "antd";
+import { CopyOutlined, CheckOutlined } from "@ant-design/icons";
 
 const wrapperStyle = {
   display: "flex",
@@ -24,18 +25,30 @@ const copyStyle = {
  * Table-cell text that ellipsizes, with a copy icon that never gets clipped.
  */
 export default function CopyableEllipsisText({ text, children }) {
+  const { token } = theme.useToken();
+
   if (text == null || text === "") {
     return "-";
   }
 
   const display = String(text);
+  const iconStyle = { color: token.colorPrimary };
 
   return (
     <div style={wrapperStyle}>
       <Typography.Text ellipsis={{ tooltip: display }} style={textStyle}>
         {children ?? display}
       </Typography.Text>
-      <Typography.Text copyable={{ text: display }} style={copyStyle} />
+      <Typography.Text
+        copyable={{
+          text: display,
+          icon: [
+            <CopyOutlined key="copy" style={iconStyle} />,
+            <CheckOutlined key="copied" style={iconStyle} />,
+          ],
+        }}
+        style={copyStyle}
+      />
     </div>
   );
 }

@@ -5,9 +5,12 @@ import {
   ShoppingOutlined,
   PayCircleOutlined,
   RollbackOutlined,
+  WalletOutlined,
+  AccountBookOutlined,
 } from "@ant-design/icons";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import PageCard from "../../../components/PageCard";
+import StatRibbonCard, { cardAccent } from "../../../components/StatRibbonCard";
 import dayjs from "dayjs";
 import {
   Button,
@@ -17,12 +20,12 @@ import {
   Row,
   Col,
   Card,
-  Statistic,
   Alert,
   Space,
   Tag,
   Typography,
   Tooltip,
+  theme,
 } from "antd";
 import {
   statisticsIthenticate,
@@ -89,8 +92,10 @@ const refundApiMap = {
 };
 
 export default function StatisticsList({ title, props: apiKey }) {
+  const { token } = theme.useToken();
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [statTick, setStatTick] = useState(0);
   const [date, setDate] = useState("");
   const [list, setList] = useState([]);
   const [pageNum, setPageNum] = useState(1);
@@ -117,6 +122,7 @@ export default function StatisticsList({ title, props: apiKey }) {
           const { records = [], total: totalCount = 0 } = res.data || {};
           setList(records);
           setTotal(totalCount);
+          setStatTick((tick) => tick + 1);
           setRefundCache({});
           setExpandedRowKeys([]);
           refundFetchedRef.current = {};
@@ -194,7 +200,7 @@ export default function StatisticsList({ title, props: apiKey }) {
       align: "center",
       render: (val) => (
         <Space size={6}>
-          <CalendarOutlined style={{ color: "#1677ff" }} />
+          <CalendarOutlined style={{ color: token.colorPrimary }} />
           <Text>{val || "-"}</Text>
         </Space>
       ),
@@ -255,54 +261,70 @@ export default function StatisticsList({ title, props: apiKey }) {
     handleStatisticsList(pageNum, pageSize);
   }, [date, pageNum, pageSize, handleStatisticsList]);
 
+  const cardStyle = {
+    borderRadius: 12,
+    border: `1px solid ${token.colorBorderSecondary}`,
+    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+  };
+
   const statCards = [
     {
       title: "当前服务订单数",
       value: pageSummary.totalOrderCount,
       suffix: "单",
+      decimals: 0,
       icon: <ShoppingOutlined />,
-      color: "#1677ff",
-      bg: "#e6f4ff",
+      ribbonText: "订单",
+      ...cardAccent(0),
     },
     {
       title: "当前服务销售额",
-      value: formatAmount(pageSummary.totalAmount),
+      value: pageSummary.totalAmount,
       prefix: "￥",
+      suffix: "元",
+      decimals: 2,
       icon: <PayCircleOutlined />,
-      color: "#cf1322",
-      bg: "#fff1f0",
+      ribbonText: "销售",
+      ...cardAccent(1),
     },
     {
       title: "当前服务退款订单数",
       value: pageSummary.totalRefundCount,
       suffix: "单",
+      decimals: 0,
       icon: <RollbackOutlined />,
-      color: "#1677ff",
-      bg: "#e6f4ff",
+      ribbonText: "退款",
+      ...cardAccent(2),
     },
     {
       title: "当前服务退款金额",
-      value: formatAmount(pageSummary.totalRefundAmount),
+      value: pageSummary.totalRefundAmount,
       prefix: "￥",
+      suffix: "元",
+      decimals: 2,
       icon: <PayCircleOutlined />,
-      color: "#cf1322",
-      bg: "#fff1f0",
+      ribbonText: "退款",
+      ...cardAccent(3),
     },
     {
       title: "当前服务待退款金额",
-      value: formatAmount(pageSummary.pendingRefundAmount),
+      value: pageSummary.pendingRefundAmount,
       prefix: "￥",
-      icon: <PayCircleOutlined />,
-      color: "#cf1322",
-      bg: "#fff1f0",
+      suffix: "元",
+      decimals: 2,
+      icon: <WalletOutlined />,
+      ribbonText: "待退",
+      ...cardAccent(4),
     },
     {
       title: "当前服务净收入",
-      value: formatAmount(pageSummary.netIncome),
+      value: pageSummary.netIncome,
       prefix: "￥",
-      icon: <PayCircleOutlined />,
-      color: "#cf1322",
-      bg: "#fff1f0",
+      suffix: "元",
+      decimals: 2,
+      icon: <AccountBookOutlined />,
+      ribbonText: "净收",
+      ...cardAccent(5),
     },
   ];
 
@@ -437,66 +459,67 @@ export default function StatisticsList({ title, props: apiKey }) {
         />
       ) : (
         <>
-          <Row gutter={[16, 16]} style={{ margin: "12px 0 16px" }}>
-            {statCards.map((item) => (
-              <Col key={item.title} lg={4}>
-                <Card
-                  size="small"
-                  styles={{ body: { padding: "16px 20px" } }}
+          <div className="mt-2">
+            <Row gutter={[16, 16]}>
+              {statCards.map((item) => (
+                <Col
+                  key={item.title}
+                  xs={24}
+                  sm={12}
+                  lg={8}
+                  xxl={4}
+                  className="flex"
                 >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="flex items-center justify-center rounded-lg shrink-0"
-                      style={{
-                        width: 44,
-                        height: 44,
-                        background: item.bg,
-                        color: item.color,
-                        fontSize: 20,
-                      }}
-                    >
-                      {item.icon}
-                    </div>
-                    <Statistic
-                      title={item.title}
-                      value={item.value ?? 0}
-                      suffix={item.suffix}
-                      prefix={item.prefix}
-                      valueStyle={{
-                        color: item.color,
-                        fontSize: 22,
-                        fontWeight: 600,
-                      }}
-                    />
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+                  <StatRibbonCard
+                    item={item}
+                    loading={loading}
+                    replayKey={statTick}
+                    cardStyle={cardStyle}
+                  />
+                </Col>
+              ))}
+            </Row>
 
-          <Table
-            rowKey="date"
-            size="middle"
-            loading={loading}
-            columns={columns}
-            dataSource={list}
-            expandable={{
-              expandedRowKeys,
-              onExpand: handleExpand,
-              expandedRowRender,
-            }}
-            pagination={{
-              current: pageNum,
-              pageSize,
-              total,
-              showSizeChanger: true,
-              showTotal: (t) => `共 ${t} 条`,
-              onChange: (page, size) => {
-                setPageNum(page);
-                setPageSize(size);
-              },
-            }}
-          />
+            <Card
+              className="mt-4 rounded-xl"
+              style={cardStyle}
+              title={
+                <div>
+                  <div className="text-base font-semibold text-slate-900">
+                    金额明细
+                  </div>
+                  <Text type="secondary" className="text-xs font-normal">
+                    按日汇总订单与退款，展开查看退款订单
+                  </Text>
+                </div>
+              }
+              styles={{ body: { padding: "12px 20px 20px" } }}
+            >
+              <Table
+                rowKey="date"
+                size="middle"
+                loading={loading}
+                columns={columns}
+                dataSource={list}
+                expandable={{
+                  expandedRowKeys,
+                  onExpand: handleExpand,
+                  expandedRowRender,
+                }}
+                pagination={{
+                  current: pageNum,
+                  pageSize,
+                  total,
+                  showSizeChanger: true,
+                  showTotal: (t) => `共 ${t} 条`,
+                  onChange: (page, size) => {
+                    setPageNum(page);
+                    setPageSize(size);
+                  },
+                }}
+              />
+            </Card>
+          </div>
         </>
       )}
     </PageCard>

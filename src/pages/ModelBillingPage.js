@@ -1,17 +1,77 @@
-import { Button, Tooltip, Tag, Table, message, Row, Col, Card } from "antd";
-import PageCard from "../components/PageCard";
-import { ReloadOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
+import {
+  Button,
+  Tooltip,
+  Tag,
+  Table,
+  message,
+  Row,
+  Col,
+  Card,
+  Typography,
+  theme,
+} from "antd";
+import {
+  ReloadOutlined,
+  FileTextOutlined,
+  CheckCircleOutlined,
+  PayCircleOutlined,
+} from "@ant-design/icons";
+import PageCard from "../components/PageCard";
+import StatRibbonCard, { cardAccent } from "../components/StatRibbonCard";
 import { usageOverview, summaryByMonth, realTimeSummary } from "../server/api";
+
+const { Text } = Typography;
+
 export default function ModelBillingPage() {
+  const { token } = theme.useToken();
   const [list, setList] = useState([]);
   const [allList, setAllList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [statTick, setStatTick] = useState(0);
   const [overview, setOverview] = useState({
-    totalPromptTokens: null, //总提示token数
-    totalCompletionTokens: null, //总完成token数
-    totalCost: null, //总费用
+    totalPromptTokens: null,
+    totalCompletionTokens: null,
+    totalCost: null,
   });
+
+  const cardStyle = {
+    borderRadius: 12,
+    border: `1px solid ${token.colorBorderSecondary}`,
+    boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+  };
+
+  const metrics = [
+    {
+      title: "总提示 Token",
+      value: overview.totalPromptTokens ?? 0,
+      suffix: "",
+      decimals: 0,
+      icon: <FileTextOutlined />,
+      ribbonText: "累计",
+      ...cardAccent(0),
+    },
+    {
+      title: "总完成 Token",
+      value: overview.totalCompletionTokens ?? 0,
+      suffix: "",
+      decimals: 0,
+      icon: <CheckCircleOutlined />,
+      ribbonText: "累计",
+      ...cardAccent(1),
+    },
+    {
+      title: "总费用",
+      value: overview.totalCost ?? 0,
+      prefix: "￥",
+      suffix: "元",
+      decimals: 2,
+      icon: <PayCircleOutlined />,
+      ribbonText: "累计",
+      ...cardAccent(2),
+    },
+  ];
+
   const columns = [
     { title: "总提示token数", dataIndex: "totalPromptTokens", align: "center" },
     {
@@ -67,12 +127,12 @@ export default function ModelBillingPage() {
     },
     { title: "时间段", dataIndex: "date", align: "center" },
   ];
+
   const expandedRowRender = (record) => {
-    // 从当前行 record 中取 detailList
     const childData = (record.detailList || []).map((item, index) => ({
       ...item,
-      key: `${record.month}-${index}`, // 础保子表 key 唯一
-      date: `${item.summaryStartDate} -- ${item.summaryDate}` // 生成“时间段”
+      key: `${record.month}-${index}`,
+      date: `${item.summaryStartDate} -- ${item.summaryDate}`,
     }));
 
     return (
@@ -90,49 +150,45 @@ export default function ModelBillingPage() {
     try {
       setLoading(true);
 
-      // 并行请求两个接口
       const [resMonthly, resRealTime] = await Promise.all([
         summaryByMonth(),
-        realTimeSummary()
+        realTimeSummary(),
       ]);
 
-      // 处理月度分组数据
       let monthlyData = [];
       if (resMonthly?.code === 200) {
         monthlyData = resMonthly.data || [];
       } else {
-        message.error(resMonthly?.message || '获取月度汇总失败');
+        message.error(resMonthly?.message || "获取月度汇总失败");
         return;
       }
 
-      // 处理实时扁平数据
-      const realTimeData = resRealTime?.code === 200 ? resRealTime.data || [] : [];
+      const realTimeData =
+        resRealTime?.code === 200 ? resRealTime.data || [] : [];
 
-      // 将 monthlyData 转为 Map，便于按 month 查找
       const monthMap = new Map();
-      monthlyData.forEach(item => {
-        monthMap.set(item.month, { ...item, detailList: [...(item.detailList || [])] });
+      monthlyData.forEach((item) => {
+        monthMap.set(item.month, {
+          ...item,
+          detailList: [...(item.detailList || [])],
+        });
       });
 
-      // 遍历实时数据，按 summaryDate 归类到对应月份
-      realTimeData.forEach(item => {
+      realTimeData.forEach((item) => {
         if (!item.summaryDate) return;
-        const month = item.summaryDate.substring(0, 7); // "2026-01"
+        const month = item.summaryDate.substring(0, 7);
 
         if (monthMap.has(month)) {
-          // 已存在该月，追加到 detailList
           monthMap.get(month).detailList.push(item);
         } else {
-          // 不存在，新建分组
           monthMap.set(month, {
             month,
-            detailList: [item]
+            detailList: [item],
           });
         }
       });
 
-      // 转回数组，并计算汇总字段
-      const records = Array.from(monthMap.values()).map(item => {
+      const records = Array.from(monthMap.values()).map((item) => {
         const detailList = item.detailList || [];
 
         const totalPromptTokens = detailList.reduce(
@@ -158,13 +214,11 @@ export default function ModelBillingPage() {
         };
       });
 
-      // 设置状态
-      setList(records);      // 如果 list 用于其他地方，也可设为 records
-      setAllList(records);   // 主表数据
-
+      setList(records);
+      setAllList(records);
     } catch (error) {
-      console.error('合并数据失败:', error);
-      message.error('获取数据失败，请稍后重试');
+      console.error("合并数据失败:", error);
+      message.error("获取数据失败，请稍后重试");
     } finally {
       setLoading(false);
     }
@@ -174,16 +228,14 @@ export default function ModelBillingPage() {
     const res = await usageOverview();
     if (res?.code === 200) {
       setOverview(res?.data);
+      setStatTick((tick) => tick + 1);
     } else {
       message.error(res?.message || "获取费用使用总览失败，请联系管理员！");
     }
   };
 
   const handleRefresh = async () => {
-    await Promise.all([
-      handleGetUsageOverview(),
-      handleList(),
-    ]);
+    await Promise.all([handleGetUsageOverview(), handleList()]);
     message.success("数据已刷新");
   };
 
@@ -208,63 +260,49 @@ export default function ModelBillingPage() {
         </Tooltip>
       }
     >
-      <Row gutter={16} className="my-3">
-        <Col span={8}>
-          <Card>
-            <Card.Meta
-              title="总提示 Token"
-              description={
-                <span style={{ fontSize: 20, fontWeight: 600 }}>
-                  {overview.totalPromptTokens?.toLocaleString() ?? "-"}
-                </span>
-              }
-            />
-          </Card>
-        </Col>
+      <div className="mt-2">
+        <Row gutter={[16, 16]}>
+          {metrics.map((item) => (
+            <Col xs={24} sm={12} lg={8} key={item.title} className="flex">
+              <StatRibbonCard
+                item={item}
+                loading={loading && overview.totalCost == null}
+                replayKey={statTick}
+                cardStyle={cardStyle}
+              />
+            </Col>
+          ))}
+        </Row>
 
-        <Col span={8}>
-          <Card>
-            <Card.Meta
-              title="总完成 Token"
-              description={
-                <span style={{ fontSize: 20, fontWeight: 600 }}>
-                  {overview.totalCompletionTokens?.toLocaleString() ?? "-"}
-                </span>
-              }
-            />
-          </Card>
-        </Col>
-
-        <Col span={8}>
-          <Card>
-            <Card.Meta
-              title="总费用（¥）"
-              description={
-                <span
-                  style={{ fontSize: 20, fontWeight: 600, color: "#cf1322" }}
-                >
-                  {overview.totalCost != null
-                    ? overview.totalCost.toFixed(2)
-                    : "-"}
-                  元
-                </span>
-              }
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <Table
-        size="middle"
-        rowKey="key"
-        columns={columns}
-        expandable={{ expandedRowRender, defaultExpandedRowKeys: ["0"] }}
-        dataSource={allList}
-        pagination={{
-          showSizeChanger: true,
-          showTotal: (t) => `共 ${t} 条`,
-        }}
-      />
+        <Card
+          className="mt-4 rounded-xl"
+          style={cardStyle}
+          title={
+            <div>
+              <div className="text-base font-semibold text-slate-900">
+                月度明细
+              </div>
+              <Text type="secondary" className="text-xs font-normal">
+                按月汇总 Token 用量与费用，展开查看模型明细
+              </Text>
+            </div>
+          }
+          styles={{ body: { padding: "12px 20px 20px" } }}
+        >
+          <Table
+            size="middle"
+            rowKey="key"
+            columns={columns}
+            expandable={{ expandedRowRender, defaultExpandedRowKeys: ["0"] }}
+            dataSource={allList}
+            loading={loading}
+            pagination={{
+              showSizeChanger: true,
+              showTotal: (t) => `共 ${t} 条`,
+            }}
+          />
+        </Card>
+      </div>
     </PageCard>
   );
 }

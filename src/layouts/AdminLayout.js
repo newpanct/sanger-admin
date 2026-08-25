@@ -81,6 +81,7 @@ import { setThemeToken } from "../store/themeSlice";
 import { useIdleLogout } from "../hooks/useIdleLogout";
 import { clearAuth, persistor } from "../store";
 import { setMenuBadges, clearAllMenuBadge } from "../store/menuBadgeSlice";
+import config from "../config";
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 // icon 映射
@@ -277,14 +278,7 @@ const AdminLayout = () => {
 
 
   // 预设主题
-  const presetColors = [
-    "#1890ff", // 默认蓝色
-    "#00b42a", // 绿色
-    "#ff7d00", // 橙色
-    "#f53f3f", // 红色
-    "#722ed1", // 紫色
-    "#0fc6c2", // 青色
-  ];
+  const presetColors = config.presetColors;
 
 
   // 处理主色修改
