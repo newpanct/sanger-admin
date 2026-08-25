@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PageCard from "../../components/PageCard";
+import DoubleDeleteConfirm from "../../components/DoubleDeleteConfirm";
 import {
     Button,
     Divider,
@@ -19,7 +20,6 @@ import {
 import {
     DeleteOutlined,
     EditOutlined,
-    ExclamationCircleOutlined,
     PlusOutlined,
     ReloadOutlined,
     SearchOutlined,
@@ -52,6 +52,7 @@ export default function RoleListPage() {
     const [statusFilter, setStatusFilter] = useState();
     const [searchStatus, setSearchStatus] = useState();
     const [openDel, setOpenDel] = useState(false);
+    const [openDelConfirm, setOpenDelConfirm] = useState(false);
     const [openAdd, setOpenAdd] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
     const [currentItem, setCurrentItem] = useState({});
@@ -99,6 +100,8 @@ export default function RoleListPage() {
             if (res?.code === 200) {
                 message.success(res?.message || "删除角色成功！");
                 setOpenDel(false);
+                setOpenDelConfirm(false);
+                setCurrentItem({});
                 handleList(pageNum, pageSize);
             } else {
                 message.error(res?.message || "删除角色失败！");
@@ -321,29 +324,23 @@ export default function RoleListPage() {
                 }}
             />
 
-            <Modal
-                title="删除角色"
-                open={openDel}
-                onCancel={() => setOpenDel(false)}
-                onOk={handleDelete}
-                destroyOnHidden
-                okText="确认删除"
-                okButtonProps={{ danger: true, loading: btnLoading }}
-            >
-                <Space
-                    direction="vertical"
-                    size="middle"
-                    align="center"
-                    style={{ width: "100%", padding: "16px 0" }}
-                >
-                    <ExclamationCircleOutlined style={{ fontSize: "48px", color: "#ff4d4f" }} />
-                    <div>
-                        您确定要删除角色
-                        <span style={{ fontWeight: 600 }}> {currentItem.roleName || "--"} </span>
-                        吗？
-                    </div>
-                </Space>
-            </Modal>
+            <DoubleDeleteConfirm
+                firstOpen={openDel}
+                secondOpen={openDelConfirm}
+                name={currentItem.roleName}
+                entityLabel="角色"
+                loading={btnLoading}
+                onNext={() => {
+                    setOpenDel(false);
+                    setOpenDelConfirm(true);
+                }}
+                onConfirm={handleDelete}
+                onCancel={() => {
+                    setOpenDel(false);
+                    setOpenDelConfirm(false);
+                    setCurrentItem({});
+                }}
+            />
 
             <Modal
                 title={currentItem.id ? "编辑角色" : "新增角色"}

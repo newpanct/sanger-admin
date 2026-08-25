@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import PageCard from "../../components/PageCard";
+import DoubleDeleteConfirm from "../../components/DoubleDeleteConfirm";
 import {
     Button,
     Col,
@@ -25,7 +26,6 @@ import {
     PlusOutlined,
     ReloadOutlined,
     DeleteOutlined,
-    ExclamationCircleOutlined,
     EditOutlined,
     ArrowUpOutlined,
     ArrowDownOutlined,
@@ -253,6 +253,7 @@ export default function MenuListPage() {
     const [pageNum, setPageNum] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [openDel, setOpenDel] = useState(false);
+    const [openDelConfirm, setOpenDelConfirm] = useState(false);
     const [openAdd, setOpenAdd] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
     const [sortLoading, setSortLoading] = useState(false);
@@ -314,6 +315,8 @@ export default function MenuListPage() {
             if (res?.code === 200) {
                 message.success(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}成功！`);
                 setOpenDel(false);
+                setOpenDelConfirm(false);
+                setCurrentItem({});
                 handleList();
                 refreshAuthMenus();
             } else {
@@ -672,39 +675,33 @@ export default function MenuListPage() {
                 </SortableContext>
             </DndContext>
 
-            <Modal
-                title={`删除${TYPE_MAP[currentItem.type]?.label || "菜单"}`}
-                open={openDel}
-                onCancel={() => setOpenDel(false)}
-                onOk={handleDelete}
-                destroyOnHidden
-                okText="确认删除"
-                okButtonProps={{ danger: true, loading: btnLoading }}
-            >
-                <Space
-                    direction="vertical"
-                    size="middle"
-                    align="center"
-                    style={{ width: "100%", padding: "16px 0" }}
-                >
-                    <ExclamationCircleOutlined style={{ fontSize: "48px", color: "#ff4d4f" }} />
-                    <div>
-                        您确定要删除{TYPE_MAP[currentItem.type]?.label || "菜单"}
-                        <span style={{ fontWeight: 600 }}> {currentItem.name} </span>
-                        吗？
-                    </div>
-                    {currentItem.type === 1 && currentItem.children?.length > 0 && (
-                        <div style={{ color: "#ff4d4f" }}>
-                            该目录下还有子菜单，删除后子级也会一并移除。
+            <DoubleDeleteConfirm
+                firstOpen={openDel}
+                secondOpen={openDelConfirm}
+                name={currentItem.name}
+                entityLabel={TYPE_MAP[currentItem.type]?.label || "菜单"}
+                extra={
+                    currentItem.children?.length > 0 &&
+                    (currentItem.type === 1 || currentItem.type === 2) ? (
+                        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-[13px] leading-6 text-red-700">
+                            {currentItem.type === 1
+                                ? "该目录下还有子菜单，删除后子级也会一并移除。"
+                                : "该菜单下还有子项，删除后子级也会一并移除。"}
                         </div>
-                    )}
-                    {currentItem.type === 2 && currentItem.children?.length > 0 && (
-                        <div style={{ color: "#ff4d4f" }}>
-                            该菜单下还有子项，删除后子级也会一并移除。
-                        </div>
-                    )}
-                </Space>
-            </Modal>
+                    ) : null
+                }
+                loading={btnLoading}
+                onNext={() => {
+                    setOpenDel(false);
+                    setOpenDelConfirm(true);
+                }}
+                onConfirm={handleDelete}
+                onCancel={() => {
+                    setOpenDel(false);
+                    setOpenDelConfirm(false);
+                    setCurrentItem({});
+                }}
+            />
 
             <Modal
                 title={currentItem.id ? "编辑菜单" : "新增菜单"}
