@@ -447,7 +447,7 @@ export default function PayPersonalAccountDetailPage() {
         <PageCard
           title={
             <div>
-              <div className="text-base font-semibold text-slate-900">
+              <div className="text-base text-slate-900">
               个人账户明细查询
               </div>
               <Text type="secondary" className="text-xs font-normal">

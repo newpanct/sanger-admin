@@ -548,7 +548,16 @@ export default function EnterprisePage() {
 
     return (
         <PageCard
-            title="企业/组织管理"
+          title={
+            <div>
+              <div className="text-base text-slate-900">
+              企业/组织管理
+              </div>
+              <Text type="secondary" className="text-xs font-normal">
+                管理企业/组织列表，左侧展开查看开票记录
+              </Text>
+            </div>
+          }
             rightActions={
                 <div className="flex items-center">
                     <Tooltip title="新增企业/组织">
