@@ -63,6 +63,7 @@ const componentMap = {
   
   // 优惠码
   PromoCodePage: lazy(() => import("../pages/scan/PromoCodePage")),
+  OrderDetailPage: lazy(() => import("../pages/scan/OrderDetailPage")),
   // 预审
   JournalPage: lazy(() => import("../pages/check/JournalPage")),
   ManuscriptPage: lazy(() => import("../pages/check/ManuscriptPage")),

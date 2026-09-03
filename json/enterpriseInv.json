@@ -329,15 +329,22 @@
                   "minimum": 0.01,
                   "exclusiveMinimum": 0.01,
                   "x-apifox-mock": "@float(0.01,9999,2)"
+                },
+                "invoiceType": {
+                  "type": "integer",
+                  "description": "开票类型：0=正常开票，1=提前开票",
+                  "enum": [0, 1]
                 }
               },
               "x-apifox-orders": [
                 "enterpriseId",
-                "invoiceAmount"
+                "invoiceAmount",
+                "invoiceType"
               ],
               "required": [
                 "enterpriseId",
-                "invoiceAmount"
+                "invoiceAmount",
+                "invoiceType"
               ]
             }
           },

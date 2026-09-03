@@ -14,6 +14,7 @@ import {
     Modal,
     Radio,
     Space,
+    Tabs,
     message,
 } from "antd";
 import {
@@ -34,6 +35,18 @@ import {
 } from "@ant-design/icons";
 
 const { Text, Paragraph } = Typography;
+
+const getInvoiceLimit = (invoiceType, item) => {
+    if (Number(invoiceType) === 1) {
+        return Math.max(
+            0,
+            Number(item?.balance || 0) +
+                Number(item?.totalSpent || 0) -
+                Number(item?.invoicedAmount || 0)
+        );
+    }
+    return Number(item?.availableInvoice || 0);
+};
 
 const INVOICE_RECORD_COLUMNS = [
     {
@@ -117,8 +130,7 @@ export default function EnterprisePage() {
 
     // 企业开票
     const [invoiceOpen, setInvoiceOpen] = useState(false);
-    const [invoiceList, setInvoiceList] = useState([]);
-    const [invoiceListLoading, setInvoiceListLoading] = useState(false);
+    const [invoiceType, setInvoiceType] = useState(0);
 
     // 当前操作企业
     const [currentItem, setCurrentItem] = useState({});
@@ -156,12 +168,16 @@ export default function EnterprisePage() {
             });
 
             if (res?.code === 200) {
-                setList(res?.data?.records || []);
+                const records = res?.data?.records || [];
+                setList(records);
                 setTotal(res?.data?.total || 0);
+                return records;
             }
+            return [];
         } catch (error) {
             console.error("获取企业列表失败：", error);
             message.error("获取企业列表失败，请稍后重试！");
+            return [];
         } finally {
             setLoading(false);
         }
@@ -240,44 +256,68 @@ export default function EnterprisePage() {
         }
     };
 
-    const loadInvoiceRecords = async (enterpriseId) => {
-        if (!enterpriseId) return;
-        try {
-            setInvoiceListLoading(true);
-            const res = await enterpriseInvoiceRecords(enterpriseId);
-            if (res?.code === 200) {
-                setInvoiceList(res?.data || []);
-            } else {
-                message.error(res?.message || "获取开票记录失败");
-            }
-        } catch (error) {
-            console.error("获取开票记录失败：", error);
-            message.error("获取开票记录失败，请稍后重试！");
-        } finally {
-            setInvoiceListLoading(false);
-        }
-    };
-
     const handleOpenInvoice = (record) => {
         setCurrentItem(record);
-        setInvoiceList([]);
+        setInvoiceType(0);
         invoiceForm.resetFields();
+        invoiceForm.setFieldValue("invoiceType", 0);
         setInvoiceOpen(true);
-        loadInvoiceRecords(record.id);
     };
 
     const handleCloseInvoice = () => {
         if (invoiceLoading) return;
         setInvoiceOpen(false);
-        setInvoiceList([]);
+        setInvoiceType(0);
         invoiceForm.resetFields();
+    };
+
+    const handleInvoiceTabChange = (key) => {
+        const type = Number(key);
+        setInvoiceType(type);
+        invoiceForm.setFieldValue("invoiceType", type);
+        if (invoiceForm.getFieldValue("invoiceAmount") != null) {
+            invoiceForm.validateFields(["invoiceAmount"]).catch(() => {});
+        }
+    };
+
+    const handleInvoiceAll = () => {
+        const type = Number(
+            invoiceForm.getFieldValue("invoiceType") ?? invoiceType
+        );
+        const limit = Number(getInvoiceLimit(type, currentItem).toFixed(2));
+        if (limit <= 0) {
+            message.warning(
+                type === 1 ? "暂无提前开票金额" : "暂无可开票金额"
+            );
+            return;
+        }
+        const amountText = `￥${limit.toFixed(2)}`;
+        Modal.confirm({
+            title: "确认一次性开票全部",
+            content:
+                type === 1
+                    ? `确认按提前开票上限 ${amountText} 一次性开票？`
+                    : `确认按可开票金额 ${amountText} 一次性开票？`,
+            okText: "确认开票",
+            cancelText: "取消",
+            onOk: () =>
+                handleAddInvoice({
+                    invoiceAmount: limit,
+                    invoiceType: type,
+                }),
+        });
     };
 
     const handleAddInvoice = async (values) => {
         const invoiceAmount = Number(values.invoiceAmount);
-        const available = Number(currentItem?.availableInvoice || 0);
-        if (invoiceAmount > available) {
-            message.warning("开票金额不能超过可开票金额");
+        const type = Number(values.invoiceType ?? invoiceType);
+        const limit = getInvoiceLimit(type, currentItem);
+        if (invoiceAmount > limit) {
+            message.warning(
+                type === 1
+                    ? "开票金额不能超过提前开票上限"
+                    : "开票金额不能超过可开票金额"
+            );
             return;
         }
         try {
@@ -285,22 +325,32 @@ export default function EnterprisePage() {
             const res = await enterpriseInvoiceAdd({
                 enterpriseId: currentItem.id,
                 invoiceAmount,
+                invoiceType: type,
             });
             if (res?.code === 200) {
                 message.success(res?.message || "开票成功！");
                 invoiceForm.resetFields();
-                setCurrentItem((prev) => ({
-                    ...prev,
-                    availableInvoice: Math.max(
-                        0,
-                        Number(prev.availableInvoice || 0) - invoiceAmount
-                    ),
-                    invoicedAmount:
-                        Number(prev.invoicedAmount || 0) + invoiceAmount,
-                }));
-                await loadInvoiceRecords(currentItem.id);
+                invoiceForm.setFieldValue("invoiceType", type);
+                setCurrentItem((prev) => {
+                    const next = {
+                        ...prev,
+                        invoicedAmount:
+                            Number(prev.invoicedAmount || 0) + invoiceAmount,
+                    };
+                    if (type === 0) {
+                        next.availableInvoice = Math.max(
+                            0,
+                            Number(prev.availableInvoice || 0) - invoiceAmount
+                        );
+                    }
+                    return next;
+                });
                 setInvoiceRefreshKey((key) => key + 1);
-                await handleList();
+                const records = await handleList();
+                const latest = records?.find(
+                    (item) => item.id === currentItem.id
+                );
+                if (latest) setCurrentItem(latest);
             } else {
                 message.error(res?.message || "开票失败！");
             }
@@ -910,64 +960,118 @@ export default function EnterprisePage() {
                 destroyOnHidden
                 okText="确认开票"
                 cancelText="取消"
-                width={640}
+                width={420}
                 okButtonProps={{
                     loading: invoiceLoading,
                 }}
                 maskClosable={!invoiceLoading}
             >
-                <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
-                    <div className="text-xs text-gray-400">可开票金额</div>
-                    <Text strong className="text-[15px] text-red-700">
-                        ￥{Number(currentItem?.availableInvoice || 0).toFixed(2)}
-                    </Text>
-                </div>
+                <Tabs
+                    size="small"
+                    activeKey={String(invoiceType)}
+                    onChange={handleInvoiceTabChange}
+                    items={[
+                        {
+                            key: "0",
+                            label: "正常开票",
+                            children: (
+                                <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                                    <div className="text-xs text-gray-400">
+                                        可开票金额
+                                    </div>
+                                    <Text strong className="text-[15px] text-red-700">
+                                        ￥
+                                        {Number(
+                                            currentItem?.availableInvoice || 0
+                                        ).toFixed(2)}
+                                    </Text>
+                                </div>
+                            ),
+                        },
+                        {
+                            key: "1",
+                            label: "提前开票",
+                            children: (
+                                <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                                    <div className="text-xs text-gray-400">
+                                        提前开票上限
+                                    </div>
+                                    <Text strong className="text-[15px] text-red-700">
+                                        ￥
+                                        {getInvoiceLimit(1, currentItem).toFixed(2)}
+                                    </Text>
+                                </div>
+                            ),
+                        },
+                    ]}
+                />
                 <Form
                     form={invoiceForm}
                     layout="vertical"
+                    className="mt-3"
                     onFinish={handleAddInvoice}
+                    initialValues={{ invoiceType: 0 }}
                 >
-                    <Form.Item
-                        label="开票金额（元）"
-                        name="invoiceAmount"
-                        rules={[
-                            { required: true, message: "请输入开票金额" },
-                            {
-                                validator(_, value) {
-                                    if (value == null || Number(value) <= 0) {
-                                        return Promise.reject("金额必须大于 0");
-                                    }
-                                    const available = Number(
-                                        currentItem?.availableInvoice || 0
-                                    );
-                                    if (Number(value) > available) {
-                                        return Promise.reject(
-                                            "开票金额不能超过可开票金额"
-                                        );
-                                    }
-                                    return Promise.resolve();
-                                },
-                            },
-                        ]}
-                    >
-                        <InputNumber
-                            min={0.01}
-                            precision={2}
-                            step={0.01}
-                            style={{ width: "100%" }}
-                            placeholder="请输入开票金额"
-                        />
+                    <Form.Item name="invoiceType" hidden>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item label="开票金额（元）" required className="mb-0">
+                        <Space.Compact className="w-full">
+                            <Form.Item
+                                name="invoiceAmount"
+                                noStyle
+                                dependencies={["invoiceType"]}
+                                rules={[
+                                    { required: true, message: "请输入开票金额" },
+                                    {
+                                        validator(_, value) {
+                                            if (value == null || Number(value) <= 0) {
+                                                return Promise.reject(
+                                                    "金额必须大于 0"
+                                                );
+                                            }
+                                            const type = Number(
+                                                invoiceForm.getFieldValue(
+                                                    "invoiceType"
+                                                ) ?? invoiceType
+                                            );
+                                            const limit = getInvoiceLimit(
+                                                type,
+                                                currentItem
+                                            );
+                                            if (Number(value) > limit) {
+                                                return Promise.reject(
+                                                    type === 1
+                                                        ? "开票金额不能超过提前开票上限"
+                                                        : "开票金额不能超过可开票金额"
+                                                );
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    },
+                                ]}
+                            >
+                                <InputNumber
+                                    min={0.01}
+                                    precision={2}
+                                    step={0.01}
+                                    style={{ width: "100%" }}
+                                    placeholder="请输入开票金额"
+                                />
+                            </Form.Item>
+                            <Button
+                                disabled={
+                                    invoiceLoading ||
+                                    getInvoiceLimit(invoiceType, currentItem) <=
+                                        0
+                                }
+                                onClick={handleInvoiceAll}
+                            >
+                                开全部
+                            </Button>
+                        </Space.Compact>
                     </Form.Item>
                 </Form>
-                <div className="mb-2 text-sm font-medium">开票记录</div>
-                <Table
-                    size="small"
-                    rowKey="id"
-                    loading={invoiceListLoading}
-                    dataSource={invoiceList}
-                    pagination={false}
-                    columns={INVOICE_RECORD_COLUMNS}
-                />
             </Modal>
         </PageCard>
     );

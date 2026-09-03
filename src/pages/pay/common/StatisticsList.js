@@ -101,6 +101,10 @@ export default function StatisticsList({ title, props: apiKey }) {
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalOrderCount, setTotalOrderCount] = useState(0);
+  const [totalRefundCount, setTotalRefundCount] = useState(0);
+  const [totalRefundAmount, setTotalRefundAmount] = useState(0);
   const [pendingRefundAmount, setPendingRefundAmount] = useState(0);
   const [netIncome, setNetIncome] = useState(0);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -124,11 +128,19 @@ export default function StatisticsList({ title, props: apiKey }) {
           const {
             records = [],
             total: totalCount = 0,
+            totalAmount: amount = 0,
+            totalOrderCount: orderCount = 0,
+            totalRefundCount: refundCount = 0,
+            totalRefundAmount: refundAmount = 0,
             pendingRefundAmount: pending = 0,
             netIncome: income = 0,
           } = res.data || {};
           setList(records);
           setTotal(totalCount);
+          setTotalAmount(Number(amount) || 0);
+          setTotalOrderCount(Number(orderCount) || 0);
+          setTotalRefundCount(Number(refundCount) || 0);
+          setTotalRefundAmount(Number(refundAmount) || 0);
           setPendingRefundAmount(Number(pending) || 0);
           setNetIncome(Number(income) || 0);
           setStatTick((tick) => tick + 1);
@@ -193,14 +205,21 @@ export default function StatisticsList({ title, props: apiKey }) {
 
   const pageSummary = useMemo(() => {
     return {
-      totalAmount: list.reduce((acc, item) => acc + Number(item.amount || 0), 0),
-      totalOrderCount: list.reduce((acc, item) => acc + Number(item.orderCount || 0), 0),
-      totalRefundCount: list.reduce((acc, item) => acc + Number(item.refundCount || 0), 0),
-      totalRefundAmount: list.reduce((acc, item) => acc + Number(item.refundAmount || 0), 0),
+      totalAmount,
+      totalOrderCount,
+      totalRefundCount,
+      totalRefundAmount,
       pendingRefundAmount,
       netIncome,
     };
-  }, [list, pendingRefundAmount, netIncome]);
+  }, [
+    totalAmount,
+    totalOrderCount,
+    totalRefundCount,
+    totalRefundAmount,
+    pendingRefundAmount,
+    netIncome,
+  ]);
 
   const columns = [
     {

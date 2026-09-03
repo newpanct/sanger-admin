@@ -390,10 +390,10 @@ export default function PayPersonalAccountDetailPage() {
           title={
             <div>
               <div className="text-base text-slate-900">
-              个人账户明细查询
+              订单明细查询
               </div>
               <Text type="secondary" className="text-xs font-normal">
-                查询个人账户明细，查询后左侧展开查看发票订单
+                查询订单明细，查询后左侧展开查看发票订单
               </Text>
             </div>
           }
