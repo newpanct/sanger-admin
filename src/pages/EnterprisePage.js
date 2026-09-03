@@ -1,12 +1,13 @@
 import PageCard from "../components/PageCard";
 import CopyableEllipsisText from "../components/CopyableEllipsisText";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     Table,
     Tag,
     Typography,
     Form,
     Input,
+    InputNumber,
     Tooltip,
     Divider,
     Button,
@@ -20,6 +21,8 @@ import {
     enterprisePage,
     enterpriseDelete,
     enterpriseManualRecharge,
+    enterpriseInvoiceAdd,
+    enterpriseInvoiceRecords,
 } from "../server/api";
 import {
     PlusOutlined,
@@ -27,9 +30,76 @@ import {
     ExclamationCircleOutlined,
     ReloadOutlined,
     DeleteOutlined,
+    HistoryOutlined,
 } from "@ant-design/icons";
 
 const { Text, Paragraph } = Typography;
+
+const INVOICE_RECORD_COLUMNS = [
+    {
+        title: "开票金额",
+        dataIndex: "invoiceAmount",
+        align: "center",
+        render: (val) =>
+            val === null || val === undefined || val === "" ? (
+                "--"
+            ) : (
+                <Text strong className="text-red-700">
+                    ￥{Number(val || 0).toFixed(2)}
+                </Text>
+            ),
+    },
+    {
+        title: "操作人",
+        dataIndex: "operator",
+        align: "center",
+        render: (val) => val || "--",
+    },
+    {
+        title: "创建时间",
+        dataIndex: "createTime",
+        align: "center",
+        render: (val) => val || "--",
+    },
+];
+
+function InvoiceRecordPanel({ enterpriseId, refreshKey }) {
+    const [list, setList] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const loadList = useCallback(async () => {
+        if (!enterpriseId) return;
+        try {
+            setLoading(true);
+            const res = await enterpriseInvoiceRecords(enterpriseId);
+            if (res?.code === 200) {
+                setList(res?.data || []);
+            } else {
+                message.error(res?.message || "获取开票记录失败");
+            }
+        } catch (error) {
+            console.error("获取开票记录失败：", error);
+            message.error("获取开票记录失败，请稍后重试！");
+        } finally {
+            setLoading(false);
+        }
+    }, [enterpriseId]);
+
+    useEffect(() => {
+        loadList();
+    }, [loadList, refreshKey]);
+
+    return (
+        <Table
+            size="small"
+            rowKey="id"
+            loading={loading}
+            dataSource={list}
+            pagination={false}
+            columns={INVOICE_RECORD_COLUMNS}
+        />
+    );
+}
 
 export default function EnterprisePage() {
     const [list, setList] = useState([]);
@@ -44,6 +114,11 @@ export default function EnterprisePage() {
 
     // 企业充值
     const [addOpenRecharge, setAddOpenRecharge] = useState(false);
+
+    // 企业开票
+    const [invoiceOpen, setInvoiceOpen] = useState(false);
+    const [invoiceList, setInvoiceList] = useState([]);
+    const [invoiceListLoading, setInvoiceListLoading] = useState(false);
 
     // 当前操作企业
     const [currentItem, setCurrentItem] = useState({});
@@ -60,10 +135,13 @@ export default function EnterprisePage() {
     // 各操作独立 loading
     const [addLoading, setAddLoading] = useState(false);
     const [rechargeLoading, setRechargeLoading] = useState(false);
+    const [invoiceLoading, setInvoiceLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
     const [addForm] = Form.useForm();
     const [addRechargeForm] = Form.useForm();
+    const [invoiceForm] = Form.useForm();
+    const [invoiceRefreshKey, setInvoiceRefreshKey] = useState(0);
 
     /**
      * 获取企业列表
@@ -138,7 +216,7 @@ export default function EnterprisePage() {
                 enterpriseId: currentItem.id,
                 amount: amountFen,
                 remark: values.remark,
-                isInvoiced: values.isInvoiced,
+                // isInvoiced: values.isInvoiced,
             });
 
             if (res?.code === 200) {
@@ -159,6 +237,78 @@ export default function EnterprisePage() {
             message.error("充值失败，请稍后重试！");
         } finally {
             setRechargeLoading(false);
+        }
+    };
+
+    const loadInvoiceRecords = async (enterpriseId) => {
+        if (!enterpriseId) return;
+        try {
+            setInvoiceListLoading(true);
+            const res = await enterpriseInvoiceRecords(enterpriseId);
+            if (res?.code === 200) {
+                setInvoiceList(res?.data || []);
+            } else {
+                message.error(res?.message || "获取开票记录失败");
+            }
+        } catch (error) {
+            console.error("获取开票记录失败：", error);
+            message.error("获取开票记录失败，请稍后重试！");
+        } finally {
+            setInvoiceListLoading(false);
+        }
+    };
+
+    const handleOpenInvoice = (record) => {
+        setCurrentItem(record);
+        setInvoiceList([]);
+        invoiceForm.resetFields();
+        setInvoiceOpen(true);
+        loadInvoiceRecords(record.id);
+    };
+
+    const handleCloseInvoice = () => {
+        if (invoiceLoading) return;
+        setInvoiceOpen(false);
+        setInvoiceList([]);
+        invoiceForm.resetFields();
+    };
+
+    const handleAddInvoice = async (values) => {
+        const invoiceAmount = Number(values.invoiceAmount);
+        const available = Number(currentItem?.availableInvoice || 0);
+        if (invoiceAmount > available) {
+            message.warning("开票金额不能超过可开票金额");
+            return;
+        }
+        try {
+            setInvoiceLoading(true);
+            const res = await enterpriseInvoiceAdd({
+                enterpriseId: currentItem.id,
+                invoiceAmount,
+            });
+            if (res?.code === 200) {
+                message.success(res?.message || "开票成功！");
+                invoiceForm.resetFields();
+                setCurrentItem((prev) => ({
+                    ...prev,
+                    availableInvoice: Math.max(
+                        0,
+                        Number(prev.availableInvoice || 0) - invoiceAmount
+                    ),
+                    invoicedAmount:
+                        Number(prev.invoicedAmount || 0) + invoiceAmount,
+                }));
+                await loadInvoiceRecords(currentItem.id);
+                setInvoiceRefreshKey((key) => key + 1);
+                await handleList();
+            } else {
+                message.error(res?.message || "开票失败！");
+            }
+        } catch (error) {
+            console.error("新增开票记录失败：", error);
+            message.error("开票失败，请稍后重试！");
+        } finally {
+            setInvoiceLoading(false);
         }
     };
 
@@ -326,8 +476,21 @@ export default function EnterprisePage() {
                 ),
         },
         {
-            title: "未开票金额",
-            dataIndex: "uninvoicedAmount",
+            title: "可开票金额",
+            dataIndex: "availableInvoice",
+            align: "center",
+            render: (val) =>
+                val === null || val === undefined || val === "" ? (
+                    "--"
+                ) : (
+                    <Text strong className="text-[15px] text-red-700">
+                        ￥{(Number(val || 0)).toFixed(2)}
+                    </Text>
+                ),
+        },
+        {
+            title: "已消费金额",
+            dataIndex: "totalSpent",
             align: "center",
             render: (val) =>
                 val === null || val === undefined || val === "" ? (
@@ -352,6 +515,16 @@ export default function EnterprisePage() {
                             }}
                         >
                             余额充值
+                        </Button>
+                    </Tooltip>
+
+                    
+                    <Tooltip title="开发票">
+                        <Button
+                            icon={<HistoryOutlined />}
+                            onClick={() => handleOpenInvoice(record)}
+                        >
+                            开发票
                         </Button>
                     </Tooltip>
 
@@ -410,6 +583,14 @@ export default function EnterprisePage() {
                 loading={loading}
                 dataSource={list}
                 columns={columns}
+                expandable={{
+                    expandedRowRender: (record) => (
+                        <InvoiceRecordPanel
+                            enterpriseId={record.id}
+                            refreshKey={invoiceRefreshKey}
+                        />
+                    ),
+                }}
                 pagination={{
                     current: pageNum,
                     pageSize,
@@ -678,7 +859,7 @@ export default function EnterprisePage() {
                         </Space.Compact>
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         label="是否已开发票"
                         name="isInvoiced"
                         initialValue={true}
@@ -693,7 +874,7 @@ export default function EnterprisePage() {
                             <Radio value={true}>已开票</Radio>
                             <Radio value={false}>未开票</Radio>
                         </Radio.Group>
-                    </Form.Item>
+                    </Form.Item> */}
 
                     <Form.Item
                         label="备注"
@@ -709,6 +890,75 @@ export default function EnterprisePage() {
                         <Input placeholder="请输入备注" />
                     </Form.Item>
                 </Form>
+            </Modal>
+
+            {/* ==================== 企业开票 ==================== */}
+            <Modal
+                title={`${currentItem?.enterpriseName || ""} -- 开发票`}
+                open={invoiceOpen}
+                onCancel={handleCloseInvoice}
+                onOk={() => invoiceForm.submit()}
+                destroyOnHidden
+                okText="确认开票"
+                cancelText="取消"
+                width={640}
+                okButtonProps={{
+                    loading: invoiceLoading,
+                }}
+                maskClosable={!invoiceLoading}
+            >
+                <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div className="text-xs text-gray-400">可开票金额</div>
+                    <Text strong className="text-[15px] text-red-700">
+                        ￥{Number(currentItem?.availableInvoice || 0).toFixed(2)}
+                    </Text>
+                </div>
+                <Form
+                    form={invoiceForm}
+                    layout="vertical"
+                    onFinish={handleAddInvoice}
+                >
+                    <Form.Item
+                        label="开票金额（元）"
+                        name="invoiceAmount"
+                        rules={[
+                            { required: true, message: "请输入开票金额" },
+                            {
+                                validator(_, value) {
+                                    if (value == null || Number(value) <= 0) {
+                                        return Promise.reject("金额必须大于 0");
+                                    }
+                                    const available = Number(
+                                        currentItem?.availableInvoice || 0
+                                    );
+                                    if (Number(value) > available) {
+                                        return Promise.reject(
+                                            "开票金额不能超过可开票金额"
+                                        );
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                    >
+                        <InputNumber
+                            min={0.01}
+                            precision={2}
+                            step={0.01}
+                            style={{ width: "100%" }}
+                            placeholder="请输入开票金额"
+                        />
+                    </Form.Item>
+                </Form>
+                <div className="mb-2 text-sm font-medium">开票记录</div>
+                <Table
+                    size="small"
+                    rowKey="id"
+                    loading={invoiceListLoading}
+                    dataSource={invoiceList}
+                    pagination={false}
+                    columns={INVOICE_RECORD_COLUMNS}
+                />
             </Modal>
         </PageCard>
     );

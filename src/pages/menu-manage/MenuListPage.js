@@ -20,6 +20,7 @@ import {
     InputNumber,
     Row,
     Radio,
+    Typography,
 } from "antd";
 import * as AntdIcons from "@ant-design/icons";
 import {
@@ -40,6 +41,7 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+const { Text } = Typography;
 import {
     menuPage,
     menuAdd,
@@ -615,7 +617,16 @@ export default function MenuListPage() {
 
     return (
         <PageCard
-            title="菜单列表"
+          title={
+            <div>
+              <div className="text-base font-semibold text-slate-900">
+                菜单列表
+              </div>
+              <Text type="secondary" className="text-xs font-normal">
+                管理系统菜单列表，左侧可拖拽排序展开子菜单
+              </Text>
+            </div>
+          }
             rightActions={
                 <>
                     <Tooltip title="新增菜单">

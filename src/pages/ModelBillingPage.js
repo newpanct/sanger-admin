@@ -291,7 +291,7 @@ export default function ModelBillingPage() {
               </Text>
             </div>
           }
-          styles={{ body: { padding: "12px 20px 20px" } }}
+          styles={{ body: { padding: "0px" } }}
         >
           <Table
             size="middle"

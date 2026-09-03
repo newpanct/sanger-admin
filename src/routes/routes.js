@@ -93,7 +93,7 @@ const componentMap = {
   MemberPage:lazy(()=>import("../pages/user/MemberPage")),
   UserListPage:lazy(()=>import("../pages/user/UserListPage")),
   // 链接管理
-  LinkPage:lazy(()=>import("../pages/LinkPage")),
+  LinkPage:lazy(()=>import("../pages/web/LinkPage")),
   // 企业
   EnterprisePage:lazy(()=>import("../pages/EnterprisePage")),
 

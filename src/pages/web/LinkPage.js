@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import PageCard from "../components/PageCard";
-import CopyableEllipsisText from "../components/CopyableEllipsisText";
+import PageCard from "../../components/PageCard";
+import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import {
     Button,
     Divider,
@@ -27,7 +27,7 @@ import {
     serviceUrlUpdate,
     serviceUrlDelete,
     serviceUrlToggleStatus,
-} from "../server/api";
+} from "../../server/api";
 
 const { Text } = Typography;
 

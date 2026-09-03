@@ -15,7 +15,7 @@ import {
     Typography,
     message,
 } from "antd";
-import { PlusOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { PlusOutlined, ReloadOutlined, SearchOutlined, FileSearchOutlined, PictureOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import {
     invoiceAdd,
     invoiceMark,
@@ -27,9 +27,21 @@ import dayjs from "dayjs";
 const { Text } = Typography;
 
 const SERVICE_TYPE_MAP = {
-    imagetwin: { label: "Imagetwin", color: "purple" },
-    ithenticate: { label: "CrossCheck", color: "blue" },
-    sangerboxscope: { label: "SangerboxScope", color: "cyan" },
+    imagetwin: {
+        label: "Imagetwin",
+        color: "purple",
+        icon: <PictureOutlined />,
+    },
+    ithenticate: {
+        label: "CrossCheck",
+        color: "blue",
+        icon: <FileSearchOutlined />,
+    },
+    sangerboxscope: {
+        label: "SangerboxScope",
+        color: "cyan",
+        icon: <ThunderboltOutlined />,
+    },
 };
 
 const formatYuan = (val) =>
@@ -59,7 +71,15 @@ function InvoiceOrderPanel({ email, type, refreshKey, onParentRefresh }) {
     const [addOpen, setAddOpen] = useState(false);
     const [addLoading, setAddLoading] = useState(false);
     const [form] = Form.useForm();
-    const typeLabel = SERVICE_TYPE_MAP[type]?.label || type || "--";
+    const typeMeta = SERVICE_TYPE_MAP[type];
+    const typeLabel = typeMeta?.label || type || "--";
+    const typeTag = typeMeta ? (
+        <Tag color={typeMeta.color} icon={typeMeta.icon}>
+            {typeMeta.label}
+        </Tag>
+    ) : (
+        typeLabel
+    );
 
     const loadList = useCallback(
         async (page = pageNum, size = pageSize, monthVal = month) => {
@@ -217,7 +237,7 @@ function InvoiceOrderPanel({ email, type, refreshKey, onParentRefresh }) {
     return (
         <div className="py-2">
             <Space className="mb-3" wrap>
-                <Text type="secondary">{typeLabel} 发票订单</Text>
+                <Text type="secondary">{typeTag} 发票订单</Text>
                 <DatePicker
                     picker="month"
                     allowClear
@@ -345,7 +365,11 @@ export default function PayPersonalAccountDetailPage() {
             render: (type) => {
                 const meta = SERVICE_TYPE_MAP[type];
                 if (!meta) return "--";
-                return <Tag color={meta.color}>{meta.label}</Tag>;
+                return (
+                    <Tag color={meta.color} icon={meta.icon}>
+                        {meta.label}
+                    </Tag>
+                );
             },
         },
         {
@@ -421,7 +445,16 @@ export default function PayPersonalAccountDetailPage() {
 
     return (
         <PageCard
-            title="个人账户明细查询"
+          title={
+            <div>
+              <div className="text-base font-semibold text-slate-900">
+              个人账户明细查询
+              </div>
+              <Text type="secondary" className="text-xs font-normal">
+                查询个人账户明细，查询后左侧展开查看发票订单
+              </Text>
+            </div>
+          }
             extraActions={
                 <Space>
                     <Text type="secondary">邮箱</Text>

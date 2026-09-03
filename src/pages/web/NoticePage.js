@@ -416,7 +416,7 @@ export default function NoticePage() {
       <Alert
         type="info"
         showIcon
-        style={{ marginBottom: 16 }}
+        style={{ marginBottom: 12, marginTop: 12 }}
         message="服务名称说明"
         description={
           <ul style={{ margin: 0, paddingLeft: 20 }}>
@@ -436,7 +436,7 @@ export default function NoticePage() {
       />
 
       {/* 当前最新激活横幅预览 */}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 12 }}>
         <Text type="secondary" style={{ display: "block", marginBottom: 8 }}>
           当前线上最新横幅（{PREVIEW_SERVICE_NAME} → scholar.sangerbox.com）：
         </Text>

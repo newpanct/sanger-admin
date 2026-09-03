@@ -9,6 +9,7 @@ import {
   Typography,
   message,
   Alert,
+  Card,
 } from "antd";
 import {
   ReloadOutlined,
@@ -38,7 +39,7 @@ const SERVICE_LIST = [
     toggleKey: "imagetwin",
     name: "Imagetwin",
     icon: <PictureOutlined />,
-    color: "#52c41a",
+    color: "#722ed1",
     description:
       "图像查重 AI 工具，检测科研论文图片的重复使用、篡改、抄袭及 AI 生成内容。",
   },
@@ -47,7 +48,7 @@ const SERVICE_LIST = [
     toggleKey: "sangerboxScope",
     name: "SangerboxScope",
     icon: <ThunderboltOutlined />,
-    color: "#722ed1",
+    color: "#13c2c2",
     description: "SangerboxScope 查重服务，提供专业的查重检测能力。",
   },
 ];
@@ -130,15 +131,18 @@ export default function ServerPage() {
         description="服务状态的开启或关闭会直接影响线上产品的使用，请谨慎操作。"
       />
       <Spin spinning={loading}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
           {SERVICE_LIST.map((service) => {
             const enabled = status[service.key];
             const toggling = togglingKey === service.toggleKey;
             return (
-              <div
+              <Card
                 key={service.key}
-                className="bg-white rounded-lg border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow"
+                hoverable
+                className="rounded-lg"
+                styles={{ body: { padding: 12 } }}
               >
+                <div className="flex flex-col gap-3">
                 {/* 头部：图标 + 名称 + 状态标签 */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -183,7 +187,8 @@ export default function ServerPage() {
                     onChange={() => handleToggle(service)}
                   />
                 </div>
-              </div>
+                </div>
+              </Card>
             );
           })}
         </div>

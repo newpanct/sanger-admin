@@ -1,6 +1,37 @@
 import React from "react";
-import { Card, Divider, Flex } from "antd";
-const PageCard = ({ title, extraActions, rightActions, children }) => {
+import { Card, Divider, Flex, Modal, Table } from "antd";
+
+const getTypeName = (type) => {
+  if (typeof type === "string") return type;
+  return type?.displayName || type?.name || "";
+};
+
+const isAntdTable = (child) =>
+  React.isValidElement(child) &&
+  (child.type === Table || getTypeName(child.type) === "Table");
+
+const isAntdModal = (child) =>
+  React.isValidElement(child) &&
+  (child.type === Modal || getTypeName(child.type) === "Modal");
+
+const PageCard = ({
+  title,
+  extraActions,
+  rightActions,
+  bodyPadding,
+  children,
+}) => {
+  const contentChildren = React.Children.toArray(children).filter(
+    (child) => React.isValidElement(child) && !isAntdModal(child)
+  );
+  const onlyTable =
+    contentChildren.length > 0 && contentChildren.every(isAntdTable);
+  const padding = bodyPadding ?? (onlyTable ? 0 : undefined);
+  const bodyStyle =
+    padding !== undefined
+      ? { padding }
+      : { padding: "10px", paddingTop: "0px" };
+
   return (
     <Card
       title={
@@ -29,7 +60,7 @@ const PageCard = ({ title, extraActions, rightActions, children }) => {
         </div>
       }
       styles={{
-        body: { padding: "10px", paddingTop: "1px" },
+        body: bodyStyle,
       }}
     >
       {children}

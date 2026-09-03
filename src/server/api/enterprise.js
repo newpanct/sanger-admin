@@ -16,3 +16,8 @@ export const enterpriseManualRecharge = (obj) => postJson("/user/enterprise/manu
 
 export const enterpriseStatistics = () =>
   getBase("/user/b2b/recharge/statistics");
+
+export const enterpriseInvoiceAdd = (obj) =>
+  postJson("/admin/b2b/invoice/add", obj);
+export const enterpriseInvoiceRecords = (enterpriseId) =>
+  getBase("/admin/b2b/invoice/records", { enterpriseId });
