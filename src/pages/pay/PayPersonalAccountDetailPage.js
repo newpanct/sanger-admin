@@ -125,7 +125,7 @@ function InvoiceOrderPanel({ email, type, refreshKey, onParentRefresh }) {
             okText: "确认标记",
             cancelText: "取消",
             onOk: async () => {
-                const res = await invoiceMark(payload);
+                const res = await invoiceMark({ ...payload, email });
                 if (res?.code === 200) {
                     message.success("已标记开发票");
                     await loadList();
