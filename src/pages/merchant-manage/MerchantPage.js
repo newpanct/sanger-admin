@@ -71,23 +71,6 @@ const MerchantPage = () => {
       ),
     },
     { title: "商户身份", dataIndex: "role", ellipsis: true, align: "center" },
-    // {
-    //   title: "权限类别",
-    //   dataIndex: "serviceGroups",
-    //   ellipsis: true,
-    //   align: "center",
-    //   render: (serviceGroups) => {
-    //     return (
-    //       <Space wrap>
-    //         {serviceGroups.map((key) => (
-    //           <span key={key}>
-    //             {key.serviceGroup}
-    //           </span>
-    //         ))}
-    //       </Space>
-    //     );
-    //   },
-    // },
 
     {
       title: "邮箱",
@@ -165,9 +148,6 @@ const MerchantPage = () => {
 
   const handleCreateBtn = async () => {
     setIsCreateModalOpen(true);
-    // createForm.setFieldsValue({
-    //   serviceGroup: ["dedup"], // 默认勾选
-    // });
   };
 
   // 创建商户

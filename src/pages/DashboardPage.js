@@ -180,6 +180,7 @@ const DashboardPage = () => {
       title: "今日营收",
       value: statistics.todayMoney ?? 0,
       suffix: "元",
+      decimals: 2,
       icon: <PayCircleOutlined />,
       ribbonText: "今日",
       ...cardAccent(1),
@@ -198,6 +199,7 @@ const DashboardPage = () => {
       title: "本月营收",
       value: statistics.monthMoney ?? 0,
       suffix: "元",
+      decimals: 2,
       icon: <PayCircleOutlined />,
       ribbonText: "本月",
       growth: monthMoneyGrowth,
@@ -295,14 +297,22 @@ const DashboardPage = () => {
         {
           channel: "y",
           name: "营收",
-          valueFormatter: (value) => `￥${Number(value ?? 0).toLocaleString()}`,
+          valueFormatter: (value) =>
+            `￥${Number(value ?? 0).toLocaleString("zh-CN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}`,
         },
       ],
     },
     label: {
       position: "top",
       offset: 8,
-      formatter: (v) => `￥${v}`,
+      formatter: (v) =>
+        `￥${Number(v ?? 0).toLocaleString("zh-CN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`,
       style: labelStyle,
     },
     xAxis: {
@@ -310,7 +320,7 @@ const DashboardPage = () => {
       line: { style: { stroke: "#E2E8F0" } },
     },
     yAxis: {
-      title: { text: "营收（元）", style: { fill: "#64748B" } },
+      title: { text: "营收", style: { fill: "#64748B" } },
       grid: {
         line: { style: { stroke: "#F1F5F9", lineDash: [4, 4] } },
       },

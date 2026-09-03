@@ -92,8 +92,8 @@
       "inheritPreProcessors": {},
       "items": [
         {
-          "name": "订单管理",
-          "id": 93923361,
+          "name": "发票管理",
+          "id": 94846030,
           "auth": {},
           "securityScheme": {},
           "parentId": 0,
@@ -127,11 +127,11 @@
           "inheritPreProcessors": {},
           "items": [
             {
-              "name": "用户个人账户明细查询",
+              "name": "新增已开票金额",
               "api": {
-                "id": "504461240",
+                "id": "509693567",
                 "method": "post",
-                "path": "/admin/order/account",
+                "path": "/admin/invoice/add",
                 "parameters": {
                   "path": [],
                   "query": [],
@@ -143,10 +143,10 @@
                 "commonParameters": {},
                 "responses": [
                   {
-                    "id": "150063620",
+                    "id": "111338449",
                     "code": 200,
                     "jsonSchema": {
-                      "$ref": "#/definitions/306459440"
+                      "$ref": "#/definitions/227581040"
                     },
                     "itemSchema": {},
                     "contentType": "json"
@@ -157,18 +157,144 @@
                   "type": "application/json",
                   "parameters": [],
                   "jsonSchema": {
-                    "$ref": "#/definitions/306470070",
+                    "$ref": "#/definitions/310164119",
                     "description": ""
                   },
                   "oasExtensions": ""
                 },
-                "description": "用户个人账户明细查询",
+                "description": "新增已开票金额",
                 "tags": [],
                 "status": "released",
                 "serverId": "",
                 "operationId": "",
                 "sourceUrl": "",
                 "ordering": 6,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "标记订单已开发票",
+              "api": {
+                "id": "509693568",
+                "method": "post",
+                "path": "/admin/invoice/mark",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "183631767",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/227581040"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/310164120",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "标记订单已开发票",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 12,
+                "cases": [],
+                "mocks": [],
+                "customApiFields": "{}",
+                "advancedSettings": {
+                  "disabledSystemHeaders": {}
+                },
+                "mockScript": {},
+                "codeSamples": [],
+                "commonResponseStatus": {},
+                "responseChildren": [],
+                "visibility": "INHERITED",
+                "moduleId": 6728897,
+                "oasExtensions": "",
+                "type": "http",
+                "preProcessors": [],
+                "postProcessors": [],
+                "inheritPostProcessors": {},
+                "inheritPreProcessors": {}
+              }
+            },
+            {
+              "name": "分页查询发票订单列表",
+              "api": {
+                "id": "509693569",
+                "method": "post",
+                "path": "/admin/invoice/page",
+                "parameters": {
+                  "path": [],
+                  "query": [],
+                  "cookie": [],
+                  "header": []
+                },
+                "auth": {},
+                "securityScheme": {},
+                "commonParameters": {},
+                "responses": [
+                  {
+                    "id": "108628652",
+                    "code": 200,
+                    "jsonSchema": {
+                      "$ref": "#/definitions/310164123"
+                    },
+                    "itemSchema": {},
+                    "contentType": "json"
+                  }
+                ],
+                "responseExamples": [],
+                "requestBody": {
+                  "type": "application/json",
+                  "parameters": [],
+                  "jsonSchema": {
+                    "$ref": "#/definitions/310164124",
+                    "description": ""
+                  },
+                  "oasExtensions": ""
+                },
+                "description": "分页查询发票订单列表",
+                "tags": [],
+                "status": "released",
+                "serverId": "",
+                "operationId": "",
+                "sourceUrl": "",
+                "ordering": 18,
                 "cases": [],
                 "mocks": [],
                 "customApiFields": "{}",
@@ -208,9 +334,9 @@
       "moduleId": 6728897,
       "items": [
         {
-          "name": "RListDedupOrderAccountVo",
+          "name": "RVoid",
           "displayName": "",
-          "id": "#/definitions/306459440",
+          "id": "#/definitions/227581040",
           "description": "",
           "schema": {
             "jsonSchema": {
@@ -225,11 +351,114 @@
                   "description": "响应消息"
                 },
                 "data": {
+                  "description": "响应数据",
+                  "type": "null"
+                }
+              },
+              "x-apifox-orders": [
+                "code",
+                "message",
+                "data"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "InvoiceAddDto",
+          "displayName": "",
+          "id": "#/definitions/310164119",
+          "description": "发票新增 DTO",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "账号邮箱"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "商品类型"
+                },
+                "amount": {
+                  "type": "integer",
+                  "description": "开票金额（单位：分）",
+                  "minimum": 1,
+                  "format": "int64",
+                  "x-apifox-mock": "@integer(1)"
+                }
+              },
+              "x-apifox-orders": [
+                "email",
+                "type",
+                "amount"
+              ],
+              "required": [
+                "email",
+                "type",
+                "amount"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "MarkInvoiceDto",
+          "displayName": "",
+          "id": "#/definitions/310164120",
+          "description": "标记订单已开发票 DTO",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "商品类型"
+                },
+                "month": {
+                  "type": "string",
+                  "description": "月份，格式：yyyy-MM"
+                },
+                "orderIds": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/306459439",
-                    "description": "查重订单服务类型汇总 VO（admin端 Feign 反序列化用）"
+                    "type": "integer"
                   },
+                  "description": "订单ID列表，为空表示按类型/月份批量处理"
+                }
+              },
+              "x-apifox-orders": [
+                "type",
+                "month",
+                "orderIds"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "RPageResultInvoiceOrderVo",
+          "displayName": "",
+          "id": "#/definitions/310164123",
+          "description": "",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "响应状态码"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "响应消息"
+                },
+                "data": {
+                  "$ref": "#/definitions/310164122",
                   "description": "响应数据"
                 }
               },
@@ -244,21 +473,43 @@
           "moduleId": 6728897
         },
         {
-          "name": "DedupOrderAccountQuery",
+          "name": "InvoiceOrderPageDto",
           "displayName": "",
-          "id": "#/definitions/306470070",
-          "description": "用户个人账户明细查询参数",
+          "id": "#/definitions/310164124",
+          "description": "发票订单分页查询 DTO",
           "schema": {
             "jsonSchema": {
               "type": "object",
               "properties": {
+                "pageNum": {
+                  "type": "integer",
+                  "description": "当前页码，从 1 开始",
+                  "default": 1
+                },
+                "pageSize": {
+                  "type": "integer",
+                  "description": "每页条数，默认 10",
+                  "default": 10
+                },
+                "type": {
+                  "type": "string",
+                  "description": "商品类型"
+                },
                 "email": {
                   "type": "string",
-                  "description": "用户邮箱"
+                  "description": "邮箱"
+                },
+                "month": {
+                  "type": "string",
+                  "description": "月份，格式：yyyy-MM"
                 }
               },
               "x-apifox-orders": [
-                "email"
+                "pageNum",
+                "pageSize",
+                "type",
+                "email",
+                "month"
               ]
             }
           },
@@ -266,56 +517,97 @@
           "moduleId": 6728897
         },
         {
-          "name": "DedupOrderAccountVo",
+          "name": "PageResultInvoiceOrderVo",
           "displayName": "",
-          "id": "#/definitions/306459439",
-          "description": "查重订单服务类型汇总 VO（admin端 Feign 反序列化用）",
+          "id": "#/definitions/310164122",
+          "description": "响应数据",
           "schema": {
             "jsonSchema": {
               "type": "object",
               "properties": {
-                "serviceType": {
-                  "type": "string",
-                  "description": "服务类型（imagetwin/ithenticate/sangerboxscope）"
+                "records": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/310164121",
+                    "description": "发票订单分页查询 VO"
+                  },
+                  "description": "当前页的数据记录列表\n数据 列表"
                 },
-                "totalOrderCount": {
+                "total": {
                   "type": "integer",
-                  "description": "订单数",
+                  "description": "总记录数",
                   "format": "int64"
                 },
-                "totalAmount": {
-                  "type": "number",
-                  "description": "总金额"
-                },
-                "successCount": {
+                "size": {
                   "type": "integer",
-                  "description": "成功数",
+                  "description": "每页显示记录数",
                   "format": "int64"
                 },
-                "failedCount": {
+                "current": {
                   "type": "integer",
-                  "description": "失败数",
+                  "description": "当前页码",
                   "format": "int64"
                 },
-                "failedRefundedCount": {
+                "pages": {
                   "type": "integer",
-                  "description": "失败已退款数",
-                  "format": "int64"
-                },
-                "failedUnrefundedCount": {
-                  "type": "integer",
-                  "description": "失败未退款数",
+                  "description": "总页数",
                   "format": "int64"
                 }
               },
               "x-apifox-orders": [
-                "serviceType",
-                "totalOrderCount",
-                "totalAmount",
-                "successCount",
-                "failedCount",
-                "failedRefundedCount",
-                "failedUnrefundedCount"
+                "records",
+                "total",
+                "size",
+                "current",
+                "pages"
+              ]
+            }
+          },
+          "visibility": "INHERITED",
+          "moduleId": 6728897
+        },
+        {
+          "name": "InvoiceOrderVo",
+          "displayName": "",
+          "id": "#/definitions/310164121",
+          "description": "发票订单分页查询 VO",
+          "schema": {
+            "jsonSchema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "订单ID",
+                  "format": "int64"
+                },
+                "orderNo": {
+                  "type": "string",
+                  "description": "订单号"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "邮箱"
+                },
+                "amount": {
+                  "type": "number",
+                  "description": "金额（元）"
+                },
+                "isInvoiced": {
+                  "type": "integer",
+                  "description": "是否已开发票 0=未开发票, 1=已开发票"
+                },
+                "createTime": {
+                  "type": "string",
+                  "description": "创建时间"
+                }
+              },
+              "x-apifox-orders": [
+                "id",
+                "orderNo",
+                "email",
+                "amount",
+                "isInvoiced",
+                "createTime"
               ]
             }
           },
@@ -343,7 +635,7 @@
   "commonParameters": {
     "id": 1032731,
     "createdAt": "2026-08-17T06:30:54.000Z",
-    "updatedAt": "2026-08-17T06:30:54.000Z",
+    "updatedAt": "2026-08-25T05:27:49.000Z",
     "deletedAt": null,
     "parameters": {
       "header": [
@@ -352,7 +644,7 @@
           "defaultEnable": true,
           "type": "string",
           "id": "lzF9OLcuzI",
-          "defaultValue": "Bearer 03d461651c5e43588cc3d9f9bca0601a"
+          "defaultValue": "Bearer d1fa3b96124348c88a469092249e0011"
         }
       ]
     },

@@ -11,6 +11,7 @@ import {
     Divider,
     Button,
     Modal,
+    Radio,
     Space,
     message,
 } from "antd";
@@ -137,6 +138,7 @@ export default function EnterprisePage() {
                 enterpriseId: currentItem.id,
                 amount: amountFen,
                 remark: values.remark,
+                isInvoiced: values.isInvoiced,
             });
 
             if (res?.code === 200) {
@@ -306,9 +308,35 @@ export default function EnterprisePage() {
             align: "center",
             render: (value) => (
                 <Text strong className="text-[15px] text-red-700">
-                    ￥{(Number(value || 0) / 100).toFixed(2)}
+                    ￥{(Number(value || 0)).toFixed(2)}
                 </Text>
             ),
+        },
+        {
+            title: "已开票金额",
+            dataIndex: "invoicedAmount",
+            align: "center",
+            render: (val) =>
+                val === null || val === undefined || val === "" ? (
+                    "--"
+                ) : (
+                    <Text strong className="text-[15px] text-red-700">
+                        ￥{(Number(val || 0)).toFixed(2)}
+                    </Text>
+                ),
+        },
+        {
+            title: "未开票金额",
+            dataIndex: "uninvoicedAmount",
+            align: "center",
+            render: (val) =>
+                val === null || val === undefined || val === "" ? (
+                    "--"
+                ) : (
+                    <Text strong className="text-[15px] text-red-700">
+                        ￥{(Number(val || 0)).toFixed(2)}
+                    </Text>
+                ),
         },
         {
             title: "操作",
@@ -648,6 +676,23 @@ export default function EnterprisePage() {
                                 placeholder="请输入金额"
                                 addonAfter="元" />
                         </Space.Compact>
+                    </Form.Item>
+
+                    <Form.Item
+                        label="是否已开发票"
+                        name="isInvoiced"
+                        initialValue={true}
+                        rules={[
+                            {
+                                required: true,
+                                message: "请选择是否已开发票",
+                            },
+                        ]}
+                    >
+                        <Radio.Group>
+                            <Radio value={true}>已开票</Radio>
+                            <Radio value={false}>未开票</Radio>
+                        </Radio.Group>
                     </Form.Item>
 
                     <Form.Item

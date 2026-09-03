@@ -25,6 +25,7 @@ import {
   merchantAccountAdd,
   merchantAccountDeduct,
 } from "../../server/api";
+const { Text } = Typography;
 export default function MerchantBalancePage() {
   const [total, setTotal] = useState(0);
   const [pageNum, setPageNum] = useState(1);
@@ -70,10 +71,15 @@ export default function MerchantBalancePage() {
       render: (v) => <CopyableEllipsisText text={v} />,
     },
     {
-      title: "余额（元）",
+      title: "余额",
       dataIndex: "balance",
       ellipsis: true,
       align: "center",
+      render: (value) => (
+        <Text strong className="text-[15px] text-red-700">
+          ￥{(Number(value || 0) / 100).toFixed(2)}
+        </Text>
+      ),
     },
     {
       title: "创建时间",
@@ -149,8 +155,6 @@ export default function MerchantBalancePage() {
     try {
       setConfirmLoading(true);
 
-      const amount = form.getFieldValue("amount");
-
       const obj = {
         merchantId: currentMerchant.merchantId,
         amount,
@@ -166,6 +170,7 @@ export default function MerchantBalancePage() {
         message.success(actionType === "add" ? "余额增加成功" : "余额扣减成功");
         setConfirmOpen(false);
         setOpen(false);
+        setAmount("");
         form.resetFields();
         handleList(pageNum, pageSize);
       } else {
@@ -212,8 +217,8 @@ export default function MerchantBalancePage() {
         </div>
       ) : (
         <Table
-        size="middle"
-        rowKey="id"
+          size="middle"
+          rowKey="id"
           loading={loading}
           dataSource={list}
           columns={columns}
@@ -244,12 +249,14 @@ export default function MerchantBalancePage() {
         open={open}
         onCancel={() => {
           setOpen(false);
+          setAmount("");
           form.resetFields();
         }}
         onOk={async () => {
           try {
-            await form.validateFields();
-            setConfirmOpen(true); // 打开二次确认
+            const values = await form.validateFields();
+            setAmount(values.amount);
+            setConfirmOpen(true);
           } catch (err) {
             // 校验失败不做任何事
           }
@@ -270,7 +277,7 @@ export default function MerchantBalancePage() {
           </Typography.Paragraph>
 
           <Form.Item
-            label="金额（元）"
+            label="金额"
             name="amount"
             rules={[
               { required: true, message: "请输入金额" },
@@ -294,9 +301,8 @@ export default function MerchantBalancePage() {
               min={0}
               precision={2}
               style={{ width: "100%" }}
-              placeholder={`请输入${
-                actionType === "add" ? "增加" : "扣减"
-              }金额`}
+              placeholder={`请输入${actionType === "add" ? "增加" : "扣减"
+                }金额`}
             />
           </Form.Item>
         </Form>
@@ -329,7 +335,7 @@ export default function MerchantBalancePage() {
         <Typography.Paragraph>
           变动金额：
           <Typography.Text strong type="danger">
-            ￥{form.getFieldValue("amount")}
+            ￥{Number(amount || 0).toFixed(2)}
           </Typography.Text>
         </Typography.Paragraph>
       </Modal>

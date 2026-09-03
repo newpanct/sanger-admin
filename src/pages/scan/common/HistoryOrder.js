@@ -30,6 +30,8 @@ import { useDispatch } from "react-redux";
 import Highlighter from "react-highlight-words";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { createStyles } from "antd-style";
+const { Text } = Typography;
+
 const useStyle = createStyles(({ css, token }) => {
   const { antCls } = token;
   return {
@@ -239,6 +241,14 @@ export default function HistoryOrder({ props, title }) {
       dataIndex: "payMoney",
       ellipsis: true,
       align: "center",
+      render: (val) =>
+          val === null || val === undefined || val === "" ? (
+              "--"
+          ) : (
+              <Text strong className="text-[15px] text-red-700">
+                  ￥{(Number(val || 0)).toFixed(2)}
+              </Text>
+          ),
     },
     // { title: "类型标识", dataIndex: "type", ellipsis: true, align: "center" },
     {
