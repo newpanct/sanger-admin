@@ -490,6 +490,11 @@ export default function MenuListPage() {
             },
         },
         {
+            title: "id",
+            dataIndex: "id",
+            align: "center",
+        },
+        {
             title: "路径",
             dataIndex: "path",
             align: "center",

@@ -18,6 +18,7 @@ import {
   refundReasonListAll,
   ignoreTask,
 } from "../../../server/api";
+import useDedupTaskStatus from "../../../hooks/useDedupTaskStatus";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ const findMenuPath = (menus = [], component, parentPath = "") => {
 export default function FailedOrderList({ title, props }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const statusMap = useDedupTaskStatus();
   const { token } = theme.useToken();
   const authMenus = useSelector((state) => state.auth.menus);
   const refundReasonPath = findMenuPath(authMenus, "RefundReasonPage");
@@ -80,19 +82,14 @@ export default function FailedOrderList({ title, props }) {
       render: (orderNo) => <CopyableEllipsisText text={orderNo} />,
     },
     {
-      title: "支付状态",
-      dataIndex: "payStatus",
+      title: "任务状态",
       width: 100,
+      dataIndex: "status",
       align: "center",
       render: (status) => {
-        const statusMap = {
-          1: { text: "成功", color: "success" },
-          0: { text: "失败", color: "error" },
-        };
-        const { text, color } = statusMap[status] || {
-          text: status,
-          color: "default",
-        };
+        const meta = statusMap[status];
+        const text = meta?.text ?? status;
+        const color = meta?.color ?? "default";
         return <Tag color={color}>{text}</Tag>;
       },
     },

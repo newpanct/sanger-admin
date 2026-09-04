@@ -513,32 +513,6 @@ export default function EnterprisePage() {
             ),
         },
         {
-            title: "已开票金额",
-            dataIndex: "invoicedAmount",
-            align: "center",
-            render: (val) =>
-                val === null || val === undefined || val === "" ? (
-                    "--"
-                ) : (
-                    <Text strong className="text-[15px] text-red-700">
-                        ￥{(Number(val || 0)).toFixed(2)}
-                    </Text>
-                ),
-        },
-        {
-            title: "可开票金额",
-            dataIndex: "availableInvoice",
-            align: "center",
-            render: (val) =>
-                val === null || val === undefined || val === "" ? (
-                    "--"
-                ) : (
-                    <Text strong className="text-[15px] text-red-700">
-                        ￥{(Number(val || 0)).toFixed(2)}
-                    </Text>
-                ),
-        },
-        {
             title: "已消费金额",
             dataIndex: "totalSpent",
             align: "center",
@@ -957,6 +931,22 @@ export default function EnterprisePage() {
                 }}
                 maskClosable={!invoiceLoading}
             >
+                <div className="mb-3 grid grid-cols-2 gap-2">
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <div className="text-xs text-gray-400">已开票金额</div>
+                        <Text strong className="text-[15px] text-red-700">
+                            ￥
+                            {Number(currentItem?.invoicedAmount || 0).toFixed(2)}
+                        </Text>
+                    </div>
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <div className="text-xs text-gray-400">可开票金额</div>
+                        <Text strong className="text-[15px] text-red-700">
+                            ￥
+                            {Number(currentItem?.availableInvoice || 0).toFixed(2)}
+                        </Text>
+                    </div>
+                </div>
                 <Tabs
                     size="small"
                     activeKey={String(invoiceType)}
@@ -965,19 +955,6 @@ export default function EnterprisePage() {
                         {
                             key: "0",
                             label: "正常开票",
-                            children: (
-                                <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-                                    <div className="text-xs text-gray-400">
-                                        可开票金额
-                                    </div>
-                                    <Text strong className="text-[15px] text-red-700">
-                                        ￥
-                                        {Number(
-                                            currentItem?.availableInvoice || 0
-                                        ).toFixed(2)}
-                                    </Text>
-                                </div>
-                            ),
                         },
                         {
                             key: "1",

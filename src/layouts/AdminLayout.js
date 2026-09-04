@@ -74,13 +74,14 @@ import {
   CloudServerOutlined ,
   DesktopOutlined ,
 } from "@ant-design/icons";
-import { adminLogout, getFailed } from "../server/api";
+import { adminLogout } from "../server/api";
 import adminMenu from "../data/menu.json";
 import { useDispatch, useSelector } from "react-redux";
 import { setThemeToken } from "../store/themeSlice";
 import { useIdleLogout } from "../hooks/useIdleLogout";
 import { clearAuth, persistor } from "../store";
-import { setMenuBadges, clearAllMenuBadge } from "../store/menuBadgeSlice";
+import { clearAllMenuBadge } from "../store/menuBadgeSlice";
+import { refreshFailedBadges } from "../store/refreshFailedBadges";
 import { getMenuBreadcrumb } from "../utils/menu";
 import config from "../config";
 const { Header, Sider, Content } = Layout;
@@ -218,33 +219,6 @@ const AdminLayout = () => {
   const manageTitle = "桑格管理";
   // 侧边栏
   const menuItems = generateMenuItems(menuSource, badgeMap);
-  // 刷新数据
-  const refreshDate = async () => {
-    const res = await getFailed();
-    if (res?.code === 200) {
-      const data = res?.data || {};
-      dispatch(
-        setMenuBadges([
-          {
-            path: "/scan/crosscheck/abnormal-orders",
-            value: data?.paperCount,
-          },
-          {
-            path: "/scan/imagetwin/abnormal-orders",
-            value: data?.imageCount,
-          },
-          {
-            path: "/scan/history/abnormal-orders",
-            value: data?.turnitinCount,
-          },
-          {
-            path: "/scan/duplisee/abnormal-orders",
-            value: data?.dupliseeCount,
-          },
-        ])
-      );
-    }
-  };
   // 面包屑
   const breadcrumbItems = [
     { key: "home", title: manageTitle },
@@ -322,7 +296,7 @@ const AdminLayout = () => {
   useIdleLogout();
   // 仅在路由变化时刷新异常订单角标，避免 render 期副作用
   useEffect(() => {
-    refreshDate();
+    dispatch(refreshFailedBadges());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 

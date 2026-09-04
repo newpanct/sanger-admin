@@ -36,6 +36,8 @@ import {
   dupliSeeDeleteById,
   markAbnormalOrder,
 } from "../../../server/api";
+import { useDispatch } from "react-redux";
+import { refreshFailedBadges } from "../../../store/refreshFailedBadges";
 
 const SNAPSHOT_VIEW_BASE = "https://local.sangerbox.com/ith/snapshot_view/";
 
@@ -133,6 +135,7 @@ const longTooltipProps = {
   },
 };
 export default function OrderList({ title, props }) {
+  const dispatch = useDispatch();
   const statusMap = useDedupTaskStatus();
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -431,6 +434,7 @@ export default function OrderList({ title, props }) {
         setCurrentRecord(null);
         markForm.resetFields();
         handleOrderList(pageNum, pageSize);
+        dispatch(refreshFailedBadges());
       } else {
         message.error(res?.message || "请联系管理员！");
       }
