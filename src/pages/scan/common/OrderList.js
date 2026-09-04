@@ -5,7 +5,6 @@ import {
   Tag,
   Space,
   Tooltip,
-  Input,
   Flex,
   Modal,
   message,
@@ -14,15 +13,15 @@ import {
   ReloadOutlined,
   LinkOutlined,
   DeleteOutlined,
-  SearchOutlined,
   DownloadOutlined,
   VerticalAlignBottomOutlined,
   QuestionCircleOutlined,
   WarningOutlined
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import PageCard from "../../../components/PageCard";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
+import SearchInput from "../../../components/SearchInput";
+import HighlightText from "../../../components/HighlightText";
 import {
   imagetwinPageList,
   ithenticatePageList,
@@ -200,18 +199,9 @@ export default function OrderList({ title, props }) {
     }
   };
 
-  const renderHighlight = (text) => {
-    if (!debouncedKeyword) return text;
-
-    return (
-      <Highlighter
-        highlightStyle={{ backgroundColor: "var(--app-highlight)", padding: 0 }}
-        searchWords={[debouncedKeyword]}
-        autoEscape
-        textToHighlight={text ? text.toString() : ""}
-      />
-    );
-  };
+  const renderHighlight = (text) => (
+    <HighlightText text={text} keyword={debouncedKeyword} />
+  );
 
   /** 表格列 */
   const columns = [
@@ -488,14 +478,12 @@ export default function OrderList({ title, props }) {
     <PageCard
       title={title}
       extraActions={
-        <Input
-          allowClear
-          prefix={<SearchOutlined />}
+        <SearchInput
           placeholder="请输入订单号或邮箱"
           value={searchKeyword}
           onChange={(e) => {
             const value = e.target.value;
-            setPageNum(1); // 重置到第一页
+            setPageNum(1);
             setSearchKeyword(value);
           }}
           onPressEnter={() => {

@@ -1,16 +1,12 @@
 import React from "react";
-import { Divider, Button, Input, Space } from "antd";
+import { Divider, Button, Space } from "antd";
 import {
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
-import {
-  setMenuBadges,
-  clearMenuBadge,
-  decreaseMenuBadge,
-} from "../../store/menuBadgeSlice";
+import SearchInput from "../../components/SearchInput";
+import { decreaseMenuBadge } from "../../store/menuBadgeSlice";
 import { useDispatch } from "react-redux";
 const RecommendPage = () => {
   const dispatch = useDispatch();
@@ -26,12 +22,7 @@ const RecommendPage = () => {
       }
       rightActions={
         <Space>
-          <Input
-            placeholder="请搜索内容"
-            prefix={<SearchOutlined />}
-            allowClear
-            style={{ width: 220 }}
-          />
+          <SearchInput placeholder="请搜索内容" />
           <Divider type="vertical" />
           <Button type="primary" icon={<PlusOutlined />}>
             新增

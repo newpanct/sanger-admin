@@ -14,7 +14,6 @@ import {
 } from "antd";
 import {
   ReloadOutlined,
-  SearchOutlined,
   UserAddOutlined,
   MailOutlined,
   UserOutlined,
@@ -22,8 +21,9 @@ import {
   SettingOutlined,
   KeyOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import PageCard from "../../components/PageCard";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import { merchantPageList, merchantRegister } from "../../server/api";
 import UpdatePwd from "./components/UpdatePwd";
@@ -62,12 +62,7 @@ const MerchantPage = () => {
       ellipsis: true,
       align: "center",
       render: (text) => (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[merchantName]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
+        <HighlightText text={text} keyword={debouncedMerchantName} />
       ),
     },
     { title: "商户身份", dataIndex: "role", ellipsis: true, align: "center" },
@@ -194,10 +189,8 @@ const MerchantPage = () => {
     <PageCard
       title="商户管理"
       extraActions={
-        <Input
-          allowClear
+        <SearchInput
           placeholder="请搜索商户名称"
-          prefix={<SearchOutlined />}
           value={merchantName}
           onChange={(e) => setMerchantName(e.target.value)}
         />

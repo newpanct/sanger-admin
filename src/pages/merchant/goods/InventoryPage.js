@@ -21,7 +21,7 @@ import {
   ShoppingCartOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
-import Highlighter from "react-highlight-words";
+import HighlightText from "../../../components/HighlightText";
 import { useSelector } from "react-redux";
 import {
   cardkeyExtract,
@@ -120,12 +120,7 @@ export default function InventoryPage() {
       align: "center",
       render: (text) => (
         <Text copyable={{ text }}>
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[cardKey]}
-            autoEscape
-            textToHighlight={text ? text.toString() : ""}
-          />
+          <HighlightText text={text} keyword={cardKey} />
         </Text>
       ),
     },

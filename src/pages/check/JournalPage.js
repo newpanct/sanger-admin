@@ -7,7 +7,6 @@ import {
   Modal,
   Image,
   Descriptions,
-  Input,
   Divider,
   Popover,
   Popconfirm,
@@ -23,12 +22,12 @@ import {
   ArrowUpOutlined,
   ArrowDownOutlined,
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
   ProfileOutlined,
 } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
 import PageCard from "../../components/PageCard";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import baseURL from "../../server/Network";
 
 const JournalPage = () => {
@@ -256,11 +255,8 @@ const JournalPage = () => {
       }
       rightActions={
         <Space>
-          <Input
+          <SearchInput
             placeholder="请搜索标题..."
-            prefix={<SearchOutlined />}
-            allowClear
-            style={{ width: 220 }}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             onPressEnter={handleSearch}
@@ -308,21 +304,9 @@ const JournalPage = () => {
               const processedText = formatEmptyData(text);
               if (processedText === "not data") return processedText;
               // 搜索高亮逻辑
-              if (searchText.trim()) {
-                return (
-                  <Highlighter
-                    highlightStyle={{
-                      backgroundColor: "#ffc069",
-                      padding: 2,
-                      borderRadius: 2,
-                    }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={processedText.toString()}
-                  />
-                );
-              }
-              return processedText;
+              return (
+                <HighlightText text={processedText} keyword={searchText} />
+              );
             }}
           />
 

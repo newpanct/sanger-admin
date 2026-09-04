@@ -4,7 +4,6 @@ import {
   Button,
   Space,
   Skeleton,
-  Input,
   message,
 } from "antd";
 import {
@@ -15,14 +14,13 @@ import {
 import { DownloadOutlined, ReloadOutlined } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
 import CopyableEllipsisText from "../../components/CopyableEllipsisText";
-import Highlighter from "react-highlight-words";
-const { Search } = Input;
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 const CertificationPage = () => {
   const [spinning, setSpinning] = useState(false);
   const [certificationArr, setCertificationArr] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [searchText, setSearchText] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [total, setTotal] = useState(0);
   const [title, setTitle] = useState("");
@@ -55,21 +53,7 @@ const CertificationPage = () => {
       render: (text) => {
         const processedText = formatEmptyData(text);
         if (processedText === "not data") return processedText;
-        if (searchText.trim()) {
-          return (
-            <Highlighter
-              highlightStyle={{
-                backgroundColor: "#ffc069",
-                padding: 2,
-                borderRadius: 2,
-              }}
-              searchWords={[searchText.trim()]}
-              autoEscape
-              textToHighlight={processedText.toString()}
-            />
-          );
-        }
-        return processedText;
+        return <HighlightText text={processedText} keyword={title} />;
       },
     },
     {
@@ -195,10 +179,9 @@ const CertificationPage = () => {
       }
       rightActions={
         <Space>
-          <Search
+          <SearchInput
             placeholder="请输入证书标题"
-            onSearch={onSearch}
-            style={{ width: 220 }}
+            onPressEnter={(e) => onSearch(e.target.value)}
           />
         </Space>
       }

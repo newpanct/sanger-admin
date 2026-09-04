@@ -24,6 +24,8 @@ import {
     ReloadOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import {
     roleAdd,
     roleDelete,
@@ -155,7 +157,9 @@ export default function RoleListPage() {
             title: "角色名称",
             dataIndex: "roleName",
             align: "center",
-            render: displayValue,
+            render: (name) => (
+                <HighlightText text={displayValue(name)} keyword={searchName} />
+            ),
         },
         {
             title: "描述",
@@ -245,9 +249,7 @@ export default function RoleListPage() {
             extraActions={
                 <Space>
                     <Text type="secondary">名称</Text>
-                    <Input
-                        allowClear
-                        style={{ width: 220 }}
+                    <SearchInput
                         placeholder="请输入角色名称"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}

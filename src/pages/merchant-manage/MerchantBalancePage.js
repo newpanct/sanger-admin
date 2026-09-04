@@ -11,12 +11,12 @@ import {
   Form,
   Modal,
 } from "antd";
-import Highlighter from "react-highlight-words";
 import PageCard from "../../components/PageCard";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import CopyableEllipsisText from "../../components/CopyableEllipsisText";
 import {
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
   MinusOutlined,
 } from "@ant-design/icons";
@@ -54,12 +54,7 @@ export default function MerchantBalancePage() {
       ellipsis: true,
       align: "center",
       render: (text) => (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[merchantName]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
+        <HighlightText text={text} keyword={merchantName} />
       ),
     },
 
@@ -190,10 +185,8 @@ export default function MerchantBalancePage() {
     <PageCard
       title={"余额管理"}
       extraActions={
-        <Input
-          allowClear
+        <SearchInput
           placeholder="请搜索商户名称"
-          prefix={<SearchOutlined />}
           value={merchantName}
           onChange={(e) => setMerchantName(e.target.value)}
         />

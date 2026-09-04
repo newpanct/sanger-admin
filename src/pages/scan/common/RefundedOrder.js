@@ -4,10 +4,11 @@ import {
   ReloadOutlined, UploadOutlined,
   RollbackOutlined,
   EyeInvisibleOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
+import SearchInput from "../../../components/SearchInput";
+import HighlightText from "../../../components/HighlightText";
 import {
   commitImagetwin,
   commitIthenticate,
@@ -125,7 +126,11 @@ export default function RefundedOrder({ title, props }) {
       dataIndex: "email",
       width: 220,
       align: "center",
-      render: (email) => <CopyableEllipsisText text={email} />,
+      render: (value) => (
+        <CopyableEllipsisText text={value}>
+          <HighlightText text={value} keyword={debouncedEmail} />
+        </CopyableEllipsisText>
+      ),
     },
     {
       title: "更新时间",
@@ -339,9 +344,7 @@ export default function RefundedOrder({ title, props }) {
     <PageCard
       title={title}
       extraActions={
-        <Input
-          allowClear
-          prefix={<SearchOutlined />}
+        <SearchInput
           placeholder="请输入邮箱"
           value={email}
           onChange={(e) => {

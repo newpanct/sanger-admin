@@ -11,3 +11,9 @@
   --app-bg-layout: #f5f7fa;
   --app-amount: #cf1322;
 }
+
+.app-search-highlight {
+  background-color: var(--app-highlight);
+  padding: 0 4px;
+  border-radius: 2px;
+}

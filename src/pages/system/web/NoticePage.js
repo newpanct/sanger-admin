@@ -29,6 +29,8 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
+import SearchInput from "../../../components/SearchInput";
+import HighlightText from "../../../components/HighlightText";
 import NoticeBannerPreview, {
   TYPE_STYLE_MAP,
   PREVIEW_SERVICE_NAME,
@@ -137,7 +139,9 @@ export default function NoticePage() {
       align: "center",
       render: (name) => (
         <Space direction="vertical" size={0}>
-          <span>{name}</span>
+          <span>
+            <HighlightText text={name} keyword={searchServiceName} />
+          </span>
           {SERVICE_SITE_MAP[name] && (
             <Text type="secondary" style={{ fontSize: 12 }}>
               → {SERVICE_SITE_MAP[name]}
@@ -146,7 +150,12 @@ export default function NoticePage() {
         </Space>
       ),
     },
-    { title: "公告标题", dataIndex: "title", align: "center" },
+    {
+      title: "公告标题",
+      dataIndex: "title",
+      align: "center",
+      render: (title) => <HighlightText text={title} keyword={searchTitle} />,
+    },
     {
       title: "公告内容",
       dataIndex: "content",
@@ -355,18 +364,16 @@ export default function NoticePage() {
       title={"公告管理"}
       extraActions={
         <Space>
-          <Input
+          <SearchInput
             placeholder="服务名称"
             value={searchServiceName}
             onChange={(e) => setSearchServiceName(e.target.value)}
-            style={{ width: 150 }}
             onPressEnter={handleSearch}
           />
-          <Input
+          <SearchInput
             placeholder="公告标题"
             value={searchTitle}
             onChange={(e) => setSearchTitle(e.target.value)}
-            style={{ width: 150 }}
             onPressEnter={handleSearch}
           />
           <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>

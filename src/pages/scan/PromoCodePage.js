@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import PageCard from "../../components/PageCard";
 import CopyableEllipsisText from "../../components/CopyableEllipsisText";
-import { Table, Select, Input, message, Tag, Space, Button } from "antd";
-import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { Table, Select, message, Tag, Space, Button } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 import { couponPageList } from "../../server/api";
-import Highlighter from "react-highlight-words";
-import { debounce } from "lodash"; // 建议安装 lodash: npm install lodash
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
+import { debounce } from "lodash";
 
 export default function PromoCodePage() {
     const [loading, setLoading] = useState(false);
@@ -64,12 +65,7 @@ export default function PromoCodePage() {
             align: "center",
             fixed: "left",
             render: (text) => (
-            <Highlighter
-                highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                searchWords={[searchValue]} 
-                autoEscape
-                textToHighlight={text ? text.toString() : ""}
-            />
+            <HighlightText text={text} keyword={searchValue} />
         ),
         },
         {
@@ -178,10 +174,7 @@ export default function PromoCodePage() {
             title="优惠码管理"
             extraActions={
                 <Space wrap>
-                    <Input
-                        allowClear
-                        style={{ width: 200 }}
-                        prefix={<SearchOutlined />}
+                    <SearchInput
                         placeholder="输入优惠码自动搜索"
                         value={inputValue}
                         onChange={handleInputChange}

@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import PageCard from "../../../../components/PageCard";
-import { Table, Typography, Tag, message, Input, Button, Select } from "antd";
-import Highlighter from "react-highlight-words";
+import { Table, Typography, Tag, message, Button, Select } from "antd";
 import { cardkeyPageList, soldPageList } from "../../../../server/api";
 import { useSelector } from "react-redux";
-import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
+import SearchInput from "../../../../components/SearchInput";
+import HighlightText from "../../../../components/HighlightText";
 import { debounce } from "lodash";
 
 const { Text } = Typography;
@@ -38,12 +39,7 @@ export default function ListTable({title,props,status}) {
       align: "center",
       render: (text) => (
         <Text copyable={{ text }}>
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[debouncedCardKey]}
-            autoEscape
-            textToHighlight={text ? text.toString() : ""}
-          />
+          <HighlightText text={text} keyword={debouncedCardKey} />
         </Text>
       ),
     },
@@ -139,13 +135,10 @@ export default function ListTable({title,props,status}) {
             onChange={handleTypeChange}
             options={TypeOptions}
           />
-          <Input
+          <SearchInput
             placeholder="搜索卡密"
-            prefix={<SearchOutlined />}
-            allowClear
             value={cardKey}
             onChange={handleSearchChange}
-            style={{ width: 200 }}
           />
         </>
       }

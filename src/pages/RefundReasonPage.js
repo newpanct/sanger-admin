@@ -20,6 +20,8 @@ import {
     ReloadOutlined,
     SearchOutlined,
 } from "@ant-design/icons";
+import SearchInput from "../components/SearchInput";
+import HighlightText from "../components/HighlightText";
 import {
     refundReasonDelete,
     refundReasonPageList,
@@ -118,7 +120,9 @@ export default function RefundReasonPage() {
             title: "退款原因",
             dataIndex: "reason",
             align: "center",
-            render: displayValue,
+            render: (reason) => (
+                <HighlightText text={displayValue(reason)} keyword={searchReason} />
+            ),
         },
         {
             title: "操作人",
@@ -179,9 +183,7 @@ export default function RefundReasonPage() {
             extraActions={
                 <Space>
                     <Text type="secondary">理由</Text>
-                    <Input
-                        allowClear
-                        style={{ width: 280 }}
+                    <SearchInput
                         placeholder="请输入退款理由"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}

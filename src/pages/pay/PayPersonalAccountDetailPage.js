@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PageCard from "../../components/PageCard";
+import SearchInput from "../../components/SearchInput";
 import {
     Button,
     DatePicker,
     Empty,
-    Input,
     Modal,
     Space,
     Table,
@@ -452,9 +452,7 @@ export default function PayPersonalAccountDetailPage() {
             extraActions={
                 <Space>
                     <Text type="secondary">邮箱</Text>
-                    <Input
-                        allowClear
-                        style={{ width: 280 }}
+                    <SearchInput
                         placeholder="请输入用户邮箱"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}

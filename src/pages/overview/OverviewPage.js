@@ -1,11 +1,11 @@
 import React from "react";
-import { Divider, Button, Input, Space } from "antd";
+import { Divider, Button, Space } from "antd";
 import {
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
+import SearchInput from "../../components/SearchInput";
 const OverviewPage = () => {
   return (
     <PageCard
@@ -19,12 +19,7 @@ const OverviewPage = () => {
       }
       rightActions={
         <Space>
-          <Input
-            placeholder="请搜索内容"
-            prefix={<SearchOutlined />}
-            allowClear
-            style={{ width: 220 }}
-          />
+          <SearchInput placeholder="请搜索内容" />
           <Divider type="vertical" />
           <Button type="primary" icon={<PlusOutlined />}>
             新增

@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import {
   Button,
   Space,
-  Input,
   Table,
   Tag,
   Typography,
@@ -27,7 +26,8 @@ import {
   turnicheckPageList,
 } from "../../../server/api";
 import { useDispatch } from "react-redux";
-import Highlighter from "react-highlight-words";
+import SearchInput from "../../../components/SearchInput";
+import HighlightText from "../../../components/HighlightText";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { createStyles } from "antd-style";
 const { Text } = Typography;
@@ -107,7 +107,7 @@ export default function HistoryOrder({ props, title }) {
       close,
     }) => (
       <div style={{ padding: 8, width: 260 }}>
-        <Input
+        <SearchInput
           ref={searchInput}
           placeholder={`搜索${label}`}
           value={selectedKeys[0]}
@@ -118,7 +118,7 @@ export default function HistoryOrder({ props, title }) {
             confirm();
             handleColumnSearch(dataIndex, selectedKeys[0]);
           }}
-          style={{ marginBottom: 8 }}
+          style={{ width: "100%", marginBottom: 8 }}
         />
         <Space>
           <Button
@@ -170,20 +170,9 @@ export default function HistoryOrder({ props, title }) {
           : null
         : null,
 
-    render: (text) => {
-      const highlightText = searchTexts[dataIndex];
-
-      return highlightText ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[highlightText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      );
-    },
+    render: (text) => (
+      <HighlightText text={text} keyword={searchTexts[dataIndex]} />
+    ),
   });
 
   const columns = [
@@ -202,22 +191,11 @@ export default function HistoryOrder({ props, title }) {
       width: 240,
       align: "center",
       ...getColumnSearchProps("orderNo", "订单号"),
-      render: (text) => {
-        const highlightText = searchTexts.orderNo;
-        const content = highlightText ? (
-          <Highlighter
-            highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-            searchWords={[highlightText]}
-            autoEscape
-            textToHighlight={text ? text.toString() : ""}
-          />
-        ) : (
-          text
-        );
-        return (
-          <CopyableEllipsisText text={text}>{content}</CopyableEllipsisText>
-        );
-      },
+      render: (text) => (
+        <CopyableEllipsisText text={text}>
+          <HighlightText text={text} keyword={searchTexts.orderNo} />
+        </CopyableEllipsisText>
+      ),
     },
     // { title: "代理订单ID", dataIndex: "agentOrderId", ellipsis: true, align: "center" },
     // { title: "支付订单编号", dataIndex: "orderNo", ellipsis: true, align: "center", },
@@ -430,20 +408,13 @@ export default function HistoryOrder({ props, title }) {
       extraActions={
         <Space>
           {/* 手机号搜索 */}
-          <Input
-            allowClear
-            prefix={<SearchOutlined />}
-            style={{ width: 200 }}
+          <SearchInput
             placeholder="搜索手机号"
             value={inputMobile}
             onChange={(e) => setInputMobile(e.target.value)}
           />
           <Divider type="vertical" />
-          {/* 订单号搜索 */}
-          <Input
-            allowClear
-            prefix={<SearchOutlined />}
-            style={{ width: 200 }}
+          <SearchInput
             placeholder="搜索订单号"
             value={inputOrderNo}
             onChange={(e) => setInputOrderNo(e.target.value)}

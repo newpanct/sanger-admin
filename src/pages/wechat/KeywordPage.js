@@ -15,14 +15,14 @@ import {
 } from "antd";
 import {
   ReloadOutlined,
-  SearchOutlined,
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
-import Highlighter from "react-highlight-words";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import { debounce } from "lodash";
 import {
   replyPageList,
@@ -51,12 +51,7 @@ export default function KeywordPage() {
       dataIndex: "keyword",
       align: "center",
       render: (text) => (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[debouncedCardKey]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
+        <HighlightText text={text} keyword={debouncedCardKey} />
       ),
     },
     { title: "消息类型", dataIndex: "msgType", align: "center" },
@@ -220,10 +215,8 @@ export default function KeywordPage() {
     <PageCard
       title="关键词回复"
       extraActions={
-        <Input
+        <SearchInput
           placeholder="请搜索关键词..."
-          prefix={<SearchOutlined />}
-          allowClear
           value={keyword}
           onChange={handleSearchChange}
         />

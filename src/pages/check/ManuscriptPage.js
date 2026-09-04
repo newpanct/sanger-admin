@@ -10,7 +10,6 @@ import {
   Modal,
   Steps,
   Image,
-  Input,
   Select,
   Skeleton,
   message,
@@ -32,12 +31,13 @@ import {
 } from "@ant-design/icons";
 import PageCard from "../../components/PageCard";
 import CopyableEllipsisText from "../../components/CopyableEllipsisText";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import steps from "../../data/step.json";
 import baseURL from "../../server/Network";
 const { Text } = Typography;
 const { Step } = Steps;
 const { Option } = Select;
-const { Search } = Input;
 const ManuscriptPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [spinning, setSpinning] = useState(false);
@@ -99,7 +99,7 @@ const ManuscriptPage = () => {
             whiteSpace: "nowrap",
           }}
         >
-          {text}
+          <HighlightText text={text} keyword={title} />
         </span>
       ),
     },
@@ -324,10 +324,9 @@ const ManuscriptPage = () => {
       }
       rightActions={
         <Space>
-          <Search
+          <SearchInput
             placeholder="请输入稿件标题"
-            onSearch={onSearch}
-            style={{ width: 220 }}
+            onPressEnter={(e) => onSearch(e.target.value)}
           />
         </Space>
       }

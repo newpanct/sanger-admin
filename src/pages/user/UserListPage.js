@@ -16,6 +16,8 @@ import {
     message,
 } from "antd";
 import { ReloadOutlined, SearchOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import SearchInput from "../../components/SearchInput";
+import HighlightText from "../../components/HighlightText";
 import {
     adminUserPageList,
     assignUserRole,
@@ -180,13 +182,27 @@ export default function UserListPage() {
             title: "手机号",
             dataIndex: "phone",
             align: "center",
-            render: (phone) => (phone ? <CopyableEllipsisText text={phone} /> : "--"),
+            render: (phone) =>
+                phone ? (
+                    <CopyableEllipsisText text={phone}>
+                        <HighlightText text={phone} keyword={searchParams.keyword} />
+                    </CopyableEllipsisText>
+                ) : (
+                    "--"
+                ),
         },
         {
             title: "邮箱",
             dataIndex: "email",
             align: "center",
-            render: (email) => (email ? <CopyableEllipsisText text={email} /> : "--"),
+            render: (email) =>
+                email ? (
+                    <CopyableEllipsisText text={email}>
+                        <HighlightText text={email} keyword={searchParams.keyword} />
+                    </CopyableEllipsisText>
+                ) : (
+                    "--"
+                ),
         },
         {
             title: "角色",
@@ -262,9 +278,7 @@ export default function UserListPage() {
             extraActions={
                 <Space wrap>
                     <Text type="secondary">关键词</Text>
-                    <Input
-                        allowClear
-                        style={{ width: 200 }}
+                    <SearchInput
                         placeholder="手机号 / 邮箱"
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
