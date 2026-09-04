@@ -54,6 +54,8 @@ export const getResLink = (id) => getBase("/dedup/task/getNewUrl", { id });
 
 export const ignoreTask = (obj) => postJson("/dedup/admin/task/ignore", obj);
 
+export const getDedupTaskStatusList = () => getBase("/dedup/task/statusList");
+
 /* ---------------- 订单统计 ---------------- */
 export const statisticsImagetwin = (obj) =>
   postJson("/dedup/statistics/imagetwin", obj);
@@ -76,3 +78,8 @@ export const crosscheckAbnormalOrderList = (obj) =>
 
 export const dupliSeeAbnormalOrderList = (obj) =>
   postJson("/dedup/admin/order/refund/duplisee/pageList", obj);
+
+
+// 标记异常订单
+export const markAbnormalOrder = (obj) =>
+  postJson("/dedup/admin/task/markAbnormal", obj);

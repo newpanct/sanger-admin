@@ -38,15 +38,21 @@ export default function StatRibbonCard({
   cardStyle,
   extra,
   hoverable = true,
+  onClick,
 }) {
+  const clickable = typeof onClick === "function";
   return (
-    <div className="block h-full w-full">
+    <div
+      className="block h-full w-full [&>.ant-ribbon-wrapper]:block [&>.ant-ribbon-wrapper]:h-full [&>.ant-ribbon-wrapper]:w-full"
+      onClick={clickable ? onClick : undefined}
+      style={clickable ? { cursor: "pointer" } : undefined}
+    >
       <Badge.Ribbon text={item.ribbonText} color={item.ribbonColor}>
         <Card
           hoverable={hoverable}
           className="h-full w-full rounded-xl"
           style={cardStyle}
-          styles={{ body: { padding: 20 } }}
+          styles={{ body: { padding: 20, height: "100%" } }}
         >
           <Skeleton
             loading={loading}

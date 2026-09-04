@@ -409,9 +409,11 @@ export default function PayPersonalAccountDetailPage() {
         },
         {
             title: "退款订单数",
-            dataIndex: "refundedCount",
             align: "center",
-            render: (count, record) => {
+            render: (_, record) => {
+                const count =
+                    Number(record.failedRefundedCount || 0) +
+                    Number(record.failedUnrefundedCount || 0);
                 const display = displayValue(count);
                 const component = REFUND_PAGE_MAP[record.serviceType];
                 const path = component ? findMenuPath(authMenus, component) : null;
@@ -439,16 +441,7 @@ export default function PayPersonalAccountDetailPage() {
 
     return (
         <PageCard
-          title={
-            <div>
-              <div className="text-base text-slate-900">
-              个人账户明细查询
-              </div>
-              <Text type="secondary" className="text-xs font-normal">
-                查询个人账户明细，查询后左侧展开查看发票订单
-              </Text>
-            </div>
-          }
+            description="查询个人账户明细，查询后左侧展开查看发票订单"
             extraActions={
                 <Space>
                     <Text type="secondary">邮箱</Text>

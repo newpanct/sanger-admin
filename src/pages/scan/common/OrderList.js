@@ -8,6 +8,9 @@ import {
   Flex,
   Modal,
   message,
+  Form,
+  Input,
+  Typography,
 } from "antd";
 import {
   ReloadOutlined,
@@ -22,6 +25,7 @@ import PageCard from "../../../components/PageCard";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import SearchInput from "../../../components/SearchInput";
 import HighlightText from "../../../components/HighlightText";
+import useDedupTaskStatus from "../../../hooks/useDedupTaskStatus";
 import {
   imagetwinPageList,
   ithenticatePageList,
@@ -30,6 +34,7 @@ import {
   deleteIthenticateById,
   dupliseePageList,
   dupliSeeDeleteById,
+  markAbnormalOrder,
 } from "../../../server/api";
 
 const SNAPSHOT_VIEW_BASE = "https://local.sangerbox.com/ith/snapshot_view/";
@@ -128,6 +133,7 @@ const longTooltipProps = {
   },
 };
 export default function OrderList({ title, props }) {
+  const statusMap = useDedupTaskStatus();
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
   const [orderList, setOrderList] = useState([]);
@@ -135,6 +141,10 @@ export default function OrderList({ title, props }) {
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [deletingId, setDeletingId] = useState(null);
+  const [markOpen, setMarkOpen] = useState(false);
+  const [markLoading, setMarkLoading] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState(null);
+  const [markForm] = Form.useForm();
 
   // 搜索条件
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -166,6 +176,12 @@ export default function OrderList({ title, props }) {
     imagetwin: deleteImagetwinById,
     ithenticate: deleteIthenticateById,
     dupliSee: dupliSeeDeleteById,
+  };
+
+  const taskTypeMap = {
+    imagetwin: "imagetwin",
+    ithenticate: "ithenticate",
+    dupliSee: "duplisee",
   };
 
   /** 获取列表 */
@@ -227,14 +243,9 @@ export default function OrderList({ title, props }) {
       dataIndex: "status",
       align: "center",
       render: (status) => {
-        const map = {
-          1: { text: "已付款", color: "default" },
-          2: { text: "成功", color: "success" },
-          3: { text: "失败", color: "error" },
-          4: { text: "人工已处理  ", color: "error" },
-          5: { text: "已退款", color: "warning" },
-        };
-        const { text, color } = map[status] || {};
+        const meta = statusMap[status];
+        const text = meta?.text ?? status;
+        const color = meta?.color ?? "default";
         return <Tag color={color}>{text}</Tag>;
       },
     },
@@ -373,6 +384,11 @@ export default function OrderList({ title, props }) {
                 color="orange"
                 variant="outlined"
                 icon={<WarningOutlined />}
+                onClick={() => {
+                  setCurrentRecord(record);
+                  markForm.resetFields();
+                  setMarkOpen(true);
+                }}
               >
                 标记异常
               </Button>
@@ -393,6 +409,38 @@ export default function OrderList({ title, props }) {
       },
     },
   ];
+
+  const onMarkAbnormalOrder = async (values) => {
+    if (!currentRecord) return;
+    const taskType = taskTypeMap[props];
+    if (!taskType) {
+      message.error("未匹配到任务类型");
+      return;
+    }
+    try {
+      setMarkLoading(true);
+      const abnormalReason = values.abnormalReason?.trim();
+      const res = await markAbnormalOrder({
+        taskId: currentRecord.id,
+        taskType,
+        ...(abnormalReason ? { abnormalReason } : {}),
+      });
+      if (res?.code === 200) {
+        message.success(res?.message || "标记异常订单成功");
+        setMarkOpen(false);
+        setCurrentRecord(null);
+        markForm.resetFields();
+        handleOrderList(pageNum, pageSize);
+      } else {
+        message.error(res?.message || "请联系管理员！");
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("标记异常失败，请稍后重试");
+    } finally {
+      setMarkLoading(false);
+    }
+  };
 
   const onGetNewLink = async (id) => {
     try {
@@ -528,6 +576,35 @@ export default function OrderList({ title, props }) {
           }}
         />
       )}
+      <Modal
+        open={markOpen}
+        title="标记异常订单"
+        okText="确认标记"
+        cancelText="取消"
+        confirmLoading={markLoading}
+        onOk={() => markForm.submit()}
+        onCancel={() => {
+          setMarkOpen(false);
+          setCurrentRecord(null);
+          markForm.resetFields();
+        }}
+        maskClosable={false}
+        destroyOnHidden
+      >
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
+          确认将该订单标记为异常订单吗？备注原因选填。
+        </Typography.Paragraph>
+        <Form form={markForm} layout="vertical" onFinish={onMarkAbnormalOrder}>
+          <Form.Item name="abnormalReason" label="备注原因">
+            <Input.TextArea
+              rows={3}
+              placeholder="选填，可填写异常原因或备注"
+              maxLength={200}
+              showCount
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </PageCard>
   );
 }

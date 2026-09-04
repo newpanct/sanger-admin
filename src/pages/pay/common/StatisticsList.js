@@ -1,4 +1,6 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   ReloadOutlined,
   CalendarOutlined,
@@ -7,6 +9,7 @@ import {
   RollbackOutlined,
   WalletOutlined,
   AccountBookOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
 import PageCard from "../../../components/PageCard";
@@ -91,8 +94,36 @@ const refundApiMap = {
   sangerboxscope: refundDuplisee,
 };
 
+const ORDER_PAGE_MAP = {
+  imagetwin: "ImagetwinOrderPage",
+  ithenticate: "CrossCheckOrderPage",
+  sangerboxscope: "DupliSeePage",
+};
+
+const REFUND_PAGE_MAP = {
+  imagetwin: "ImagetwinRefundedOrderPage",
+  ithenticate: "CrossCheckRefundedOrderPage",
+  sangerboxscope: "DupliSeeRefundedOrderPage",
+};
+
+const findMenuPath = (menus = [], component, parentPath = "") => {
+  for (const item of menus) {
+    const fullPath = parentPath
+      ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
+      : `/${item.path}`;
+    if (item.component === component) return fullPath;
+    if (item.children?.length) {
+      const nested = findMenuPath(item.children, component, fullPath);
+      if (nested) return nested;
+    }
+  }
+  return null;
+};
+
 export default function StatisticsList({ title, props: apiKey }) {
   const { token } = theme.useToken();
+  const navigate = useNavigate();
+  const authMenus = useSelector((state) => state.auth.menus);
   const [errMsg, setErrMsg] = useState(null);
   const [loading, setLoading] = useState(false);
   const [statTick, setStatTick] = useState(0);
@@ -295,6 +326,9 @@ export default function StatisticsList({ title, props: apiKey }) {
     boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
   };
 
+  const orderPath = findMenuPath(authMenus, ORDER_PAGE_MAP[apiKey]);
+  const refundPath = findMenuPath(authMenus, REFUND_PAGE_MAP[apiKey]);
+
   const statCards = [
     {
       title: "当前服务订单数",
@@ -303,6 +337,9 @@ export default function StatisticsList({ title, props: apiKey }) {
       decimals: 0,
       icon: <ShoppingOutlined />,
       ribbonText: "订单",
+      tooltip: orderPath ? "点击查看该服务的订单" : undefined,
+      hint: orderPath ? "点击查看订单" : undefined,
+      onClick: orderPath ? () => navigate(orderPath) : undefined,
       ...cardAccent(0),
     },
     {
@@ -322,6 +359,9 @@ export default function StatisticsList({ title, props: apiKey }) {
       decimals: 0,
       icon: <RollbackOutlined />,
       ribbonText: "退款",
+      tooltip: refundPath ? "点击查看该服务的退款订单" : undefined,
+      hint: refundPath ? "点击查看退款订单" : undefined,
+      onClick: refundPath ? () => navigate(refundPath) : undefined,
       ...cardAccent(2),
     },
     {
@@ -498,12 +538,30 @@ export default function StatisticsList({ title, props: apiKey }) {
                   xxl={4}
                   className="flex"
                 >
-                  <StatRibbonCard
-                    item={item}
-                    loading={loading}
-                    replayKey={statTick}
-                    cardStyle={cardStyle}
-                  />
+                  <Tooltip title={item.tooltip}>
+                    <div className="h-full w-full">
+                      <StatRibbonCard
+                        item={item}
+                        loading={loading}
+                        replayKey={statTick}
+                        cardStyle={cardStyle}
+                        onClick={item.onClick}
+                        extra={
+                          <div className="mt-1 h-4 leading-4">
+                            {item.hint ? (
+                              <Text
+                                type="secondary"
+                                className="inline-flex items-center gap-1 text-xs underline whitespace-nowrap"
+                              >
+                                <LinkOutlined />
+                                {item.hint}
+                              </Text>
+                            ) : null}
+                          </div>
+                        }
+                      />
+                    </div>
+                  </Tooltip>
                 </Col>
               ))}
             </Row>
@@ -517,7 +575,7 @@ export default function StatisticsList({ title, props: apiKey }) {
                     金额明细
                   </div>
                   <Text type="secondary" className="text-xs font-normal">
-                    按日汇总订单与退款，展开查看退款订单
+                    按日汇总订单与退款，展开查看当前月份退款订单
                   </Text>
                 </div>
               }

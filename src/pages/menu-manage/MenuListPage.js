@@ -617,16 +617,7 @@ export default function MenuListPage() {
 
     return (
         <PageCard
-          title={
-            <div>
-              <div className="text-base font-semibold text-slate-900">
-                菜单列表
-              </div>
-              <Text type="secondary" className="text-xs font-normal">
-                管理系统菜单列表，左侧可拖拽排序展开子菜单
-              </Text>
-            </div>
-          }
+          description="管理系统菜单列表，左侧可拖拽排序展开子菜单"
             rightActions={
                 <>
                     <Tooltip title="新增菜单">

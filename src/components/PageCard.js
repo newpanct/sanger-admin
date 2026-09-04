@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Card, Divider, Flex, Modal, Table } from "antd";
+import { Card, Divider, Flex, Modal, Table, Typography } from "antd";
 import adminMenu from "../data/menu.json";
 import { getMenuBreadcrumb } from "../utils/menu";
 
@@ -20,6 +20,7 @@ const isAntdModal = (child) =>
 
 const PageCard = ({
   title,
+  description,
   extraActions,
   rightActions,
   bodyPadding,
@@ -55,8 +56,18 @@ const PageCard = ({
           }}
         >
           {/* 左边：标题 + 额外操作 */}
-          <Flex align="center" gap={12}>
-            <div style={{ fontWeight: 500 }}>{displayTitle}</div>
+          <Flex align={description ? "flex-start" : "center"} gap={12}>
+            <div>
+              <div style={{ fontWeight: 500 }}>{displayTitle}</div>
+              {description ? (
+                <Typography.Text
+                  type="secondary"
+                  style={{ fontSize: 12, fontWeight: 400, display: "block" }}
+                >
+                  {description}
+                </Typography.Text>
+              ) : null}
+            </div>
             {extraActions && (
               <>
                 <Divider type="vertical" />
