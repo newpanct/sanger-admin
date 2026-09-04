@@ -7,6 +7,7 @@ import adminMenu from "../data/menu.json";
 import Login from "../pages/LoginPage";
 import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../pages/NotFoundPage";
+import DevelopingPage from "../pages/DevelopingPage";
 
 // 动态加载 + loading
 const withLoading = (Component) => (props) => {
@@ -127,15 +128,12 @@ const generateRoutes = (menus) =>
         };
       }
 
-      if (!item.component) return null;
-      const Comp = componentMap[item.component];
-      if (!Comp) return null;
-
-      const WrappedComp = withLoading(Comp);
+      const Comp = item.component ? componentMap[item.component] : null;
+      const Page = Comp ? withLoading(Comp) : DevelopingPage;
 
       return {
         path: item.path,
-        element: <WrappedComp key={item.path} />,
+        element: <Page key={item.path} />,
       };
     })
     .filter(Boolean);

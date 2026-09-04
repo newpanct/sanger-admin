@@ -15,6 +15,7 @@ import {
   Typography,
   Segmented,
   Badge,
+  Tag,
   message,
 } from "antd";
 import {
@@ -160,22 +161,34 @@ const generateMenuItems = (menus, badgeMap = {}, parentPath = "") =>
       }
       const badgeValue = badgeMap[fullPath];
       const showBadge = badgeValue || hasChildrenBadge;
-      const label = showBadge ? (
-        <Space size={1}>
-          <span>{item.label}</span>
-          <Badge
-            count={badgeValue === true ? 0 : badgeValue}
-            dot={badgeValue === true || hasChildrenBadge}
-          />
-        </Space>
-      ) : (
-        item.label
-      );
+      const nameNode = <span>{item.label}</span>;
+      const sourceTag = item.source ? (
+        <Tag style={{ marginInlineEnd: 0, lineHeight: "18px", fontSize: 12 }}>
+          {item.source}
+        </Tag>
+      ) : null;
+      const badgeNode = showBadge ? (
+        <Badge
+          count={badgeValue === true ? 0 : badgeValue}
+          dot={badgeValue === true || hasChildrenBadge}
+        />
+      ) : null;
+      const label =
+        sourceTag || badgeNode ? (
+          <Space size={4}>
+            {nameNode}
+            {sourceTag}
+            {badgeNode}
+          </Space>
+        ) : (
+          nameNode
+        );
 
       return {
         key: fullPath,
         label,
         icon: IconComponent ? <IconComponent /> : null,
+        style: item.color ? { backgroundColor: item.color } : undefined,
         children: childrenItems,
       };
     })

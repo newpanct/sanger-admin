@@ -40,6 +40,8 @@ export const normalizeMenus = (menus = []) =>
       path: item.path,
       label: item.label || item.name,
       icon: item.icon,
+      color: item.color || undefined,
+      source: item.source || undefined,
       component: item.component || undefined,
       hidden: item.hidden === true || item.visible === 0,
       children: hasChildren(item) ? normalizeMenus(item.children) : undefined,

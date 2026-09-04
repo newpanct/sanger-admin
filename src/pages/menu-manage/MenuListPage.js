@@ -21,6 +21,7 @@ import {
     Row,
     Radio,
     Typography,
+    ColorPicker,
 } from "antd";
 import * as AntdIcons from "@ant-design/icons";
 import {
@@ -148,6 +149,13 @@ function renderIcon(name) {
     return <IconComp />;
 }
 
+function toHexColor(value) {
+    if (!value) return undefined;
+    if (typeof value === "string") return value;
+    if (typeof value.toHexString === "function") return value.toHexString();
+    return undefined;
+}
+
 function collectIds(node, acc = new Set()) {
     if (!node) return acc;
     acc.add(node.id);
@@ -166,6 +174,16 @@ function findSiblings(tree, parentId) {
         return null;
     };
     return walk(tree) || [];
+}
+
+function isSortOrderTaken(tree, parentId, sortOrder, excludeId) {
+    const siblings = findSiblings(tree, parentId);
+    const value = Number(sortOrder ?? 0);
+    return siblings.some(
+        (item) =>
+            (excludeId == null || String(item.id) !== String(excludeId)) &&
+            Number(item.sortOrder ?? 0) === value
+    );
 }
 
 function flattenIds(nodes = [], acc = []) {
@@ -264,20 +282,27 @@ export default function MenuListPage() {
     const [addForm] = Form.useForm();
     const sortableIds = useMemo(() => flattenIds(list).map(String), [list]);
 
-    const handleList = async (nextPageNum = pageNum, nextPageSize = pageSize) => {
+    const handleList = async ({ silent = true, extraExpandIds = [] } = {}) => {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const res = await menuPage();
             if (res?.code === 200) {
                 const records = normalizeMenuTree(res?.data?.records || res?.data);
                 setList(records);
                 setTotal(res?.data?.total || 0);
-                setExpandedKeys([]);
+                const validIds = new Set(flattenIds(records).map(String));
+                setExpandedKeys((prev) => {
+                    const merged = [
+                        ...prev.map(String),
+                        ...extraExpandIds.map(String),
+                    ];
+                    return [...new Set(merged)].filter((id) => validIds.has(id));
+                });
             } else {
                 message.error(res?.message || "获取菜单列表失败！");
             }
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
@@ -302,6 +327,8 @@ export default function MenuListPage() {
             path: record.path,
             component: record.component,
             icon: record.icon,
+            color: record.color,
+            source: record.source,
             sortOrder: record.sortOrder ?? 0,
             visible: record.visible,
             status: record.status ?? 1,
@@ -319,7 +346,7 @@ export default function MenuListPage() {
                 setOpenDel(false);
                 setOpenDelConfirm(false);
                 setCurrentItem({});
-                handleList();
+                handleList({ silent: true });
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}失败！`);
@@ -330,6 +357,12 @@ export default function MenuListPage() {
     };
 
     const handleSubmit = async (values) => {
+        const parentId = values.parentId ?? 0;
+        const sortOrder = values.sortOrder ?? 0;
+        if (isSortOrderTaken(list, parentId, sortOrder, currentItem.id)) {
+            message.error("同级菜单排序值不能重复");
+            return;
+        }
         try {
             setBtnLoading(true);
             const payload = {
@@ -338,6 +371,8 @@ export default function MenuListPage() {
                 path: values.path,
                 component: values.component || undefined,
                 icon: values.icon || undefined,
+                color: toHexColor(values.color),
+                source: values.source?.trim() || undefined,
                 sortOrder: values.sortOrder ?? 0,
                 visible: values.visible ? 1 : 0,
                 status: values.status ? 1 : 0,
@@ -352,7 +387,11 @@ export default function MenuListPage() {
             if (res?.code === 200) {
                 message.success(res?.message || "操作成功！");
                 setOpenAdd(false);
-                handleList();
+                handleList({
+                    silent: true,
+                    extraExpandIds:
+                        currentItem.id || !parentId ? [] : [parentId],
+                });
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || "操作失败！");
@@ -379,7 +418,7 @@ export default function MenuListPage() {
             const res = await batchSort(payload);
             if (res?.code === 200) {
                 message.success(res?.message || "排序更新成功！");
-                handleList();
+                handleList({ silent: true });
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || "排序更新失败！");
@@ -418,7 +457,7 @@ export default function MenuListPage() {
             });
             if (res?.code === 200) {
                 message.success(res?.message || "可见状态已更新");
-                handleList();
+                handleList({ silent: true });
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || "可见状态更新失败！");
@@ -511,6 +550,35 @@ export default function MenuListPage() {
             align: "center",
             render: (icon) =>
                 icon ? <span style={{ fontSize: 18 }}>{renderIcon(icon)}</span> : "-",
+        },
+        {
+            title: "颜色",
+            dataIndex: "color",
+            align: "center",
+            render: (color) =>
+                color ? (
+                    <Space size={6}>
+                        <span
+                            style={{
+                                display: "inline-block",
+                                width: 14,
+                                height: 14,
+                                borderRadius: 4,
+                                background: color,
+                                border: "1px solid #d9d9d9",
+                            }}
+                        />
+                        {color}
+                    </Space>
+                ) : (
+                    "--"
+                ),
+        },
+        {
+            title: "来源",
+            dataIndex: "source",
+            align: "center",
+            render: (source) => (source ? <Tag>{source}</Tag> : "--"),
         },
         {
             title: "类型",
@@ -616,7 +684,7 @@ export default function MenuListPage() {
     ];
 
     useEffect(() => {
-        handleList(pageNum, pageSize);
+        handleList({ silent: false });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageNum, pageSize]);
 
@@ -639,7 +707,7 @@ export default function MenuListPage() {
                         <Button
                             type="primary"
                             icon={<ReloadOutlined />}
-                            onClick={() => handleList()}
+                            onClick={() => handleList({ silent: false })}
                         >
                             刷新数据
                         </Button>
@@ -814,7 +882,46 @@ export default function MenuListPage() {
                             </Form.Item>
                         </Col>
                         <Col span={12}>
-                            <Form.Item label="排序值" name="sortOrder">
+                            <Form.Item
+                                label="菜单颜色"
+                                name="color"
+                                getValueFromEvent={(c) => toHexColor(c)}
+                            >
+                                <ColorPicker allowClear showText format="hex" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="来源" name="source" normalize={(v) => v?.trim()}>
+                                <Input allowClear placeholder="例如 查重 / 支付，可选" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                label="排序值"
+                                name="sortOrder"
+                                dependencies={["parentId"]}
+                                rules={[
+                                    {
+                                        validator: (_, value) => {
+                                            const parentId =
+                                                addForm.getFieldValue("parentId") ?? 0;
+                                            if (
+                                                isSortOrderTaken(
+                                                    list,
+                                                    parentId,
+                                                    value ?? 0,
+                                                    currentItem.id
+                                                )
+                                            ) {
+                                                return Promise.reject(
+                                                    new Error("同级菜单排序值不能重复")
+                                                );
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    },
+                                ]}
+                            >
                                 <InputNumber min={0} style={{ width: "100%" }} placeholder="越小越靠前" />
                             </Form.Item>
                         </Col>
