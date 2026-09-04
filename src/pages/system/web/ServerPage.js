@@ -17,8 +17,8 @@ import {
   PictureOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
-import PageCard from "../../components/PageCard";
-import { dedupCheck, dedupCheckToggle } from "../../server/api";
+import PageCard from "../../../components/PageCard";
+import { dedupCheck, dedupCheckToggle } from "../../../server/api";
 
 const { Text } = Typography;
 

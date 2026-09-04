@@ -28,20 +28,20 @@ import {
   SearchOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import PageCard from "../../components/PageCard";
+import PageCard from "../../../components/PageCard";
 import NoticeBannerPreview, {
   TYPE_STYLE_MAP,
   PREVIEW_SERVICE_NAME,
   NOTICE_LINK_STYLE,
   sanitizeNoticeHtml,
   resolveNoticeStyle,
-} from "../../components/NoticeBannerPreview";
+} from "../../../components/NoticeBannerPreview";
 import {
   noticePageList,
   noticeAdd,
   noticeDelete,
   noticeGetLatestActive,
-} from "../../server/api";
+} from "../../../server/api";
 import dayjs from "dayjs";
 
 const { Text } = Typography;

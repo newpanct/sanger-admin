@@ -17,7 +17,8 @@ import {
   SearchOutlined,
   DownloadOutlined,
   VerticalAlignBottomOutlined,
-  QuestionCircleOutlined
+  QuestionCircleOutlined,
+  WarningOutlined
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import PageCard from "../../../components/PageCard";
@@ -376,7 +377,16 @@ export default function OrderList({ title, props }) {
       render: (_, record) => {
         const disabled = record.status !== 2;
         return (
-          <Space>
+          <div style={linkBtnGroupStyle}>
+            <Tooltip title="标记为异常订单">
+              <Button
+                color="orange"
+                variant="outlined"
+                icon={<WarningOutlined />}
+              >
+                标记异常
+              </Button>
+            </Tooltip>
             <Tooltip title="删除">
               <Button
                 danger
@@ -388,7 +398,7 @@ export default function OrderList({ title, props }) {
                 删除
               </Button>
             </Tooltip>
-          </Space>
+          </div>
         );
       },
     },

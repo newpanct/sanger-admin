@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import PageCard from "../../components/PageCard";
 import {
     Button,
@@ -13,7 +15,7 @@ import {
     Typography,
     message,
 } from "antd";
-import { ReloadOutlined, SearchOutlined, FileSearchOutlined, PictureOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { ReloadOutlined, SearchOutlined, FileSearchOutlined, PictureOutlined, ThunderboltOutlined, LinkOutlined } from "@ant-design/icons";
 import {
     invoiceMark,
     invoicePage,
@@ -39,6 +41,26 @@ const SERVICE_TYPE_MAP = {
         color: "cyan",
         icon: <ThunderboltOutlined />,
     },
+};
+
+const REFUND_PAGE_MAP = {
+    imagetwin: "ImagetwinRefundedOrderPage",
+    ithenticate: "CrossCheckRefundedOrderPage",
+    sangerboxscope: "DupliSeeRefundedOrderPage",
+};
+
+const findMenuPath = (menus = [], component, parentPath = "") => {
+    for (const item of menus) {
+        const fullPath = parentPath
+            ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
+            : `/${item.path}`;
+        if (item.component === component) return fullPath;
+        if (item.children?.length) {
+            const nested = findMenuPath(item.children, component, fullPath);
+            if (nested) return nested;
+        }
+    }
+    return null;
 };
 
 const formatYuan = (val) =>
@@ -259,6 +281,8 @@ function InvoiceOrderPanel({
 }
 
 export default function PayPersonalAccountDetailPage() {
+    const navigate = useNavigate();
+    const authMenus = useSelector((state) => state.auth.menus);
     const [email, setEmail] = useState("");
     const [queriedEmail, setQueriedEmail] = useState("");
     const [list, setList] = useState([]);
@@ -382,6 +406,34 @@ export default function PayPersonalAccountDetailPage() {
             dataIndex: "failedUnrefundedCount",
             align: "center",
             render: displayValue,
+        },
+        {
+            title: "退款订单数",
+            dataIndex: "refundedCount",
+            align: "center",
+            render: (count, record) => {
+                const display = displayValue(count);
+                const component = REFUND_PAGE_MAP[record.serviceType];
+                const path = component ? findMenuPath(authMenus, component) : null;
+                if (!queriedEmail || !path) return display;
+                return (
+                    <Tooltip title="查看该邮箱的退款订单">
+                        <Button
+                            type="link"
+                            size="small"
+                            icon={<LinkOutlined />}
+                            style={{ textDecoration: "underline", cursor: "pointer" }}
+                            onClick={() => {
+                                navigate(
+                                    `${path}?email=${encodeURIComponent(queriedEmail)}`
+                                );
+                            }}
+                        >
+                            {display}
+                        </Button>
+                    </Tooltip>
+                );
+            },
         },
     ];
 

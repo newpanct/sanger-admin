@@ -4,6 +4,7 @@ import {
   ReloadOutlined, UploadOutlined,
   RollbackOutlined,
   EyeInvisibleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import PageCard from "../../../components/PageCard";
 import CopyableEllipsisText from "../../../components/CopyableEllipsisText";
@@ -17,10 +18,13 @@ import {
   refundExecute,
   refundReasonListAll,
   ignoreTask,
+  imagetwinAbnormalOrderList,
+  crosscheckAbnormalOrderList,
+  dupliSeeAbnormalOrderList,
 } from "../../../server/api";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const findMenuPath = (menus = [], component, parentPath = "") => {
   for (const item of menus) {
@@ -36,10 +40,12 @@ const findMenuPath = (menus = [], component, parentPath = "") => {
   return null;
 };
 
-export default function FailedOrderList({ title, props }) {
+export default function RefundedOrder({ title, props }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { token } = theme.useToken();
+  const [searchParams] = useSearchParams();
+  const emailFromQuery = (searchParams.get("email") || "").trim();
   const authMenus = useSelector((state) => state.auth.menus);
   const refundReasonPath = findMenuPath(authMenus, "RefundReasonPage");
   const [loading, setLoading] = useState(false);
@@ -47,6 +53,8 @@ export default function FailedOrderList({ title, props }) {
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [email, setEmail] = useState(emailFromQuery);
+  const [debouncedEmail, setDebouncedEmail] = useState(emailFromQuery);
   const [commitLoadingMap, setCommitLoadingMap] = useState({});
   const [commitModalOpen, setCommitModalOpen] = useState(false);
   const [rollbackOpen, setRollbackOpen] = useState(false);
@@ -58,6 +66,22 @@ export default function FailedOrderList({ title, props }) {
   const [ignoreLoading, setIgnoreLoading] = useState(false);
   const [refundReasons, setRefundReasons] = useState([]);
   const selectedReason = Form.useWatch("reason", refundForm);
+
+  useEffect(() => {
+    setPageNum(1);
+    setEmail(emailFromQuery);
+    setDebouncedEmail(emailFromQuery);
+  }, [emailFromQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageNum(1);
+      setDebouncedEmail(email);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [email]);
+
   const orderColumn = [
     {
       title: "标题",
@@ -105,61 +129,61 @@ export default function FailedOrderList({ title, props }) {
     },
     {
       title: "更新时间",
+      width: 220,
       dataIndex: "updateTime",
       align: "center",
     },
     {
       title: "错误信息",
-      width: 200,
       dataIndex: "remark",
       align: "center",
       render: (remark) => {
         return <>{remark ? remark : "提交失败"}</>;
       },
     },
-    {
-      title: "操作",
-      align: "center",
-      width: 280,
-      render: (_, record) => {
-        return (
-          <Space>
-            <Tooltip title="手动提交">
-              <Button
-                icon={<UploadOutlined />}
-                loading={commitLoadingMap[record.id]}
-                onClick={() => {
-                  setCurrentRecord(record);
-                  setCommitModalOpen(true);
-                }}
-              >提交</Button>
-            </Tooltip>
-            <Tooltip title="退款">
-              <Button
-                loading={commitLoadingMap[record.id]}
-                onClick={() => {
-                  setCurrentRecord(record);
-                  setRollbackOpen(true);
-                  fetchRefundReasons();
-                }}
-                icon={<RollbackOutlined />}
-              >退款</Button>
-            </Tooltip>
-            <Tooltip title="忽略">
-              <Button
-                icon={<EyeInvisibleOutlined />}
-                loading={ignoreLoading && currentRecord?.id === record.id}
-                onClick={() => {
-                  setCurrentRecord(record);
-                  ignoreForm.resetFields();
-                  setIgnoreOpen(true);
-                }}
-              >忽略</Button>
-            </Tooltip>
-          </Space>
-        );
-      },
-    },
+    // {
+    //   title: "操作",
+    //   align: "center",
+    //   width: 280,
+    //   render: (_, record) => {
+    //     return (
+    //       <Space>
+    //         <Tooltip title="手动提交">
+    //           <Button
+    //             icon={<UploadOutlined />}
+    //             loading={commitLoadingMap[record.id]}
+    //             onClick={() => {
+    //               setCurrentRecord(record);
+    //               setCommitModalOpen(true);
+    //             }}
+    //           >提交</Button>
+    //         </Tooltip>
+    //         <Tooltip title="退款">
+    //           <Button
+    //             loading={commitLoadingMap[record.id]}
+    //             onClick={() => {
+    //               setCurrentRecord(record);
+    //               setRollbackOpen(true);
+    //               fetchRefundReasons();
+    //             }}
+    //             icon={<RollbackOutlined />}
+    //           >退款</Button>
+    //         </Tooltip>
+    //         <Tooltip title="忽略">
+    //           <Button
+    //             icon={<EyeInvisibleOutlined />}
+    //             loading={ignoreLoading && currentRecord?.id === record.id}
+    //             onClick={() => {
+    //               setCurrentRecord(record);
+    //               ignoreForm.resetFields();
+    //               setIgnoreOpen(true);
+    //             }}
+    //           >忽略</Button>
+    //         </Tooltip>
+    //       </Space>
+    //     );
+    //   },
+    // },
   ];
 
   const apiCommmit = {
@@ -186,14 +210,15 @@ export default function FailedOrderList({ title, props }) {
       const params = {
         pageNum: page,
         pageSize: size,
+        email: debouncedEmail.trim() || null,
       };
       let response;
       if (props === "imagetwin") {
-        response = await imagetwinFailedPageList(params);
+        response = await imagetwinAbnormalOrderList(params);
       } else if (props === "ithenticate") {
-        response = await ithenticateFailedPageList(params);
+        response = await crosscheckAbnormalOrderList(params);
       } else if (props === "dupliSee") {
-        response = await dupliseeFailedPageList(params);
+        response = await dupliSeeAbnormalOrderList(params);
       }
 
       if (response && response.code === 200) {
@@ -307,18 +332,40 @@ export default function FailedOrderList({ title, props }) {
   };
 
   useEffect(() => {
-    handleOrderList(1, pageSize);
-  }, []);
+    handleOrderList(pageNum, pageSize);
+  }, [pageNum, pageSize, debouncedEmail]);
 
   return (
     <PageCard
       title={title}
+      extraActions={
+        <Input
+          allowClear
+          prefix={<SearchOutlined />}
+          placeholder="请输入邮箱"
+          value={email}
+          onChange={(e) => {
+            setPageNum(1);
+            setEmail(e.target.value);
+          }}
+          onPressEnter={() => {
+            setPageNum(1);
+            setDebouncedEmail(email);
+          }}
+        />
+      }
       rightActions={
         <Button
           type="primary"
           icon={<ReloadOutlined />}
           loading={loading}
-          onClick={() => handleOrderList(1, pageSize)}
+          onClick={() => {
+            if (pageNum !== 1) {
+              setPageNum(1);
+            } else {
+              handleOrderList(1, pageSize);
+            }
+          }}
         >
           刷新数据
         </Button>
@@ -339,7 +386,6 @@ export default function FailedOrderList({ title, props }) {
           onChange: (page, size) => {
             setPageNum(page);
             setPageSize(size);
-            handleOrderList(page, size);
           },
         }}
       />

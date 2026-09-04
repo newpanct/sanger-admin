@@ -81,6 +81,7 @@ import { setThemeToken } from "../store/themeSlice";
 import { useIdleLogout } from "../hooks/useIdleLogout";
 import { clearAuth, persistor } from "../store";
 import { setMenuBadges, clearAllMenuBadge } from "../store/menuBadgeSlice";
+import { getMenuBreadcrumb } from "../utils/menu";
 import config from "../config";
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -215,10 +216,6 @@ const AdminLayout = () => {
   };
   const [show, setShow] = useState(false);
   const manageTitle = "桑格管理";
-
-  const splitKeyToPaths = (key) => {
-    return key.replace(/^\//, "").split("/");
-  };
   // 侧边栏
   const menuItems = generateMenuItems(menuSource, badgeMap);
   // 刷新数据
@@ -248,31 +245,10 @@ const AdminLayout = () => {
       );
     }
   };
-  const getBreadcrumbByKey = (menus, selectedKey) => {
-    if (!selectedKey) return [];
-    const paths = splitKeyToPaths(selectedKey);
-
-    const result = [];
-    let currentMenus = menus;
-
-    for (const path of paths) {
-      const match = currentMenus.find((m) => m.path === path);
-      if (!match) break;
-
-      result.push({
-        key: path,
-        title: match.label,
-      });
-
-      currentMenus = match.children || [];
-    }
-
-    return result;
-  };
   // 面包屑
   const breadcrumbItems = [
     { key: "home", title: manageTitle },
-    ...getBreadcrumbByKey(menuSource, location.pathname),
+    ...getMenuBreadcrumb(menuSource, location.pathname),
   ];
   
 

@@ -66,3 +66,13 @@ export const statisticsSangerboxScope = (obj) =>
 
 export const refundExecute = (obj) =>
   postJson("/admin/refund/execute", obj);
+
+// 异常订单
+export const imagetwinAbnormalOrderList = (obj) =>
+  postJson("/dedup/admin/order/refund/imagetwin/pageList", obj);
+
+export const crosscheckAbnormalOrderList = (obj) =>
+  postJson("/dedup/admin/order/refund/ithenticate/pageList", obj);
+
+export const dupliSeeAbnormalOrderList = (obj) =>
+  postJson("/dedup/admin/order/refund/duplisee/pageList", obj);

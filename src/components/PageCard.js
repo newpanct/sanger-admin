@@ -1,5 +1,9 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Card, Divider, Flex, Modal, Table } from "antd";
+import adminMenu from "../data/menu.json";
+import { getMenuBreadcrumb } from "../utils/menu";
 
 const getTypeName = (type) => {
   if (typeof type === "string") return type;
@@ -21,6 +25,12 @@ const PageCard = ({
   bodyPadding,
   children,
 }) => {
+  const location = useLocation();
+  const authMenus = useSelector((state) => state.auth.menus);
+  const menuSource = authMenus?.length ? authMenus : adminMenu;
+  const crumbs = getMenuBreadcrumb(menuSource, location.pathname);
+  const displayTitle = crumbs[crumbs.length - 1]?.title || title;
+
   const contentChildren = React.Children.toArray(children).filter(
     (child) => React.isValidElement(child) && !isAntdModal(child)
   );
@@ -46,7 +56,7 @@ const PageCard = ({
         >
           {/* 左边：标题 + 额外操作 */}
           <Flex align="center" gap={12}>
-            <div style={{ fontWeight: 500 }}>{title}</div>
+            <div style={{ fontWeight: 500 }}>{displayTitle}</div>
             {extraActions && (
               <>
                 <Divider type="vertical" />

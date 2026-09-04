@@ -48,10 +48,12 @@ const componentMap = {
   // -- CrossCheckPage
   CrossCheckAbnOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckAbnOrderPage")),
   CrossCheckOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckOrderPage")),
+  CrossCheckRefundedOrderPage: lazy(() => import("../pages/scan/crosscheck/CrossCheckRefundedOrderPage")),
 
   // -- ImagetwinPage
   ImagetwinAbnOrderPage: lazy(() => import("../pages/scan/imagetwin/ImagetwinAbnOrderPage")),
   ImagetwinOrderPage: lazy(() => import("../pages/scan/imagetwin/ImagetwinOrderPage")),
+  ImagetwinRefundedOrderPage: lazy(() => import("../pages/scan/imagetwin/ImagetwinRefundedOrderPage")),
 
   // -- 历史订单
   HistoryAbnOrderPage: lazy(() => import("../pages/scan/history/HistoryAbnOrderPage")),
@@ -60,6 +62,7 @@ const componentMap = {
   // -- DupliSee订单
   DupliSeePage: lazy(() => import("../pages/scan/duplisee/DupliSeePage")),
   DupliSeeFaidPage: lazy(() => import("../pages/scan/duplisee/DupliSeeFaidPage")),
+  DupliSeeRefundedOrderPage: lazy(() => import("../pages/scan/duplisee/DupliSeeRefundedOrderPage")),
   
   // 优惠码
   PromoCodePage: lazy(() => import("../pages/scan/PromoCodePage")),
@@ -94,13 +97,13 @@ const componentMap = {
   MemberPage:lazy(()=>import("../pages/user/MemberPage")),
   UserListPage:lazy(()=>import("../pages/user/UserListPage")),
   // 链接管理
-  LinkPage:lazy(()=>import("../pages/web/LinkPage")),
+  LinkPage:lazy(()=>import("../pages/system/web/LinkPage")),
   // 企业
-  EnterprisePage:lazy(()=>import("../pages/EnterprisePage")),
+  EnterprisePage:lazy(()=>import("../pages/merchant-manage/EnterprisePage")),
 
   // 网页
-  ServerPage:lazy(()=>import("../pages/web/ServerPage")),
-  NoticePage:lazy(()=>import("../pages/web/NoticePage")),
+  ServerPage:lazy(()=>import("../pages/system/web/ServerPage")),
+  NoticePage:lazy(()=>import("../pages/system/web/NoticePage")),
   // 退款理由管理
   RefundReasonPage:lazy(()=>import("../pages/RefundReasonPage")),
   // 菜单管理

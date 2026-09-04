@@ -71,3 +71,22 @@ export const getHomePath = (menus = []) => {
     });
   return hasDashboard(menus) ? "/dashboard" : firstPath || "/dashboard";
 };
+
+export const getMenuBreadcrumb = (menus = [], selectedKey = "") => {
+  if (!selectedKey) return [];
+  const paths = selectedKey.replace(/^\//, "").split("/").filter(Boolean);
+  const result = [];
+  let currentMenus = menus;
+
+  for (const path of paths) {
+    const match = currentMenus.find((m) => m.path === path);
+    if (!match) break;
+    result.push({
+      key: path,
+      title: match.label,
+    });
+    currentMenus = match.children || [];
+  }
+
+  return result;
+};
