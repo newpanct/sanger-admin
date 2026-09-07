@@ -51,7 +51,7 @@ import {
     batchSort,
     refreshAuthMenus,
 } from "../../server/api";
-import { normalizeMenuTree } from "../../utils/menu";
+import { buildMenuTree, flattenMenus, normalizeMenuTree } from "../../utils/menu";
 
 const TYPE_MAP = {
     1: { label: "目录", color: "blue" },
@@ -208,6 +208,36 @@ function findNodeMeta(tree, id, parentId = 0, siblings = tree) {
     return null;
 }
 
+function extractCreatedId(data) {
+    if (data == null || data === "") return null;
+    if (typeof data === "number" || typeof data === "string") return data;
+    if (typeof data === "object") {
+        if (data.id != null) return data.id;
+        if (data.menuId != null) return data.menuId;
+    }
+    return null;
+}
+
+function patchFlatItem(flat, id, patch) {
+    return flat.map((item) =>
+        String(item.id) === String(id) ? { ...item, ...patch } : item
+    );
+}
+
+function removeFlatByIds(flat, ids) {
+    const removed = new Set([...ids].map(String));
+    return flat.filter((item) => !removed.has(String(item.id)));
+}
+
+function applySortOrders(flat, orders) {
+    const next = new Map(orders.map((item) => [String(item.id), item.sortOrder]));
+    return flat.map((item) =>
+        next.has(String(item.id))
+            ? { ...item, sortOrder: next.get(String(item.id)) }
+            : item
+    );
+}
+
 const RowContext = createContext({});
 
 const DragHandle = () => {
@@ -282,6 +312,17 @@ export default function MenuListPage() {
     const [addForm] = Form.useForm();
     const sortableIds = useMemo(() => flattenIds(list).map(String), [list]);
 
+    const patchMenuTree = (mutator) => {
+        setList((prev) => buildMenuTree(mutator(flattenMenus(prev))));
+    };
+
+    const expandParent = (parentId) => {
+        if (!parentId) return;
+        setExpandedKeys((prev) => [
+            ...new Set([...prev.map(String), String(parentId)]),
+        ]);
+    };
+
     const handleList = async ({ silent = true, extraExpandIds = [] } = {}) => {
         try {
             if (!silent) setLoading(true);
@@ -343,10 +384,16 @@ export default function MenuListPage() {
             const res = await menuDelete(currentItem.id);
             if (res?.code === 200) {
                 message.success(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}成功！`);
+                const removedIds = collectIds(currentItem);
+                patchMenuTree((flat) => removeFlatByIds(flat, removedIds));
+                setTotal((t) => Math.max(0, t - removedIds.size));
+                const removedKeySet = new Set([...removedIds].map(String));
+                setExpandedKeys((prev) =>
+                    prev.filter((key) => !removedKeySet.has(String(key)))
+                );
                 setOpenDel(false);
                 setOpenDelConfirm(false);
                 setCurrentItem({});
-                handleList({ silent: true });
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || `删除${TYPE_MAP[currentItem.type]?.label || "菜单"}失败！`);
@@ -387,11 +434,27 @@ export default function MenuListPage() {
             if (res?.code === 200) {
                 message.success(res?.message || "操作成功！");
                 setOpenAdd(false);
-                handleList({
-                    silent: true,
-                    extraExpandIds:
-                        currentItem.id || !parentId ? [] : [parentId],
-                });
+                if (currentItem.id) {
+                    patchMenuTree((flat) =>
+                        patchFlatItem(flat, currentItem.id, payload)
+                    );
+                    expandParent(parentId);
+                } else {
+                    const newId = extractCreatedId(res.data);
+                    if (newId == null) {
+                        handleList({
+                            silent: true,
+                            extraExpandIds: parentId ? [parentId] : [],
+                        });
+                    } else {
+                        patchMenuTree((flat) => [
+                            ...flat,
+                            { ...payload, id: newId, parentId },
+                        ]);
+                        setTotal((t) => t + 1);
+                        expandParent(parentId);
+                    }
+                }
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || "操作失败！");
@@ -402,6 +465,7 @@ export default function MenuListPage() {
     };
 
     const handleReorder = async (siblings, fromIndex, toIndex) => {
+        if (sortLoading) return;
         if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
         const next = arrayMove(siblings, fromIndex, toIndex);
         // 复用当前同级已有的 sortOrder，避免分页后被重写成 1,2,3 挤到第一页
@@ -412,17 +476,22 @@ export default function MenuListPage() {
             id: item.id,
             sortOrder: sortValues[i],
         }));
+        const prevList = list;
+        patchMenuTree((flat) => applySortOrders(flat, payload));
 
         try {
             setSortLoading(true);
             const res = await batchSort(payload);
             if (res?.code === 200) {
                 message.success(res?.message || "排序更新成功！");
-                handleList({ silent: true });
                 refreshAuthMenus();
             } else {
+                setList(prevList);
                 message.error(res?.message || "排序更新失败！");
             }
+        } catch (error) {
+            setList(prevList);
+            message.error("排序更新失败！");
         } finally {
             setSortLoading(false);
         }
@@ -457,7 +526,9 @@ export default function MenuListPage() {
             });
             if (res?.code === 200) {
                 message.success(res?.message || "可见状态已更新");
-                handleList({ silent: true });
+                patchMenuTree((flat) =>
+                    patchFlatItem(flat, record.id, { visible: checked ? 1 : 0 })
+                );
                 refreshAuthMenus();
             } else {
                 message.error(res?.message || "可见状态更新失败！");
@@ -528,11 +599,11 @@ export default function MenuListPage() {
                 );
             },
         },
-        {
-            title: "id",
-            dataIndex: "id",
-            align: "center",
-        },
+        // {
+        //     title: "id",
+        //     dataIndex: "id",
+        //     align: "center",
+        // },
         {
             title: "路径",
             dataIndex: "path",

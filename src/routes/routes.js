@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { useRoutes, Outlet } from "react-router-dom";
 import { Navigate } from "react-router-dom";
@@ -9,24 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 import NotFoundPage from "../pages/NotFoundPage";
 import DevelopingPage from "../pages/DevelopingPage";
 
-// 动态加载 + loading
-const withLoading = (Component) => (props) => {
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 300);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-  return <Component {...props} />;
-};
+const LayoutOutlet = () => <Outlet />;
 
 // 所有页面组件映射
 const componentMap = {
@@ -111,8 +94,7 @@ const componentMap = {
   MenuListPage: lazy(() => import("../pages/menu-manage/MenuListPage")),
   RoleListPage: lazy(() => import("../pages/menu-manage/RoleListPage")),
   RoleMenuPage: lazy(() => import("../pages/menu-manage/RoleMenuPage")),
-  // 通用空容器 (带 Outlet)
-  LayoutOutlet: () => <Outlet />,
+  LayoutOutlet,
 };
 
 // 生成路由
@@ -123,17 +105,17 @@ const generateRoutes = (menus) =>
       if (item.children?.length) {
         return {
           path: item.path,
-          element: <componentMap.LayoutOutlet key={item.path} />,
+          element: <LayoutOutlet />,
           children: generateRoutes(item.children, item.path),
         };
       }
 
-      const Comp = item.component ? componentMap[item.component] : null;
-      const Page = Comp ? withLoading(Comp) : DevelopingPage;
+      const Page =
+        (item.component && componentMap[item.component]) || DevelopingPage;
 
       return {
         path: item.path,
-        element: <Page key={item.path} />,
+        element: <Page />,
       };
     })
     .filter(Boolean);
