@@ -151,45 +151,55 @@ const generateMenuItems = (menus, badgeMap = {}, parentPath = "") =>
       const IconComponent = iconMap[item.icon];
       const fullPath = computeFullPath(item, parentPath);
       let childrenItems;
-      let hasChildrenBadge = false;
       if (item.children?.length) {
         childrenItems = generateMenuItems(item.children, badgeMap, fullPath);
         if (!childrenItems.length) return null;
-        hasChildrenBadge = childrenItems.some((child) =>
-          child.label?.props?.children?.some?.((c) => c?.type === Badge)
-        );
       }
       const badgeValue = badgeMap[fullPath];
-      const showBadge = badgeValue || hasChildrenBadge;
-      const nameNode = <span>{item.label}</span>;
+      const childHasBadge = (childrenItems || []).some((child) => child.hasBadge);
+      const hasOwnBadge = badgeValue === true || Number(badgeValue) > 0;
+      const hasBadge = hasOwnBadge || childHasBadge;
+      const badgeNode = hasOwnBadge ? (
+        <Badge count={badgeValue === true ? 0 : badgeValue} overflowCount={99} />
+      ) : childHasBadge ? (
+        <Badge dot />
+      ) : null;
+      const label = badgeNode ? (
+        <Space size={4}>
+          <span>{item.label}</span>
+          {badgeNode}
+        </Space>
+      ) : (
+        item.label
+      );
       const sourceTag = item.source ? (
-        <Tag style={{ marginInlineEnd: 0, lineHeight: "18px", fontSize: 12 }}>
+        <Tag
+          className="absolute right-full top-1/2 mr-1 -translate-y-1/2"
+          style={{
+            padding: "0 4px",
+            fontSize: 10,
+            lineHeight: "14px",
+            height: 16,
+          }}
+        >
           {item.source}
         </Tag>
       ) : null;
-      const badgeNode = showBadge ? (
-        <Badge
-          count={badgeValue === true ? 0 : badgeValue}
-          dot={badgeValue === true || hasChildrenBadge}
-        />
-      ) : null;
-      const label =
-        sourceTag || badgeNode ? (
-          <Space size={4}>
-            {nameNode}
-            {sourceTag}
-            {badgeNode}
-          </Space>
-        ) : (
-          nameNode
-        );
 
       return {
         key: fullPath,
         label,
-        icon: IconComponent ? <IconComponent /> : null,
+        icon: IconComponent ? (
+          <span className="relative inline-flex items-center">
+            {sourceTag}
+            <IconComponent />
+          </span>
+        ) : sourceTag ? (
+          <span className="relative inline-flex items-center">{sourceTag}</span>
+        ) : null,
         style: item.color ? { backgroundColor: item.color } : undefined,
         children: childrenItems,
+        hasBadge,
       };
     })
     .filter(Boolean);
@@ -412,6 +422,7 @@ const AdminLayout = () => {
             }}
           >
             <Menu
+              className="admin-sider-menu"
               mode="inline"
               theme={theme}
               items={menuItems}

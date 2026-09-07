@@ -25,10 +25,11 @@ import {
   turnicheckFailedPageList,
   turnicheckPageList,
 } from "../../../server/api";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SearchInput from "../../../components/SearchInput";
 import HighlightText from "../../../components/HighlightText";
 import { decreaseMenuBadge } from "../../../store/menuBadgeSlice";
+import { findMenuPath } from "../../../utils/menu";
 import { createStyles } from "antd-style";
 const { Text } = Typography;
 
@@ -51,6 +52,7 @@ const useStyle = createStyles(({ css, token }) => {
 
 export default function HistoryOrder({ props, title }) {
   const dispatch = useDispatch();
+  const authMenus = useSelector((state) => state.auth.menus);
   const [errMsg, setErrMsg] = useState(null);
   const [loading, serLoading] = useState(false);
   const [openText, setOpenText] = useState(false);
@@ -361,7 +363,8 @@ export default function HistoryOrder({ props, title }) {
       const res = await delTurFaiOrder(order.orderId, order.mobile);
       if (res?.code === 200) {
         message.success(res?.message || `已手动提交订单${order.orderId}成功！`);
-        dispatch(decreaseMenuBadge("/scan/history/abnormal-orders"))
+        const path = findMenuPath(authMenus, "HistoryAbnOrderPage");
+        if (path) dispatch(decreaseMenuBadge(path));
         handleOrderList(pageNum, pageSize);
       } else {
         message.error(res?.message || "提交失败，请联系管理员！");

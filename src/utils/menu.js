@@ -63,6 +63,27 @@ export const getFirstLeafPath = (menus = [], parentPath = "") => {
   return "";
 };
 
+export const findMenuPath = (menus = [], component, parentPath = "") => {
+  for (const item of menus) {
+    const fullPath = parentPath
+      ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
+      : `/${item.path}`;
+    if (item.component === component) return fullPath;
+    if (item.children?.length) {
+      const nested = findMenuPath(item.children, component, fullPath);
+      if (nested) return nested;
+    }
+  }
+  return null;
+};
+
+export const FAILED_ORDER_PAGES = [
+  { component: "CrossCheckAbnOrderPage", field: "paperCount", title: "CrossCheck" },
+  { component: "ImagetwinAbnOrderPage", field: "imageCount", title: "ImageTwin" },
+  { component: "HistoryAbnOrderPage", field: "turnitinCount", title: "Turnitin" },
+  { component: "DupliSeeFaidPage", field: "dupliseeCount", title: "SangerboxScope" },
+];
+
 export const getHomePath = (menus = []) => {
   const firstPath = getFirstLeafPath(menus);
   const hasDashboard = (items) =>

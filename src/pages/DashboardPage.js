@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { statDashboard, statMoon, noticeGetLatestActive } from "../server/api";
+import { FAILED_ORDER_PAGES, findMenuPath } from "../utils/menu";
+import adminMenu from "../data/menu.json";
 import { Column } from "@ant-design/charts";
 import {
   Badge,
@@ -59,20 +61,6 @@ const getMonthGrowth = (list, field) => {
   };
 };
 
-const findNoticePath = (menus = [], parentPath = "") => {
-  for (const item of menus) {
-    const fullPath = parentPath
-      ? `${parentPath}/${item.path}`.replace(/\/+/g, "/")
-      : `/${item.path}`;
-    if (item.component === "NoticePage") return fullPath;
-    if (item.children?.length) {
-      const nested = findNoticePath(item.children, fullPath);
-      if (nested) return nested;
-    }
-  }
-  return null;
-};
-
 const DashboardPage = () => {
   const navigate = useNavigate();
   const { token } = theme.useToken();
@@ -81,7 +69,8 @@ const DashboardPage = () => {
 
   const badgeMap = useSelector((state) => state.menuBadge.badges);
   const authMenus = useSelector((state) => state.auth.menus);
-  const noticePath = findNoticePath(authMenus);
+  const menuSource = authMenus?.length ? authMenus : adminMenu;
+  const noticePath = findMenuPath(menuSource, "NoticePage");
 
   const [statistics, setStatistics] = useState({
     todaySingle: 0,
@@ -96,12 +85,12 @@ const DashboardPage = () => {
   const [latestActive, setLatestActive] = useState(null);
   const [statTick, setStatTick] = useState(0);
 
-  const failedStat = {
-    paperCount: badgeMap["/scan/crosscheck/abnormal-orders"] || 0,
-    imageCount: badgeMap["/scan/imagetwin/abnormal-orders"] || 0,
-    turnitinCount: badgeMap["/scan/history/abnormal-orders"] || 0,
-    dupliseeCount: badgeMap["/scan/duplisee/abnormal-orders"] || 0,
-  };
+  const failedStat = Object.fromEntries(
+    FAILED_ORDER_PAGES.map(({ field, component }) => {
+      const path = findMenuPath(menuSource, component);
+      return [field, (path && badgeMap[path]) || 0];
+    })
+  );
 
   useEffect(() => {
     onInit();
@@ -207,28 +196,14 @@ const DashboardPage = () => {
     },
   ];
 
-  const abnormalItems = [
-    {
-      title: "CrossCheck",
-      count: failedStat.paperCount,
-      path: "/scan/crosscheck/abnormal-orders",
-    },
-    {
-      title: "ImageTwin",
-      count: failedStat.imageCount,
-      path: "/scan/imagetwin/abnormal-orders",
-    },
-    {
-      title: "Turnitin",
-      count: failedStat.turnitinCount,
-      path: "/scan/history/abnormal-orders",
-    },
-    {
-      title: "SangerboxScope",
-      count: failedStat.dupliseeCount,
-      path: "/scan/duplisee/abnormal-orders",
-    },
-  ].filter((item) => item.count > 0);
+  const abnormalItems = FAILED_ORDER_PAGES.map(({ title, field, component }) => {
+    const path = findMenuPath(menuSource, component);
+    return {
+      title,
+      count: failedStat[field] || 0,
+      path,
+    };
+  }).filter((item) => item.count > 0 && item.path);
 
   const cardStyle = {
     borderRadius: 12,

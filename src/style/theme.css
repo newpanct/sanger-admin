@@ -17,3 +17,9 @@
   padding: 0 4px;
   border-radius: 2px;
 }
+
+.admin-sider-menu .ant-menu-item,
+.admin-sider-menu .ant-menu-submenu-title,
+.admin-sider-menu .ant-menu-item-icon {
+  overflow: visible;
+}

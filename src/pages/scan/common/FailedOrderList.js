@@ -172,9 +172,9 @@ export default function FailedOrderList({ title, props }) {
   };
 
   const pathMap = {
-    imagetwin: "/scan/imagetwin/abnormal-orders",
-    ithenticate: "/scan/crosscheck/abnormal-orders",
-    dupliSee: "/scan/duplisee/abnormal-orders",
+    imagetwin: findMenuPath(authMenus, "ImagetwinAbnOrderPage"),
+    ithenticate: findMenuPath(authMenus, "CrossCheckAbnOrderPage"),
+    dupliSee: findMenuPath(authMenus, "DupliSeeFaidPage"),
   };
 
   const handleOrderList = async (page = pageNum, size = pageSize) => {
